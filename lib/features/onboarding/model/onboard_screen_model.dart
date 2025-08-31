@@ -2,21 +2,21 @@ import '../../../core/resources/ui_assets.dart';
 
 List<OnboardScreenModel> onboardingData = [
   OnboardScreenModel(
-    title: 'Welcome to Tourism Guide App',
+    title: 'Welcome to ScanQR',
     image: UiAssets.onboardScreen1,
-    description: 'Discover the world of sports and make unforgettable memories.',
+    description: 'A smart and simple way to scan, store, and share QR codes seamlessly.',
   ),
-
   OnboardScreenModel(
-    title: 'Destinations',
+    title: 'Instant Wi-Fi Access',
     image: UiAssets.onboardScreen2,
-    description: 'Discover the world of sports and make unforgettable memories.',
+    description: 'Connect to Wi-Fi instantly by scanning QR codes—no need to type long passwords.',
     buttonText: 'Next',
   ),
   OnboardScreenModel(
-    title: 'Get Started',
+    title: 'Create Your Own QR Codes',
     image: UiAssets.onboardScreen3,
-    description: 'Discover the world of sports and make unforgettable memories.',
+    description:
+        'Easily generate QR codes for links, contacts, or Wi-Fi and share them effortlessly.',
     buttonText: 'Get Started',
   ),
 ];

@@ -1,12 +1,8 @@
-import 'dart:developer';
 import 'dart:io';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:scan_qr/core/routes/app_pages.dart';
 import 'package:scan_qr/core/widgets/export_custom_widget.dart';
@@ -15,7 +11,7 @@ import '../../../core/resources/export_resources.dart';
 import '../../../core/widgets/export_common_widget.dart';
 import '../../qr_scan/model/qr_scan_model.dart';
 import '../controller/home_controller.dart';
-import 'animated_password.dart';
+import 'animated_text.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -40,6 +36,70 @@ class _HomePageState extends State<HomePage> {
               final historyList = [...hc.wifiHistory, ...hc.urlHistory];
 
               return Scaffold(
+                endDrawer: Drawer(
+                  backgroundColor:
+                      Theme.of(context).brightness == Brightness.dark ? darkBgColor : greyColor,
+                  child: ListView(
+                    padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
+                    children: [
+                      DrawerHeader(
+                        padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
+                        curve: Curves.easeInSine,
+                        child: Container(
+                          padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            color: primaryColor,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundImage: const AssetImage(UiAssets.user),
+                              ),
+                              config.verticalSpaceMedium(),
+                              Text(
+                                'Welcome to ScanQR',
+                                style: customTextStyle(
+                                  color: whiteColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              config.verticalSpaceSmall(),
+
+                              Text(
+                                hc.platformVersion,
+                                maxLines: 2,
+                                style: customTextStyle(
+                                  color: whiteColor,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      buildSettingItem(
+                        context,
+                        HeroIcons.qr_code,
+                        'Scan QR Code',
+                        onTap: () => Get.toNamed(Routes.qrscanScreen),
+                      ),
+                      config.verticalSpaceSmall(),
+                      buildSettingItem(
+                        context,
+                        HeroIcons.pencil_square,
+                        'Generate QR Code',
+                        onTap: () => Get.toNamed(Routes.generateQr),
+                      ),
+                    ],
+                  ),
+                ),
+
                 floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
                 floatingActionButton: Padding(
                   padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
@@ -168,10 +228,11 @@ class _HomePageState extends State<HomePage> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
                                               children: [
                                                 Expanded(
-                                                  child: AnimatedPassword(
-                                                    password: dataList.password!,
+                                                  child: AnimatedTextAnimation(
+                                                    text: dataList.password!,
                                                     isVisible: isVisible,
                                                     textStyle: customTextStyle(
                                                       color:
@@ -322,139 +383,135 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder:
           (context) => AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                drawQrImage(data),
-                config.verticalSpaceSmall(),
-                Text(
-                  'Scan Me'.toUpperCase(),
-                  style: GoogleFonts.stalinistOne(
-                    fontWeight: FontWeight.bold,
-                    color: blackColor,
-                    fontSize: config.appHeight(4),
-                  ),
-                ),
-                config.verticalSpaceMedium(),
+            content: GetBuilder<HomeController>(
+              builder: (hc) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RepaintBoundary(key: hc.qrKey, child: drawQrImage(data)),
+                    config.verticalSpaceSmall(),
+                    Text(
+                      'Scan Me'.toUpperCase(),
+                      style: GoogleFonts.stalinistOne(
+                        fontWeight: FontWeight.bold,
+                        color: blackColor,
+                        fontSize: config.appHeight(4),
+                      ),
+                    ),
+                    config.verticalSpaceMedium(),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children:
-                      urlData != null
-                          ? List.generate(UrlActionType.values.length, (index) {
-                            IconData? icon;
-                            Color? color;
-                            Function() onTap;
-                            switch (UrlActionType.values[index]) {
-                              case UrlActionType.open:
-                                icon = HeroIcons.globe_alt;
-                                color = blueColor;
-                                onTap = () async {
-                                  urlLaunchMethod(urlData.url!);
-                                };
-                                break;
-                              case UrlActionType.copy:
-                                icon = HeroIcons.clipboard_document_list;
-                                color = greenishColor;
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children:
+                          urlData != null
+                              ? List.generate(UrlActionType.values.length, (index) {
+                                IconData? icon;
+                                Color? color;
+                                Function() onTap;
+                                switch (UrlActionType.values[index]) {
+                                  case UrlActionType.open:
+                                    icon = HeroIcons.globe_alt;
+                                    color = blueColor;
+                                    onTap = () async {
+                                      urlLaunchMethod(urlData.url!);
+                                    };
+                                    break;
+                                  case UrlActionType.copy:
+                                    icon = HeroIcons.clipboard_document_list;
+                                    color = greenishColor;
 
-                                onTap = () {
-                                  copyToClipboard(context, urlData.url!);
-                                };
+                                    onTap = () {
+                                      copyToClipboard(context, urlData.url!);
+                                    };
 
-                                break;
-                              case UrlActionType.share:
-                                icon = HeroIcons.share;
-                                color = blueColor;
-                                onTap = () async {
-                                  // final image = await qrImageXfileMethod(urlData.url!);
-                                  // log(image.path);
-                                  await shareFunction(
-                                    title: 'Shared URL Link',
-                                    text: 'URL Link: ${urlData.url}\nTitle: ${urlData.title}',
-                                    subject: 'Shared from ScanQR',
-                                    // thummbnailPath: image,
-                                  );
-                                };
-                                break;
-                              case UrlActionType.close:
-                                icon = Icons.close;
-                                color = redColor;
-                                onTap = () {
-                                  Get.back();
-                                };
-                                break;
-                            }
-                            return circleAvatarMethodCustom(
-                              config,
-                              null,
-                              onTap: onTap,
-                              child: Icon(icon, color: color, size: config.appHeight(3)),
-                              radius: config.appHeight(3),
-                            );
-                          })
-                          : wifiData != null
-                          ? List.generate(ActionType.values.length, (index) {
-                            IconData? icon;
-                            Color? color;
-                            Function() onTap;
-                            switch (ActionType.values[index]) {
-                              case ActionType.connect:
-                                icon = HeroIcons.wifi;
-                                color = greenColor;
-                                onTap = () async {
-                                  if (Platform.isAndroid) {
-                                    await connectToWifi(
-                                      wifiData.ssid!,
-                                      wifiData.password!,
-                                      wifiData.wifiType!,
-                                    );
-                                  } else {
-                                    final uri = Uri.parse("App-Prefs:root=WIFI");
-                                    await launchUrl(uri, mode: LaunchMode.platformDefault);
-                                  }
-                                };
-                                break;
-                              case ActionType.copy:
-                                icon = HeroIcons.clipboard_document_list;
-                                color = blueAccent;
+                                    break;
+                                  case UrlActionType.share:
+                                    icon = HeroIcons.share;
+                                    color = blueColor;
+                                    onTap = () async {
+                                      hc.shareQr(hc.qrKey, text: urlData.url);
+                                    };
+                                    break;
+                                  case UrlActionType.close:
+                                    icon = Icons.close;
+                                    color = redColor;
+                                    onTap = () {
+                                      Get.back();
+                                    };
+                                    break;
+                                }
+                                return circleAvatarMethodCustom(
+                                  config,
+                                  null,
+                                  onTap: onTap,
+                                  child: Icon(icon, color: color, size: config.appHeight(3)),
+                                  radius: config.appHeight(3),
+                                );
+                              })
+                              : wifiData != null
+                              ? List.generate(ActionType.values.length, (index) {
+                                IconData? icon;
+                                Color? color;
+                                Function() onTap;
+                                switch (ActionType.values[index]) {
+                                  case ActionType.connect:
+                                    icon = HeroIcons.wifi;
+                                    color = greenColor;
+                                    onTap = () async {
+                                      if (Platform.isAndroid) {
+                                        await connectToWifi(
+                                          wifiData.ssid!,
+                                          wifiData.password!,
+                                          wifiData.wifiType!,
+                                        );
+                                      } else {
+                                        final uri = Uri.parse("App-Prefs:root=WIFI");
+                                        await launchUrl(uri, mode: LaunchMode.platformDefault);
+                                      }
+                                    };
+                                    break;
+                                  case ActionType.copy:
+                                    icon = HeroIcons.clipboard_document_list;
+                                    color = blueAccent;
 
-                                onTap = () {
-                                  copyToClipboard(context, wifiData.password!);
-                                };
+                                    onTap = () {
+                                      copyToClipboard(context, wifiData.password!);
+                                    };
 
-                                break;
-                              case ActionType.share:
-                                icon = HeroIcons.share;
-                                color = blueColor;
-                                onTap = () async {
-                                  await shareFunction(
-                                    text:
-                                        'SSID: ${wifiData.ssid}\nPassword: ${wifiData.password}\nType: ${wifiData.wifiType}',
-                                    title: 'Wifi Credentials',
-                                    subject: 'Shared from ScanQR',
-                                  );
-                                };
-                                break;
-                              case ActionType.close:
-                                icon = Icons.close;
-                                color = redColor;
-                                onTap = () {
-                                  Get.back();
-                                };
-                                break;
-                            }
-                            return circleAvatarMethodCustom(
-                              config,
-                              null,
-                              onTap: onTap,
-                              child: Icon(icon, color: color, size: config.appHeight(3)),
-                              radius: config.appHeight(3),
-                            );
-                          })
-                          : [],
-                ),
-                config.verticalSpaceMedium(),
-              ],
+                                    break;
+                                  case ActionType.share:
+                                    icon = HeroIcons.share;
+                                    color = blueColor;
+                                    onTap = () async {
+                                      hc.shareQr(
+                                        hc.qrKey,
+                                        text:
+                                            'Wi-Fi Credentials:\n\nSSID: ${wifiData.ssid}\nPassword: ${wifiData.password}\nSecurity Type: ${wifiData.wifiType}',
+                                      );
+                                    };
+                                    break;
+                                  case ActionType.close:
+                                    icon = Icons.close;
+                                    color = redColor;
+                                    onTap = () {
+                                      Get.back();
+                                    };
+                                    break;
+                                }
+                                return circleAvatarMethodCustom(
+                                  config,
+                                  null,
+                                  onTap: onTap,
+                                  child: Icon(icon, color: color, size: config.appHeight(3)),
+                                  radius: config.appHeight(3),
+                                );
+                              })
+                              : [],
+                    ),
+                    config.verticalSpaceMedium(),
+                  ],
+                );
+              },
             ),
           ),
     );

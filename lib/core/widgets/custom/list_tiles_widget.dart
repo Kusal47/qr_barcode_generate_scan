@@ -25,7 +25,7 @@ Widget buildSettingItem(
           side: BorderSide(color: transparent, width: 0.3),
         ),
 
-        contentPadding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
+        contentPadding: EdgeInsets.symmetric(horizontal: config.appHorizontalPaddingSmall()),
         leading: Icon(icon, size: config.appHeight(3), color: color),
         title: customTitleText(
           title,
@@ -80,10 +80,9 @@ Widget customListTileWidget(
         child: ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius ?? 5),
-            side:
-                side ?? BorderSide(color: borderColor ?? transparent, width: borderWidth ?? 0.3),
+            side: side ?? BorderSide(color: borderColor ?? transparent, width: borderWidth ?? 0.3),
           ),
-      
+
           contentPadding: contentPadding ?? EdgeInsets.all(config.appHorizontalPaddingMedium()),
           leading:
               icon != null

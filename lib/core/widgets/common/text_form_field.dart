@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:intl_phone_field/countries.dart';
+import 'package:intl_phone_field/country_picker_dialog.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/phone_number.dart';
 
 import '../../resources/colors.dart';
 import 'base_widget.dart';
@@ -44,6 +48,7 @@ class PrimaryFormField extends HookWidget {
   final bool? hideBorder;
   final int? maxLength;
   final String? counterText;
+  final AutovalidateMode? autovalidateMode;
 
   const PrimaryFormField({
     super.key,
@@ -84,6 +89,7 @@ class PrimaryFormField extends HookWidget {
     this.hideBorder = false,
     this.maxLength,
     this.counterText,
+    this.autovalidateMode,
   });
 
   @override
@@ -125,7 +131,7 @@ class PrimaryFormField extends HookWidget {
           initialValue: initialValue,
           keyboardType: keyboardType,
           controller: controller,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: autovalidateMode ?? AutovalidateMode.onUserInteraction,
           validator: validator,
           onSaved: (value) {
             onSaved(value!);
@@ -170,6 +176,268 @@ class PrimaryFormField extends HookWidget {
 
             hintText: hintTxt,
 
+            hintStyle:
+                hintStyle ??
+                Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color:
+                      Theme.of(context).brightness == Brightness.dark ? whiteColor : darkGreyColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+            labelStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).brightness == Brightness.dark ? whiteColor : blackColor,
+              fontSize: 16,
+            ),
+            filled: isFilled!,
+            isDense: true,
+            contentPadding:
+                contentPadding ??
+                EdgeInsets.symmetric(
+                  horizontal: size.width * 0.02,
+                  vertical: size.height * 0.02,
+                ), //TODO: VERTICAL:12
+            fillColor:
+                fillColor ??
+                (Theme.of(context).brightness == Brightness.dark ? whiteColor : whiteColor),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(radius ?? 5)),
+              borderSide:
+                  hideBorder!
+                      ? BorderSide.none
+                      : BorderSide(
+                        width: 1,
+                        color:
+                            Theme.of(context).brightness == Brightness.dark ? redColor : redColor,
+                      ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(radius ?? 5)),
+              borderSide:
+                  hideBorder!
+                      ? BorderSide.none
+                      : BorderSide(
+                        width: 1,
+                        color:
+                            Theme.of(context).brightness == Brightness.dark ? redColor : redColor,
+                      ),
+            ),
+            enabledBorder:
+                enabledBorder ??
+                OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(radius ?? 5)),
+                  borderSide:
+                      hideBorder!
+                          ? BorderSide.none
+                          : BorderSide(
+                            width: 1,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? whiteColor
+                                    : blackColor,
+                          ),
+                ),
+            focusedBorder:
+                focusedBorder ??
+                OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(radius ?? 5)),
+                  borderSide:
+                      hideBorder!
+                          ? BorderSide.none
+                          : BorderSide(
+                            width: 1,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? whiteColor
+                                    : blackColor,
+                          ),
+                ),
+            disabledBorder:
+                disabledBorder ??
+                OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(radius ?? 5),
+                  borderSide:
+                      hideBorder!
+                          ? BorderSide.none
+                          : BorderSide(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? whiteColor
+                                    : blackColor,
+                            width: 1,
+                          ),
+                ),
+          ),
+          style: TextStyle(
+            color:
+                color ??
+                (Theme.of(context).brightness == Brightness.dark ? whiteColor : blackColor),
+            fontSize: fontSize ?? size.height * 0.02,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PrimaryPhoneFormField extends HookWidget {
+  final String? hintTxt;
+  final bool? isFilled;
+  final String? Function(PhoneNumber?)? validator;
+  final void Function(PhoneNumber)? onChanged;
+  final void Function(Country)? onCountryChanged;
+  final void Function(PhoneNumber) onSaved;
+  final Widget? prefixIcon;
+  final Widget? prefix;
+  final bool? isPassword;
+  final TextInputType? keyboardType;
+  final TextEditingController? controller;
+  final int maxLines;
+  final int? minLines;
+  final bool? autofocus;
+  final Widget? suffixIcon;
+  final String? initialValue;
+  final bool? readOnly;
+  final InputBorder? focusedBorder;
+  final InputBorder? disabledBorder;
+  final InputBorder? enabledBorder;
+  final EdgeInsetsGeometry? contentPadding;
+  final List<TextInputFormatter>? inputFormatters;
+  final double? fontSize;
+  final String? title;
+  final String? label;
+  final void Function()? onTap;
+  final double? radius;
+  final bool? showLable;
+  final void Function(String)? onFieldSubmitted;
+  final TextInputAction? textInputAction;
+  final TextStyle? hintStyle;
+  final Color? color;
+  final Color? fillColor;
+  final bool? enabled;
+  final bool? hideBorder;
+
+  const PrimaryPhoneFormField({
+    super.key,
+    this.color,
+    this.onTap,
+    this.hintTxt,
+    this.initialValue,
+    this.onCountryChanged,
+    this.controller,
+    this.validator,
+    this.onChanged,
+    this.maxLines = 1,
+    this.minLines,
+    required this.onSaved,
+    this.suffixIcon,
+    this.prefixIcon,
+    this.isPassword = false,
+    this.isFilled = false,
+    this.keyboardType,
+    this.readOnly,
+    this.focusedBorder,
+    this.disabledBorder,
+    this.enabledBorder,
+    this.contentPadding,
+    this.autofocus,
+    this.inputFormatters,
+    this.fontSize,
+    this.title,
+    this.label,
+    this.radius,
+    this.showLable = false,
+    this.onFieldSubmitted,
+    this.prefix,
+    this.textInputAction,
+    this.hintStyle,
+    this.enabled,
+    this.fillColor,
+    this.hideBorder = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Visibility(
+          visible: showLable == false,
+          child: Text(
+            title ?? '',
+            style: customTextStyle(
+              color: Theme.of(context).brightness == Brightness.dark ? whiteColor : blackColor,
+              fontSize: fontSize ?? 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Visibility(
+          visible: showLable == false && title != null,
+          child: SizedBox(height: size.height * 0.005),
+        ),
+        IntlPhoneField(
+          initialCountryCode: 'NP',
+          dropdownIconPosition: IconPosition.trailing,
+          pickerDialogStyle: PickerDialogStyle(
+            width: size.width,
+            countryNameStyle: customTextStyle(),
+            searchFieldInputDecoration: InputDecoration(
+              suffixIcon: const Icon(Icons.search),
+              hintText: 'Search country',
+              hintStyle: customTextStyle(color: blackColor, fontSize: 14),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  width: 1,
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? whiteColor
+                          : blackColor.withOpacity(0.06),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderSide: BorderSide(
+                  width: 1.5,
+                  color:
+                      Theme.of(context).brightness == Brightness.dark ? primaryColor : primaryColor,
+                ),
+              ),
+            ),
+          ),
+          invalidNumberMessage: 'Invalid phone number',
+
+          languageCode: 'en',
+          enabled: enabled ?? true,
+          textInputAction: textInputAction ?? TextInputAction.next,
+          onTap: onTap,
+          initialValue: initialValue,
+          keyboardType: keyboardType ?? TextInputType.phone,
+          controller: controller,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: validator,
+
+          onSaved: (value) {
+            onSaved(value!);
+          },
+          readOnly: readOnly ?? false,
+          inputFormatters: inputFormatters,
+          onChanged: onChanged,
+          onCountryChanged: onCountryChanged,
+          onSubmitted: onFieldSubmitted,
+          autofocus: autofocus ?? false,
+          decoration: InputDecoration(
+            errorMaxLines: 1,
+            prefixIcon: prefixIcon,
+            prefix: prefix,
+            prefixStyle: customTextStyle(
+              color: Theme.of(context).brightness == Brightness.dark ? whiteColor : blackColor,
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+            ),
+            label: showLable == true ? Text(label!) : null,
+            hintText: hintTxt,
             hintStyle:
                 hintStyle ??
                 Theme.of(context).textTheme.bodySmall?.copyWith(

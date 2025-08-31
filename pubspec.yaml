@@ -34,6 +34,12 @@ dependencies:
   pretty_qr_code: ^3.5.0
   flutter_launcher_icons: ^0.14.4
   dots_indicator: ^4.0.1
+  permission_handler: ^12.0.1
+  intl_phone_field: ^3.2.0
+  flutter_image_gallery_saver: ^0.0.2
+  open_file: ^3.5.10
+  pdf: ^3.11.3
+  printing: ^5.14.2
 
 dev_dependencies:
   flutter_test:
@@ -53,7 +59,6 @@ flutter:
     - assets/gifs/
     - assets/images/
     - assets/logo/
-    - assets/auth/
     - assets/images/
     - assets/onboard/
     - assets/svg/

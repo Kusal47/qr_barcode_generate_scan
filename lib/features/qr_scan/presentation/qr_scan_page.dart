@@ -140,7 +140,10 @@ class _QRScanScreenState extends State<QRScanScreen> {
                             width: size.height * 0.235,
                             child:
                                 qrController.qrScannedData != null
-                                    ? drawQrImage(qrController.qrScannedData!.displayValue!)
+                                    ? RepaintBoundary(
+                                      key: qrController.qrKey,
+                                      child: drawQrImage(qrController.qrScannedData!.displayValue!),
+                                    )
                                     : null,
                           ),
                         ),
@@ -358,11 +361,10 @@ class _QRScanScreenState extends State<QRScanScreen> {
                         icon = HeroIcons.share;
                         color = blueColor;
                         onTap = () async {
-                          await shareFunction(
+                          qrController.shareQr(
+                            qrController.qrKey,
                             text:
-                                'Password: ${qrData.wifi!.password}\nType: ${qrData.wifi!.wifiType}',
-                            title: qrData.wifi!.ssid,
-                            subject: 'Shared from ScanQR',
+                                'Wifi Details\nSSID: ${qrData.wifi!.ssid!}\nPassword: ${qrData.wifi!.password!}\nWifi Security Type: ${qrData.wifi!.wifiType!}',
                           );
                         };
                         break;
@@ -464,11 +466,10 @@ class _QRScanScreenState extends State<QRScanScreen> {
                         icon = HeroIcons.share;
                         color = blueColor;
                         onTap = () async {
-                          await shareFunction(
-                            title: qrData.url!.title,
-                            text: '${qrData.url!.url}',
-                            subject: 'Shared from ScanQR',
-                          );
+                          qrController.shareQr(
+                            qrController.qrKey,
+                            
+                            text: 'URL: ${qrData.url!.url}');
                         };
                         break;
                       case UrlActionType.close:
