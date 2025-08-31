@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       builder:
           (context, config, theme) => GetBuilder<HomeController>(
             builder: (hc) {
-              final historyList = [...hc.wifiHistory, ...hc.urlHistory];
+              final historyList = [...hc.wifiHistory, ...hc.urlHistory, ...hc.contactHistory];
 
               return Scaffold(
                 endDrawer: Drawer(
@@ -87,14 +87,20 @@ class _HomePageState extends State<HomePage> {
                         context,
                         HeroIcons.qr_code,
                         'Scan QR Code',
-                        onTap: () => Get.toNamed(Routes.qrscanScreen),
+                        onTap: () {
+                          Get.back();
+                          Get.toNamed(Routes.qrscanScreen);
+                        },
                       ),
                       config.verticalSpaceSmall(),
                       buildSettingItem(
                         context,
                         HeroIcons.pencil_square,
                         'Generate QR Code',
-                        onTap: () => Get.toNamed(Routes.generateQr),
+                        onTap: () {
+                          Get.back();
+                          Get.toNamed(Routes.generateQr);
+                        },
                       ),
                     ],
                   ),
@@ -123,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                     hc.refreshController.refreshCompleted();
                   },
                   child: Padding(
-                    padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
+                    padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
                     child:
                         historyList.isEmpty
                             ? customTextMessages('No history found!', context)
@@ -146,27 +152,36 @@ class _HomePageState extends State<HomePage> {
                                           Icons.wifi_password_outlined,
                                           color: theme.primaryColor,
                                         ),
-                                        trailing: InkWell(
-                                          onTap: () async {
-                                            await showMenu<String>(
-                                              context: context,
-                                              position: RelativeRect.fromLTRB(
-                                                config.appWidth(8),
-                                                config.appHeight(20),
-                                                0,
-                                                0,
-                                              ),
-                                              items: [
+                                        trailing: PopupMenuButton<String>(
+                                          icon: Icon(Icons.more_vert_rounded, color: blackColor),
+                                          onSelected: (value) {
+                                            if (value == 'view_qr') {
+                                              viewQrDialog(
+                                                context,
+                                                config,
+                                                "SSID: ${dataList.ssid}\nPassword: ${dataList.password}\nWifi Type: ${dataList.wifiType}",
+                                                wifiData: dataList,
+                                              );
+                                            } else if (value == 'delete') {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (context) => CustomAlertDialog(
+                                                      tilte: 'Delete',
+                                                      content:
+                                                          'Are you sure you want to delete this wifi?',
+                                                      onYesPressed: () {
+                                                        hc.deleteQRData(ssid: dataList.ssid!);
+                                                        Get.back();
+                                                      },
+                                                    ),
+                                              );
+                                            }
+                                          },
+                                          itemBuilder:
+                                              (context) => [
                                                 PopupMenuItem(
                                                   value: 'view_qr',
-                                                  onTap: () {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      "SSID: ${dataList.ssid}\nPassword: ${dataList.password}\nWifi Type: ${dataList.wifiType}",
-                                                      wifiData: dataList,
-                                                    );
-                                                  },
                                                   child: Row(
                                                     children: [
                                                       Icon(
@@ -186,21 +201,6 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 PopupMenuItem(
                                                   value: 'delete',
-                                                  onTap: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this wifi?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(ssid: dataList.ssid!);
-                                                              Get.back();
-                                                            },
-                                                          ),
-                                                    );
-                                                  },
                                                   child: Row(
                                                     children: [
                                                       Icon(
@@ -219,9 +219,6 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                 ),
                                               ],
-                                            );
-                                          },
-                                          child: Icon(Icons.more_vert_rounded, color: blackColor),
                                         ),
 
                                         subtitle: Column(
@@ -268,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                                       padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
                                       child: customListTileWidget(
                                         context,
-                                        'Title: ${dataList.title != null && dataList.title!.isNotEmpty ? dataList.title : 'N/A'}',
+                                        'Title: ${dataList.url != null && dataList.url!.isNotEmpty ? Uri.tryParse(dataList.url!)?.host ?? dataList.url : 'N/A'}',
 
                                         subtitle: Text(
                                           'Url: ${dataList.url}',
@@ -279,27 +276,36 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                         containerColor: greyColor.withOpacity(0.3),
                                         leadingWidget: Icon(Icons.link, color: theme.primaryColor),
-                                        trailing: InkWell(
-                                          onTap: () async {
-                                            await showMenu<String>(
-                                              context: context,
-                                              position: RelativeRect.fromLTRB(
-                                                config.appWidth(8),
-                                                config.appHeight(20),
-                                                0,
-                                                0,
-                                              ),
-                                              items: [
+                                        trailing: PopupMenuButton<String>(
+                                          icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                          onSelected: (value) {
+                                            if (value == 'view_qr') {
+                                              viewQrDialog(
+                                                context,
+                                                config,
+                                                urlData: dataList,
+                                                "${dataList.url}",
+                                              );
+                                            } else if (value == 'delete') {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (context) => CustomAlertDialog(
+                                                      tilte: 'Delete',
+                                                      content:
+                                                          'Are you sure you want to delete this URL?',
+                                                      onYesPressed: () {
+                                                        hc.deleteQRData(url: dataList.url);
+                                                        Get.back();
+                                                      },
+                                                    ),
+                                              );
+                                            }
+                                          },
+                                          itemBuilder:
+                                              (context) => [
                                                 PopupMenuItem(
                                                   value: 'view_qr',
-                                                  onTap: () {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      urlData: dataList,
-                                                      "${dataList.url}",
-                                                    );
-                                                  },
                                                   child: Row(
                                                     children: [
                                                       Icon(
@@ -319,21 +325,6 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 PopupMenuItem(
                                                   value: 'delete',
-                                                  onTap: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this wifi?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(url: dataList.url);
-                                                              Get.back();
-                                                            },
-                                                          ),
-                                                    );
-                                                  },
                                                   child: Row(
                                                     children: [
                                                       Icon(
@@ -352,9 +343,117 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                 ),
                                               ],
-                                            );
+                                        ),
+                                      ),
+                                    );
+                                  } else if (dataList is ContactInfoModel) {
+                                    return Padding(
+                                      padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
+                                      child: customListTileWidget(
+                                        context,
+                                        'Name: ${dataList.contactName != null && dataList.contactName!.isNotEmpty ? dataList.contactName : 'N/A'}',
+
+                                        subtitle: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Phone: ${dataList.contactNumber}',
+                                              style: customTextStyle(
+                                                color: darkGreyColor,
+                                                overflow: TextOverflow.visible,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Email: ${dataList.contactEmail}',
+                                              style: customTextStyle(
+                                                color: darkGreyColor,
+                                                overflow: TextOverflow.visible,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Address: ${dataList.contactAddress}',
+                                              style: customTextStyle(
+                                                color: darkGreyColor,
+                                                overflow: TextOverflow.visible,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        containerColor: greyColor.withOpacity(0.3),
+                                        leadingWidget: circleAvatarMethodCustom(
+                                          config,
+                                          AssetImage(UiAssets.user),
+                                          radius: config.appHeight(3),
+                                        ),
+                                        trailing: PopupMenuButton<String>(
+                                          icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                          onSelected: (value) {
+                                            if (value == 'view_qr') {
+                                              viewQrDialog(
+                                                context,
+                                                config,
+                                                contactInfoData: dataList,
+                                                'Name: ${dataList.contactName}, Phone: ${dataList.contactNumber}, E-mail: ${dataList.contactEmail} Address: ${dataList.contactAddress}',
+                                              );
+                                            } else if (value == 'delete') {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (context) => CustomAlertDialog(
+                                                      tilte: 'Delete',
+                                                      content:
+                                                          'Are you sure you want to delete this contact info?',
+                                                      onYesPressed: () {
+                                                        hc.deleteQRData(
+                                                          contactNumber: dataList.contactNumber,
+                                                        );
+                                                        Get.back();
+                                                      },
+                                                    ),
+                                              );
+                                            }
                                           },
-                                          child: Icon(Icons.more_vert_rounded, color: blackColor),
+                                          itemBuilder:
+                                              (context) => [
+                                                PopupMenuItem(
+                                                  value: 'view_qr',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        HeroIcons.qr_code,
+                                                        color: blueColor,
+                                                        size: config.appHeight(4),
+                                                      ),
+                                                      config.horizontalSpaceSmall(),
+                                                      Text(
+                                                        'View QR',
+                                                        style: customTextStyle(
+                                                          fontSize: config.appHeight(2.2),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 'delete',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.delete,
+                                                        color: redColor,
+                                                        size: config.appHeight(4),
+                                                      ),
+                                                      config.horizontalSpaceSmall(),
+                                                      Text(
+                                                        'Delete',
+                                                        style: customTextStyle(
+                                                          fontSize: config.appHeight(2.2),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
                                         ),
                                       ),
                                     );
@@ -378,6 +477,7 @@ class _HomePageState extends State<HomePage> {
     String data, {
     UrlModel? urlData,
     WifiModel? wifiData,
+    ContactInfoModel? contactInfoData,
   }) {
     return showDialog(
       context: context,
@@ -491,6 +591,60 @@ class _HomePageState extends State<HomePage> {
                                     };
                                     break;
                                   case ActionType.close:
+                                    icon = Icons.close;
+                                    color = redColor;
+                                    onTap = () {
+                                      Get.back();
+                                    };
+                                    break;
+                                }
+                                return circleAvatarMethodCustom(
+                                  config,
+                                  null,
+                                  onTap: onTap,
+                                  child: Icon(icon, color: color, size: config.appHeight(3)),
+                                  radius: config.appHeight(3),
+                                );
+                              })
+                              : contactInfoData != null
+                              ? List.generate(ContactActionType.values.length, (index) {
+                                IconData? icon;
+                                Color? color;
+                                Function() onTap;
+                                switch (ContactActionType.values[index]) {
+                                  case ContactActionType.call:
+                                    icon = HeroIcons.phone;
+                                    color = blueColor;
+                                    onTap = () async {
+                                      if (contactInfoData.contactNumber != null) {
+                                        urlLaunchMethod('tel:${contactInfoData.contactNumber}');
+                                      } else {
+                                        showErrorToast('Phone number not found');
+                                      }
+                                    };
+                                    break;
+                                  case ContactActionType.mailto:
+                                    icon = HeroIcons.envelope;
+                                    color = greenishColor;
+
+                                    onTap = () {
+                                      if (contactInfoData.contactEmail != null) {
+                                        urlLaunchMethod('mailto:${contactInfoData.contactEmail}');
+                                      }
+                                    };
+
+                                    break;
+                                  case ContactActionType.copy:
+                                    icon = HeroIcons.clipboard_document_list;
+                                    color = blueColor;
+                                    onTap = () async {
+                                      copyToClipboard(
+                                        context,
+                                        'Name: ${contactInfoData.contactName}, Phone: ${contactInfoData.contactNumber}, E-mail: ${contactInfoData.contactEmail} Address: ${contactInfoData.contactAddress}',
+                                      );
+                                    };
+                                    break;
+                                  case ContactActionType.close:
                                     icon = Icons.close;
                                     color = redColor;
                                     onTap = () {

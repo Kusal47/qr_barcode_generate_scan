@@ -8,6 +8,7 @@ class WifiScanResult {
   final String? ssid;
   final String? password;
   final UrlModel? url;
+  final ContactInfoModel? contactInfo;
 
   WifiScanResult({
     this.ssid,
@@ -17,6 +18,7 @@ class WifiScanResult {
     this.type = BarcodeType.unknown,
     this.wifi,
     this.url,
+    this.contactInfo,
   });
 
   factory WifiScanResult.fromBarcode(Barcode barcode) => WifiScanResult(
@@ -25,9 +27,18 @@ class WifiScanResult {
     type: barcode.type,
     wifi: barcode.wifi != null ? WifiModel.fromJson(barcode.wifi!) : null,
     url: barcode.url != null ? UrlModel.fromJson(barcode.url!) : null,
+    contactInfo:
+        barcode.contactInfo != null ? ContactInfoModel.fromJson(barcode.contactInfo!) : null,
   );
-}
 
+  Map<String, dynamic> toJson() => {
+    'displayValue': displayValue,
+    'rawValue': rawValue,
+    'type': type?.index,
+    'wifi': wifi?.toJson(),
+    'url': url?.toJson(),
+  };
+}
 
 class UrlModel {
   String? url;
@@ -37,6 +48,7 @@ class UrlModel {
   factory UrlModel.fromJson(UrlBookmark data) => UrlModel(url: data.url, title: data.title);
   Map<String, dynamic> toJson() => {'url': url, 'title': title};
 }
+
 class WifiModel {
   String? ssid;
   String? password;
@@ -66,5 +78,29 @@ class WifiModel {
   Map<String, dynamic> toJson() => {'ssid': ssid, 'password': password, 'wifiType': wifiType};
 }
 
+class ContactInfoModel {
+  String? contactName;
+  String? contactNumber;
+  String? contactEmail;
+  String? contactAddress;
+  ContactInfoModel({this.contactName, this.contactNumber, this.contactEmail, this.contactAddress});
+
+  factory ContactInfoModel.fromJson(ContactInfo data) => ContactInfoModel(
+    contactName: '${data.name!.formattedName}'.toString(),
+    contactNumber: data.phones[0].number,
+    contactEmail: data.emails[0].address,
+    contactAddress: data.addresses[0].addressLines[0],
+  );
+  Map<String, dynamic> toJson() => {
+    'contactName': contactName,
+    'contactNumber': contactNumber,
+    'contactEmail': contactEmail,
+    'contactAddress': contactAddress,
+  };
+}
+
 enum ActionType { connect, copy, share, close }
+
 enum UrlActionType { open, copy, share, close }
+
+enum ContactActionType { call, mailto, copy, close }

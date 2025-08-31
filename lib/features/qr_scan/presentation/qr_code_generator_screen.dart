@@ -7,7 +7,7 @@ import 'package:scan_qr/core/constants/validators.dart';
 import 'package:scan_qr/core/resources/colors.dart';
 import 'package:scan_qr/core/widgets/export_common_widget.dart';
 import 'package:scan_qr/core/widgets/export_custom_widget.dart';
-import 'package:scan_qr/features/qr_scan/model/gr_generate_params.dart';
+import 'package:scan_qr/features/qr_scan/model/qr_generate_params.dart';
 
 import '../controller/qr_code_generation_controller.dart';
 
@@ -59,16 +59,6 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                             config.verticalSpaceMedium(),
                             if (qgc.textController.text.toLowerCase() == 'url') ...[
                               PrimaryFormField(
-                                controller: qgc.urlTitlecontroller,
-                                title: "Url Title",
-                                hintTxt: "Enter url title",
-                                onSaved: (p0) {
-                                  qgc.qrGenerateParams?.urlTitle = p0;
-                                },
-                              ),
-                              config.verticalSpaceSmall(),
-
-                              PrimaryFormField(
                                 controller: qgc.urlcontroller,
                                 title: "Url Link",
                                 hintTxt: "Enter Url Link to generate QR",
@@ -84,7 +74,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                 items: ['WPA', 'WEP', 'None'].map((e) => e.toUpperCase()).toList(),
                                 itemToString: (p0) => p0,
                                 onSelected: (value) {
-                                  qgc.qrGenerateParams?.secuityType = value;
+                                  qgc.qrGenerateParams?.wifiType = value;
                                   setState(() {});
                                 },
                                 textcontroller: qgc.typeController,
@@ -113,7 +103,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                   validator: Validators.checkFieldEmpty,
                                 ),
                               ],
-                            ] else if (qgc.textController.text.toLowerCase() == 'contact') ...[
+                            ] else if (qgc.textController.text.toLowerCase() == 'contactinfo') ...[
                               PrimaryFormField(
                                 controller: qgc.contactNamecontroller,
                                 title: "Full Name",

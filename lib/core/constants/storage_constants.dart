@@ -5,5 +5,7 @@ class StorageConstants {
 
   static const urlHistory = "Url_HISTORY";
 
+  static const contactInfoHistory = "CONTACT_INFO_HISTORY";
+
   static const showOnboarding = "SHOW_ONBOARDING";
 }
