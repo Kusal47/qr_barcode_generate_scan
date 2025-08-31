@@ -1,0 +1,77 @@
+name: scan_qr
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  cupertino_icons: ^1.0.8
+  mobile_scanner: ^7.0.1
+  get: ^4.7.2
+  google_fonts: ^6.3.1
+  intl: ^0.20.2
+  flutter_secure_storage: ^9.2.4
+  internet_connection_checker: ^3.0.1
+  image_picker: ^1.2.0
+  flutter_hooks: ^0.21.2
+  fluttertoast: ^8.2.12
+  icons_plus: ^5.0.0
+  pull_to_refresh: ^2.0.0
+  device_info_plus: ^11.5.0
+  share_plus: ^11.1.0
+  wifi_iot: ^0.3.19+2
+  url_launcher: ^6.3.2
+  pretty_qr_code: ^3.5.0
+  flutter_launcher_icons: ^0.14.4
+  dots_indicator: ^4.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+
+flutter:
+
+
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - .env
+    - assets/
+    - assets/gifs/
+    - assets/images/
+    - assets/logo/
+    - assets/auth/
+    - assets/images/
+    - assets/onboard/
+    - assets/svg/
+    - assets/icons/
+  
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo/launcher_icon.png"

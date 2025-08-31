@@ -1,0 +1,106 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:get/get.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:scan_qr/core/resources/export_resources.dart';
+import 'package:scan_qr/features/qr_scan/model/qr_scan_model.dart';
+
+class HomeController extends GetxController {
+  String platformVersion = 'Unknown';
+  int? visibleIndex;
+  final SecureStorageService secureStorageService = SecureStorageService();
+  final RefreshController refreshController = RefreshController();
+  @override
+  void onInit() {
+    super.onInit();
+    getDeviceInfo();
+    fetchWifiHistory();
+    fetchUrlHistory();
+  }
+
+  Future<void> getDeviceInfo() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      platformVersion = androidInfo.model;
+    } else {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      platformVersion = iosInfo.utsname.machine;
+    }
+    update();
+  }
+
+  void changeVisibility(int index) {
+    if (visibleIndex == index) {
+      visibleIndex = null; // hide if already visible
+    } else {
+      visibleIndex = index; // show this one, hide others
+    }
+    update();
+  }
+
+  List<WifiModel> wifiHistory = [];
+  List<WiFi> wifiList = [];
+  fetchWifiHistory() async {
+    try {
+      final wifiData = await secureStorageService.getWifiData();
+      if (wifiData != null && wifiData.isNotEmpty) {
+        for (var i in wifiData) {
+          final WiFi data = WiFi(
+            ssid: i.ssid,
+            password: i.password,
+            encryptionType: i.encryptionType,
+          );
+          wifiList.add(data);
+        }
+        final uniqueWifiLists = {for (var val in wifiList) val.ssid: val}.values.toList();
+        wifiHistory = uniqueWifiLists.map((e) => WifiModel.fromJson(e)).toList().reversed.toList();
+      } else {
+        wifiHistory = [];
+      }
+    } catch (e) {
+      log("Error while decoding data: $e");
+      wifiHistory = [];
+    }
+    update();
+  }
+  List<UrlModel> urlHistory = [];
+  List<UrlBookmark> urlList = [];
+  fetchUrlHistory() async {
+    try {
+      final wifiData = await secureStorageService.getUrlData();
+      if (wifiData != null && wifiData.isNotEmpty) {
+        for (var i in wifiData) {
+          final UrlBookmark data = UrlBookmark(
+            url: i.url,
+            title: i.title,
+          );
+          urlList.add(data);
+        }
+        final uniqueUrlLists = {for (var val in urlList) val.url: val}.values.toList();
+        urlHistory = uniqueUrlLists.map((e) => UrlModel.fromJson(e)).toList().reversed.toList();
+      } else {
+        urlHistory = [];
+      }
+    } catch (e) {
+      log("Error while decoding data: $e");
+      urlHistory = [];
+    }
+    update();
+  }
+
+  deleteQRData({String? ssid, String? url, bool all = false}) async {
+    all == true
+        ? await secureStorageService.deleteQrData()
+        : await secureStorageService.deleteIndividualQrData(ssid: ssid, url: url);
+
+    fetchWifiHistory();
+    fetchUrlHistory();
+    update();
+  }
+  
+}
