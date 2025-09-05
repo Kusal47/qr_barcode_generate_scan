@@ -90,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       ? obController.pageController.page ?? 0
                                       : 0,
                               decorator: DotsDecorator(
-                                activeColor: secondaryColor,
+                                activeColor: primaryColor,
                                 color: greyColor,
                                 size: Size.square(config.appWidth(2)),
                                 activeSize: Size(config.appWidth(8), config.appWidth(2)),
@@ -122,7 +122,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             );
                           }
                         },
-                        backgroundColor: secondaryColor,
+                        backgroundColor: primaryColor,
                         fontSize: config.appHeight(2.5),
                         height: config.appHeight(6),
                       ),

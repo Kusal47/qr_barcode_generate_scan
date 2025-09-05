@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:scan_qr/features/home/presentation/home_page.dart';
 
 import '../../features/onboarding/presentation/onboarding_page.dart';
+import '../../features/qr_scan/presentation/qr_code_generator_screen.dart';
 import '../../features/qr_scan/presentation/qr_scan_page.dart';
 import '../../features/splash/presentation/splash_page.dart';
 
@@ -18,6 +19,7 @@ class AppPages {
     GetPage(name: _Paths.onboardScreen, page: OnboardingScreen.new),
     GetPage(name: _Paths.home, page: HomePage.new),
     GetPage(name: _Paths.qrscanScreen, page: QRScanScreen.new),
+    GetPage(name: _Paths.generateQr, page: QrGeneratorPage.new),
     
   ];
 }

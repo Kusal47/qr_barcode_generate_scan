@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 const Color whiteColor = Color(0xFFFFFFFF); // #FFFFFF
 const Color blackColor = Color(0xFF000000); // #000000
 const Color mainColor = Color(0xFF160C28); // #160C28
-const Color primaryColor = Color(0xFF00A900);    // Color(0xFF18B6A4); // #0F1C39
-const Color secondaryColor = Color(0xFF03B703);  // Color(0xFF0298896); // #0A3983
+const Color primaryColor = Color(0xFF276BA7); // Color(0xFF18B6A4); // #0F1C39
+const Color secondaryColor = Color(0xFF57A4CA); // Color(0xFF0298896); // #0A3983
 const Color transparent = Colors.transparent;
 
 const Color buttonColor = Color(0xE40D81CF); // #0D81CF with 228 alpha

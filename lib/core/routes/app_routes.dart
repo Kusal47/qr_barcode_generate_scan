@@ -8,7 +8,7 @@ abstract class Routes {
   static const home = _Paths.home;
   static const qrscanScreen = _Paths.qrscanScreen;
   static const onboardScreen = _Paths.onboardScreen;
-  
+  static const generateQr = _Paths.generateQr;
 }
 
 abstract class _Paths {
@@ -16,5 +16,5 @@ abstract class _Paths {
   static const onboardScreen = '/onboard-screen';
   static const home = '/home';
   static const qrscanScreen = '/qrscan-screen';
-
+  static const generateQr = '/generateQr-screen';
 }

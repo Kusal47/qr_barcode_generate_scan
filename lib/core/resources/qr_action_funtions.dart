@@ -21,12 +21,14 @@ Future<void> shareFunction({
   String? title,
   String? subject,
   XFile? thummbnailPath,
+  List<XFile>? files,
 }) async {
   final params = ShareParams(
     title: title,
     subject: subject,
     text: text,
     previewThumbnail: thummbnailPath,
+    files: files,
   );
 
   final result = await SharePlus.instance.share(params);

@@ -74,6 +74,22 @@ class _QRScanScreenState extends State<QRScanScreen> {
               qrController.resetScanner();
             });
           }
+        } else if (qrController.qrScannedData!.contactInfo != null) {
+          if (!qrController.isDialogDisplayed) {
+            qrController.isDialogDisplayed = true;
+            showModalBottomSheet(
+              context: context,
+              isDismissible: true,
+              barrierColor: Colors.transparent,
+              enableDrag: false,
+              builder: (_) {
+                return contactDetailsBottomSheet(qrController.qrScannedData!);
+              },
+            ).then((_) {
+              qrController.isDialogDisplayed = false;
+              qrController.resetScanner();
+            });
+          }
         }
       } else if (!qrController.isSnackbarActive) {
         qrController.isSnackbarActive = true;
@@ -140,7 +156,10 @@ class _QRScanScreenState extends State<QRScanScreen> {
                             width: size.height * 0.235,
                             child:
                                 qrController.qrScannedData != null
-                                    ? drawQrImage(qrController.qrScannedData!.displayValue!)
+                                    ? RepaintBoundary(
+                                      key: qrController.qrKey,
+                                      child: drawQrImage(qrController.qrScannedData!.displayValue!),
+                                    )
                                     : null,
                           ),
                         ),
@@ -358,11 +377,10 @@ class _QRScanScreenState extends State<QRScanScreen> {
                         icon = HeroIcons.share;
                         color = blueColor;
                         onTap = () async {
-                          await shareFunction(
+                          qrController.shareQr(
+                            qrController.qrKey,
                             text:
-                                'Password: ${qrData.wifi!.password}\nType: ${qrData.wifi!.wifiType}',
-                            title: qrData.wifi!.ssid,
-                            subject: 'Shared from ScanQR',
+                                'Wifi Details\nSSID: ${qrData.wifi!.ssid!}\nPassword: ${qrData.wifi!.password!}\nWifi Security Type: ${qrData.wifi!.wifiType!}',
                           );
                         };
                         break;
@@ -464,11 +482,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                         icon = HeroIcons.share;
                         color = blueColor;
                         onTap = () async {
-                          await shareFunction(
-                            title: qrData.url!.title,
-                            text: '${qrData.url!.url}',
-                            subject: 'Shared from ScanQR',
-                          );
+                          qrController.shareQr(qrController.qrKey, text: 'URL: ${qrData.url!.url}');
                         };
                         break;
                       case UrlActionType.close:
@@ -489,6 +503,149 @@ class _QRScanScreenState extends State<QRScanScreen> {
                     );
                   }),
                 ),
+                config.verticalSpaceMedium(),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  contactDetailsBottomSheet(WifiScanResult qrData) {
+    return BaseWidget(
+      builder: (context, config, theme) {
+        return Container(
+          width: double.maxFinite,
+          decoration: const BoxDecoration(
+            color: whiteColor,
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+            shape: BoxShape.rectangle,
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(config.appHorizontalPaddingLarge()),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                customTitleText('Contact Info', context),
+                config.verticalSpaceMedium(),
+
+                // Full Name
+                if (qrData.contactInfo!.contactName != null &&
+                    qrData.contactInfo!.contactName!.isNotEmpty)
+                  Text(
+                    'Name: ${qrData.contactInfo!.contactName}',
+                    style: customTextStyle(
+                      color: blackColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                config.verticalSpaceSmall(),
+
+                // Phone Number
+                if (qrData.contactInfo!.contactNumber != null &&
+                    qrData.contactInfo!.contactNumber!.isNotEmpty)
+                  Text(
+                    'Phone: ${qrData.contactInfo!.contactNumber}',
+                    style: customTextStyle(
+                      color: blackColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                config.verticalSpaceSmall(),
+
+                // Email
+                if (qrData.contactInfo!.contactEmail != null &&
+                    qrData.contactInfo!.contactEmail!.isNotEmpty)
+                  Text(
+                    'Email: ${qrData.contactInfo!.contactEmail}',
+                    style: customTextStyle(
+                      color: blackColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                config.verticalSpaceSmall(),
+
+                // Address
+                if (qrData.contactInfo!.contactAddress != null &&
+                    qrData.contactInfo!.contactAddress!.isNotEmpty)
+                  Text(
+                    'Address: ${qrData.contactInfo!.contactAddress}',
+                    style: customTextStyle(
+                      color: blackColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                config.verticalSpaceMedium(),
+
+                // Action buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(ContactActionType.values.length, (index) {
+                    IconData? icon;
+                    Color? color;
+                    Function() onTap;
+                    switch (ContactActionType.values[index]) {
+                      case ContactActionType.call:
+                        icon = HeroIcons.phone;
+                        color = blueColor;
+                        onTap = () async {
+                          if (qrData.contactInfo!.contactNumber != null) {
+                            urlLaunchMethod('tel:${qrData.contactInfo!.contactNumber}');
+                          } else {
+                            showErrorToast('Phone number not found');
+                          }
+                        };
+                        break;
+                      case ContactActionType.mailto:
+                        icon = HeroIcons.envelope;
+                        color = greenishColor;
+
+                        onTap = () {
+                          if (qrData.contactInfo!.contactEmail != null) {
+                            urlLaunchMethod('mailto:${qrData.contactInfo!.contactEmail}');
+                          }
+                        };
+
+                        break;
+                      case ContactActionType.copy:
+                        icon = HeroIcons.clipboard_document_list;
+                        color = blueColor;
+                        onTap = () async {
+                          copyToClipboard(
+                            context,
+                            'Name: ${qrData.contactInfo!.contactName}, Phone: ${qrData.contactInfo!.contactNumber}, E-mail: ${qrData.contactInfo!.contactEmail} Address: ${qrData.contactInfo!.contactAddress}',
+                          );
+                        };
+                        break;
+                      case ContactActionType.close:
+                        icon = Icons.close;
+                        color = redColor;
+                        onTap = () {
+                          qrController.resetScanner();
+                          Get.back();
+                        };
+                        break;
+                    }
+                    return circleAvatarMethodCustom(
+                      config,
+                      null,
+                      onTap: onTap,
+                      child: Icon(icon, color: color, size: config.appHeight(3)),
+                      radius: config.appHeight(3),
+                    );
+                  }),
+                ),
+
                 config.verticalSpaceMedium(),
               ],
             ),
