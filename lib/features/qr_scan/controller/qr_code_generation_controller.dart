@@ -5,6 +5,7 @@ import 'package:scan_qr/core/widgets/common/toast.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/resources/export_resources.dart';
+import '../../../core/widgets/export_common_widget.dart';
 import '../../../core/widgets/export_custom_widget.dart';
 import '../model/qr_generate_params.dart';
 
@@ -18,6 +19,29 @@ class QrCodeGenerationController extends GetxController {
   final TextEditingController contactAddresscontroller = TextEditingController();
   final TextEditingController textController = TextEditingController();
   final TextEditingController typeController = TextEditingController();
+
+  // 📧 Email
+  final emailAddressController = TextEditingController();
+  final emailSubjectController = TextEditingController();
+  final emailBodyController = TextEditingController();
+
+  // 💬 SMS
+  final smsNumberController = TextEditingController();
+  final smsMessageController = TextEditingController();
+
+  // ☎ Phone
+  final phoneNumberController = TextEditingController();
+
+  // 📍 Geo
+  final latitudeController = TextEditingController();
+  final longitudeController = TextEditingController();
+
+  // 📅 Calendar Event
+  final eventTitleController = TextEditingController();
+  final eventDescriptionController = TextEditingController();
+  final eventLocationController = TextEditingController();
+  final eventStartController = TextEditingController();
+  final eventEndController = TextEditingController();
   QRGenerateParams? qrGenerateParams = QRGenerateParams();
   String qrData = "";
 
@@ -59,5 +83,86 @@ class QrCodeGenerationController extends GetxController {
       thummbnailPath: XFile(filePath),
       files: [XFile(filePath)],
     );
+  }
+
+  String isSelected = "";
+  void toggleSelected(String name) {
+    if (isSelected == name) {
+      isSelected = "";
+    } else {
+      isSelected = name;
+    }
+    update();
+  }
+
+  Future<void> eventDatePicker({bool isStart = false}) async {
+    final DateTime? pickedDate = await datePicker(Get.context!);
+
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await timePicker(Get.context!);
+
+      if (pickedTime != null) {
+        // Combine date + time
+        final DateTime finalDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        // Save to params
+        if (isStart) {
+          qrGenerateParams!.eventStart = finalDateTime;
+          eventStartController.text = formatDateTime(finalDateTime, dateTimeOnly: true);
+        } else {
+          qrGenerateParams!.eventEnd = finalDateTime;
+          eventEndController.text = formatDateTime(finalDateTime, dateTimeOnly: true);
+        }
+
+        update();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // URL
+    urlcontroller.dispose();
+
+    // WiFi
+    typeController.dispose();
+    wifiNamecontroller.dispose();
+    wifiPasswordcontroller.dispose();
+
+    // Contact Info
+    contactNamecontroller.dispose();
+    contactNumbercontroller.dispose();
+    contactEmailcontroller.dispose();
+    contactAddresscontroller.dispose();
+
+    // Email
+    emailAddressController.dispose();
+    emailSubjectController.dispose();
+    emailBodyController.dispose();
+
+    // SMS
+    smsNumberController.dispose();
+    smsMessageController.dispose();
+
+    // Phone
+    phoneNumberController.dispose();
+
+    // Geo
+    latitudeController.dispose();
+    longitudeController.dispose();
+
+    // Calendar
+    eventTitleController.dispose();
+    eventDescriptionController.dispose();
+    eventLocationController.dispose();
+    eventStartController.dispose();
+    eventEndController.dispose();
   }
 }

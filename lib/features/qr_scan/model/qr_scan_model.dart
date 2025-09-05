@@ -10,6 +10,13 @@ class WifiScanResult {
   final UrlModel? url;
   final ContactInfoModel? contactInfo;
 
+  // New types
+  final EmailModel? email;
+  final SmsModel? sms;
+  final PhoneModel? phone;
+  final GeoPointModel? geo;
+  final CalendarEventModel? calendarEvent;
+
   WifiScanResult({
     this.ssid,
     this.password,
@@ -19,6 +26,11 @@ class WifiScanResult {
     this.wifi,
     this.url,
     this.contactInfo,
+    this.email,
+    this.sms,
+    this.phone,
+    this.geo,
+    this.calendarEvent,
   });
 
   factory WifiScanResult.fromBarcode(Barcode barcode) => WifiScanResult(
@@ -29,6 +41,12 @@ class WifiScanResult {
     url: barcode.url != null ? UrlModel.fromJson(barcode.url!) : null,
     contactInfo:
         barcode.contactInfo != null ? ContactInfoModel.fromJson(barcode.contactInfo!) : null,
+    email: barcode.email != null ? EmailModel.fromJson(barcode.email!) : null,
+    sms: barcode.sms != null ? SmsModel.fromJson(barcode.sms!) : null,
+    phone: barcode.phone != null ? PhoneModel.fromJson(barcode.phone!) : null,
+    geo: barcode.geoPoint != null ? GeoPointModel.fromJson(barcode.geoPoint!) : null,
+    calendarEvent:
+        barcode.calendarEvent != null ? CalendarEventModel.fromJson(barcode.calendarEvent!) : null,
   );
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +55,92 @@ class WifiScanResult {
     'type': type?.index,
     'wifi': wifi?.toJson(),
     'url': url?.toJson(),
+    'contactInfo': contactInfo?.toJson(),
+    'email': email?.toJson(),
+    'sms': sms?.toJson(),
+    'phone': phone?.toJson(),
+    'geo': geo?.toJson(),
+    'calendarEvent': calendarEvent?.toJson(),
+  };
+}
+
+// 🔹 New Models
+
+class EmailModel {
+  String? address;
+  String? subject;
+  String? body;
+
+  EmailModel({this.address, this.subject, this.body});
+
+  factory EmailModel.fromJson(Email data) =>
+      EmailModel(address: data.address, subject: data.subject, body: data.body);
+
+  Map<String, dynamic> toJson() => {'address': address, 'subject': subject, 'body': body};
+}
+
+class SmsModel {
+  String? number;
+  String? message;
+
+  SmsModel({this.number, this.message});
+
+  factory SmsModel.fromJson(SMS data) => SmsModel(number: data.phoneNumber, message: data.message);
+
+  Map<String, dynamic> toJson() => {'number': number, 'message': message};
+}
+
+class PhoneModel {
+  String? number;
+
+  PhoneModel({this.number});
+
+  factory PhoneModel.fromJson(Phone data) => PhoneModel(number: data.number);
+
+  Map<String, dynamic> toJson() => {'number': number};
+}
+
+class GeoPointModel {
+  double? latitude;
+  double? longitude;
+
+  GeoPointModel({this.latitude, this.longitude});
+
+  factory GeoPointModel.fromJson(GeoPoint data) =>
+      GeoPointModel(latitude: data.latitude, longitude: data.longitude);
+
+  Map<String, dynamic> toJson() => {'latitude': latitude, 'longitude': longitude};
+}
+
+class CalendarEventModel {
+  String? summary;
+  String? description;
+  String? location;
+  DateTime? start;
+  DateTime? end;
+  // String? organizer;
+  // String? status;
+
+  CalendarEventModel({this.summary, this.description, this.location, this.start, this.end});
+
+  factory CalendarEventModel.fromJson(CalendarEvent data) => CalendarEventModel(
+    summary: data.summary,
+    description: data.description,
+    location: data.location,
+    start: data.start,
+    end: data.end,
+    // organizer: data.organizer,
+    // status: data.status,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'summary': summary,
+    'description': description,
+    'location': location,
+    'start': start?.toIso8601String(),
+    'end': end?.toIso8601String(),
+    // 'organizer': organizer,
+    // 'status': status,
   };
 }
 
@@ -99,8 +203,26 @@ class ContactInfoModel {
   };
 }
 
+// 🔹 WiFi actions
 enum ActionType { connect, copy, share, close }
 
+// 🔹 URL actions (already defined)
 enum UrlActionType { open, copy, share, close }
 
+// 🔹 Contact actions (already defined)
 enum ContactActionType { call, mailto, copy, close }
+
+// 🔹 Email actions
+enum EmailActionType { send, copy, share, close }
+
+// 🔹 SMS actions
+enum SmsActionType { send, copy, share, close }
+
+// 🔹 Phone actions
+enum PhoneActionType { call, copy, share, close }
+
+// 🔹 Geo/Location actions
+enum GeoActionType { openMap, copy, share, close }
+
+// 🔹 Calendar Event actions
+enum CalendarEventActionType { addToCalendar, copy, share, close }
