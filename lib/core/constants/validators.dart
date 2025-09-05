@@ -15,7 +15,7 @@ class Validators {
   static String? checkPhoneNumberField(PhoneNumber? fieldContent) {
     if (fieldContent == null) {
       return 'This field is required';
-    } else if (fieldContent != null && fieldContent.number.isEmpty) {
+    } else if (fieldContent.number.isEmpty) {
       return 'This field is required';
     }
 
