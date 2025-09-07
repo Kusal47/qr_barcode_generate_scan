@@ -20,6 +20,7 @@ Future<void> shareFunction({
   String? text,
   String? title,
   String? subject,
+  String? uri,
   XFile? thummbnailPath,
   List<XFile>? files,
 }) async {
@@ -29,6 +30,7 @@ Future<void> shareFunction({
     text: text,
     previewThumbnail: thummbnailPath,
     files: files,
+    uri:text == null ?  Uri.parse(uri ?? ''):null,
   );
 
   final result = await SharePlus.instance.share(params);

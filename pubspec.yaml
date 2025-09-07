@@ -40,6 +40,10 @@ dependencies:
   open_file: ^3.5.10
   pdf: ^3.11.3
   printing: ^5.14.2
+  country_picker: ^2.0.27
+  nepali_date_picker: ^6.0.2
+  barcode: ^2.2.9
+  flutter_svg: ^2.2.1
 
 dev_dependencies:
   flutter_test:

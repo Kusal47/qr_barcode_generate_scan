@@ -44,6 +44,6 @@ const List<Color> gradient = [
   Color(0xFF0B5ED7),
 ];
 
-const List<Color> tabGradient = [greenishColor, primaryColor];
+const List<Color> tabGradient = [secondaryColor, primaryColor];
 const Color darkRedbgColor = Color(0xFF9E392C); // Dark red background color for the icon
 const Color darkBgColor = Color(0xFF212121);

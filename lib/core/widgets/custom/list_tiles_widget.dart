@@ -104,66 +104,97 @@ Widget customListTileWidget(
   );
 }
 
-// Future<dynamic> formatSelectionDialog(
-//   BuildContext context,
-//   SizeConfig config,
-//   Function(String)? onTap, {
-// }) {
+Widget customExpansionTileWidget(
+  BuildContext context,
+  String title, {
+  IconData? icon,
+  Color? iconColor,
+  Widget? leadingWidget,
+  Widget? subtitle,
+  Color? subtitleColor,
+  double? titleFontSize,
+  double? subtitleFontSize,
+  FontWeight? titleFontWeight,
+  FontWeight? subtitleFontWeight,
+  double? iconSize,
+  double? radius,
+  BorderSide? side,
+  Color? borderColor,
+  double? borderWidth,
+  Color? containerColor,
+  EdgeInsetsGeometry? contentPadding,
+  IconData? leadingIcon,
+  String? leadingImage,
+  List<Widget> childrens = const [],
+}) {
+  return BaseWidget(
+    builder: (context, config, theme) {
+      return Column(
+        children: [
+          ExpansionTile(
+            tilePadding: contentPadding ?? EdgeInsets.all(config.appHorizontalPaddingSmall()),
 
-//   return showDialog(
-//     context: context,
-//     builder:
-//         (context) => StatefulBuilder(
-//           builder: (context, setState) {
-//             return AlertDialog(
-//               title: Text(
-//                 'Select Sport Format',
-//                 style: customTextStyle(
-//                   fontWeight: FontWeight.bold,
-//                   fontSize: config.appHeight(2.0),
-//                 ),
-//               ),
-//               content: Wrap(
-//                 spacing: config.appHorizontalPaddingSmall(),
-//                 children: List.generate(
-//                   ,
-//                   (index) => InkWell(
-//                     onTap: () {
-//                       sportFormat = sportFormatLists[index];
-//                       onTap!(sportFormat);
-//                       setState(() {});
-//                     },
-//                     child: Chip(
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(5),
-//                         side: BorderSide(
-//                           color: sportFormatLists[index] == sportFormat ? whiteColor : greyColor,
-//                         ),
-//                       ),
-//                       backgroundColor:
-//                           sportFormatLists[index] == sportFormat ? primaryColor : whiteColor,
-//                       label: Text(
-//                         sportFormatLists[index],
-//                         style: customTextStyle(
-//                           color: sportFormatLists[index] == sportFormat ? whiteColor : blackColor,
-//                           fontSize: config.appHeight(1.75),
-//                           fontWeight: FontWeight.w500,
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               actions: [
-//                 PrimaryButton(
-//                   label: 'Confirm',
-//                   onPressed: () {
-//                     Get.back();
-//                   },
-//                 ),
-//               ],
-//             );
-//           },
-//         ),
-//   );
-// }
+            collapsedShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radius ?? 5),
+              side:
+                  side ??
+                  BorderSide(color: borderColor ?? Colors.transparent, width: borderWidth ?? 0),
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radius ?? 5),
+              side:
+                  side ??
+                  BorderSide(color: borderColor ?? Colors.transparent, width: borderWidth ?? 0),
+            ),
+
+            // Leading widget handling
+            leading:
+                leadingWidget ??
+                (leadingImage != null
+                    ? Image.asset(
+                      leadingImage,
+                      height: config.appHeight(3),
+                      width: config.appHeight(3),
+                      fit: BoxFit.contain,
+                    )
+                    : (leadingIcon != null
+                        ? Icon(
+                          leadingIcon,
+                          color: iconColor ?? theme.primaryColor,
+                          size: iconSize ?? config.appHeight(3),
+                        )
+                        : null)),
+
+            collapsedBackgroundColor: containerColor ?? Colors.white,
+            backgroundColor: containerColor ?? Colors.white,
+
+            childrenPadding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
+
+            title: Text(
+              title,
+              style: customTextStyle(
+                fontWeight: titleFontWeight ?? FontWeight.bold,
+                fontSize: titleFontSize ?? config.appHeight(2.0),
+              ),
+            ),
+
+            subtitle:
+                subtitle != null
+                    ? DefaultTextStyle.merge(
+                      style: customTextStyle(
+                        fontWeight: subtitleFontWeight ?? FontWeight.normal,
+                        fontSize: subtitleFontSize ?? config.appHeight(1.6),
+                        color: subtitleColor ?? Colors.grey,
+                      ),
+                      child: subtitle,
+                    )
+                    : null,
+
+            children: childrens,
+          ),
+          config.verticalSpaceSmall(),
+        ],
+      );
+    },
+  );
+}

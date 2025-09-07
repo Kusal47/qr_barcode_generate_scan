@@ -49,6 +49,8 @@ class PrimaryFormField extends HookWidget {
   final int? maxLength;
   final String? counterText;
   final AutovalidateMode? autovalidateMode;
+  final Color? outlineBorderColor;
+  final double? outlineBorderWidth;
 
   const PrimaryFormField({
     super.key,
@@ -90,6 +92,8 @@ class PrimaryFormField extends HookWidget {
     this.maxLength,
     this.counterText,
     this.autovalidateMode,
+    this.outlineBorderColor,
+    this.outlineBorderWidth,
   });
 
   @override
@@ -229,11 +233,12 @@ class PrimaryFormField extends HookWidget {
                       hideBorder!
                           ? BorderSide.none
                           : BorderSide(
-                            width: 1,
+                            width:outlineBorderWidth?? 1,
                             color:
-                                Theme.of(context).brightness == Brightness.dark
+                                outlineBorderColor ??
+                                (Theme.of(context).brightness == Brightness.dark
                                     ? whiteColor
-                                    : blackColor,
+                                    : blackColor),
                           ),
                 ),
             focusedBorder:
@@ -244,11 +249,12 @@ class PrimaryFormField extends HookWidget {
                       hideBorder!
                           ? BorderSide.none
                           : BorderSide(
-                            width: 1,
+                            width: outlineBorderWidth??1,
                             color:
-                                Theme.of(context).brightness == Brightness.dark
+                                outlineBorderColor ??
+                                (Theme.of(context).brightness == Brightness.dark
                                     ? whiteColor
-                                    : blackColor,
+                                    : blackColor),
                           ),
                 ),
             disabledBorder:
@@ -260,10 +266,11 @@ class PrimaryFormField extends HookWidget {
                           ? BorderSide.none
                           : BorderSide(
                             color:
-                                Theme.of(context).brightness == Brightness.dark
+                                outlineBorderColor ??
+                                (Theme.of(context).brightness == Brightness.dark
                                     ? whiteColor
-                                    : blackColor,
-                            width: 1,
+                                    : blackColor),
+                            width:outlineBorderWidth?? 1,
                           ),
                 ),
           ),

@@ -5,10 +5,12 @@ abstract class Routes {
   Routes._();
 
   static const splash = _Paths.splash;
+  static const onboardScreen = _Paths.onboardScreen;
   static const home = _Paths.home;
   static const qrscanScreen = _Paths.qrscanScreen;
-  static const onboardScreen = _Paths.onboardScreen;
   static const generateQr = _Paths.generateQr;
+  static const barcodescanScreen = _Paths.barcodescanScreen;
+  static const generateBarcode = _Paths.generateBarcode;
 }
 
 abstract class _Paths {
@@ -16,5 +18,7 @@ abstract class _Paths {
   static const onboardScreen = '/onboard-screen';
   static const home = '/home';
   static const qrscanScreen = '/qrscan-screen';
-  static const generateQr = '/generateQr-screen';
+  static const generateQr = '/generate_qr-screen';
+  static const barcodescanScreen = '/barcodescan-screen';
+  static const generateBarcode = '/generate_barcode-screen';
 }

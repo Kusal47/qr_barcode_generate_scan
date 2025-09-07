@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:scan_qr/core/resources/export_resources.dart';
-import 'package:scan_qr/features/qr_scan/model/qr_scan_model.dart';
+import 'package:scan_qr/features/qr_code/model/qr_scan_model.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/widgets/export_custom_widget.dart';
@@ -21,9 +21,20 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     getDeviceInfo();
-    fetchWifiHistory();
-    fetchUrlHistory();
-    fetchContactInfoHistory();
+    fetchAllHistory();
+  }
+
+  fetchAllHistory() async {
+    await fetchWifiHistory();
+    await fetchUrlHistory();
+    await fetchContactInfoHistory();
+    await fetchEmailHistory();
+    await fetchSmsHistory();
+    await fetchPhoneHistory();
+    await fetchGeoHistory();
+    await fetchCalendarEventHistory();
+
+    update();
   }
 
   Future<void> getDeviceInfo() async {
@@ -101,7 +112,6 @@ class HomeController extends GetxController {
   fetchContactInfoHistory() async {
     try {
       final contactInfoData = await secureStorageService.getContactInfoData();
-      log("contactInfoData: $contactInfoData");
       if (contactInfoData != null && contactInfoData.isNotEmpty) {
         for (var e in contactInfoData) {
           final ContactInfo data = ContactInfo(
@@ -126,29 +136,188 @@ class HomeController extends GetxController {
     update();
   }
 
-  deleteQRData({String? ssid, String? url, bool all = false, String? contactNumber}) async {
-    all == true
-        ? await secureStorageService.deleteQrData()
-        : await secureStorageService.deleteIndividualQrData(
-          ssid: ssid,
-          url: url,
-          contactNumber: contactNumber,
+  // 🔹 Email History
+  List<EmailModel> emailHistory = [];
+  List<Email> emailList = [];
+
+  fetchEmailHistory() async {
+    try {
+      final emailData = await secureStorageService.getEmailData();
+      if (emailData != null && emailData.isNotEmpty) {
+        final data = Email(
+          address: emailData[0].address,
+          subject: emailData[0].subject,
+          body: emailData[0].body,
         );
-    fetchWifiHistory();
-    fetchUrlHistory();
-    fetchContactInfoHistory();
+        emailList.add(data);
+        final uniqueEmails = {for (var val in emailList) val.address: val}.values.toList();
+        emailHistory = uniqueEmails.map((e) => EmailModel.fromJson(e)).toList().reversed.toList();
+      } else {
+        emailHistory = [];
+      }
+    } catch (e) {
+      log("Error fetching Email history: $e");
+      emailHistory = [];
+    }
+    update();
+  }
+
+  // 🔹 SMS History
+  List<SmsModel> smsHistory = [];
+  List<SMS> smsList = [];
+
+  fetchSmsHistory() async {
+    try {
+      final smsData = await secureStorageService.getSmsData();
+      if (smsData != null && smsData.isNotEmpty) {
+        final data = SMS(phoneNumber: smsData[0].phoneNumber, message: smsData[0].message);
+        smsList.add(data);
+        final uniqueSms = {for (var val in smsList) val.phoneNumber: val}.values.toList();
+        smsHistory = uniqueSms.map((e) => SmsModel.fromJson(e)).toList().reversed.toList();
+      } else {
+        smsHistory = [];
+      }
+    } catch (e) {
+      log("Error fetching SMS history: $e");
+      smsHistory = [];
+    }
+    update();
+  }
+
+  // 🔹 Phone History
+  List<PhoneModel> phoneHistory = [];
+  List<Phone> phoneList = [];
+
+  fetchPhoneHistory() async {
+    try {
+      final phoneData = await secureStorageService.getPhoneData();
+      if (phoneData != null && phoneData.isNotEmpty) {
+        final data = Phone(number: phoneData[0].number);
+        phoneList.add(data);
+        final uniquePhones = {for (var val in phoneList) val.number: val}.values.toList();
+        phoneHistory = uniquePhones.map((e) => PhoneModel.fromJson(e)).toList().reversed.toList();
+      } else {
+        phoneHistory = [];
+      }
+    } catch (e) {
+      log("Error fetching Phone history: $e");
+      phoneHistory = [];
+    }
+    update();
+  }
+
+  // 🔹 Geo History
+  List<GeoPointModel> geoHistory = [];
+  List<GeoPoint> geoList = [];
+
+  fetchGeoHistory() async {
+    try {
+      final geoData = await secureStorageService.getGeoData();
+      if (geoData != null && geoData.isNotEmpty) {
+        final data = GeoPoint(latitude: geoData[0].latitude, longitude: geoData[0].longitude);
+        geoList.add(data);
+        final uniqueLocations = {for (var val in geoList) val.latitude: val}.values.toList();
+        geoHistory =
+            uniqueLocations.map((e) => GeoPointModel.fromJson(e)).toList().reversed.toList();
+      } else {
+        geoHistory = [];
+      }
+    } catch (e) {
+      log("Error fetching Geo history: $e");
+      geoHistory = [];
+    }
+    update();
+  }
+
+  // 🔹 Calendar Event History
+  List<CalendarEventModel> calendarEventHistory = [];
+  List<CalendarEvent> calendarEventList = [];
+
+  fetchCalendarEventHistory() async {
+    try {
+      final eventData = await secureStorageService.getCalendarEventData();
+      if (eventData != null && eventData.isNotEmpty) {
+        final data = CalendarEvent(
+          summary: eventData[0].summary,
+          description: eventData[0].description,
+          start: eventData[0].start,
+          end: eventData[0].end,
+          location: eventData[0].location,
+        );
+        calendarEventList.add(data);
+        final uniqueEvents = {for (var val in calendarEventList) val.summary: val}.values.toList();
+        calendarEventHistory =
+            uniqueEvents.map((e) => CalendarEventModel.fromJson(e)).toList().reversed.toList();
+      } else {
+        calendarEventHistory = [];
+      }
+    } catch (e) {
+      log("Error fetching Calendar Event history: $e");
+      calendarEventHistory = [];
+    }
+    update();
+  }
+
+  deleteQRData({
+    String? ssid,
+    String? url,
+    bool all = false,
+    String? contactNumber,
+    String? email,
+    String? sms,
+    String? phone,
+    double? geo,
+    String? calendarEvent,
+  }) async {
+    if (all) {
+      await secureStorageService.deleteQrData();
+
+      // Refetch all histories
+      for (var fetch in [fetchAllHistory]) {
+        fetch();
+      }
+    } else {
+      await secureStorageService.deleteIndividualQrData(
+        ssid: ssid,
+        url: url,
+        contactNumber: contactNumber,
+        email: email,
+        sms: sms,
+        phone: phone,
+        geo: geo,
+        calendarEvent: calendarEvent,
+      );
+
+      // Call only the relevant fetcher
+      (ssid != null ? fetchWifiHistory : null)?.call();
+      (url != null ? fetchUrlHistory : null)?.call();
+      (contactNumber != null ? fetchContactInfoHistory : null)?.call();
+      (email != null ? fetchEmailHistory : null)?.call();
+      (sms != null ? fetchSmsHistory : null)?.call();
+      (phone != null ? fetchPhoneHistory : null)?.call();
+      (geo != null ? fetchGeoHistory : null)?.call();
+      (calendarEvent != null ? fetchCalendarEventHistory : null)?.call();
+    }
+
     update();
   }
 
   GlobalKey qrKey = GlobalKey();
-  Future<void> shareQr(GlobalKey qrkey, {String? text}) async {
+  Future<void> shareQr(GlobalKey qrkey, {String? text, String? subject, String? title}) async {
     final filePath = await shareQrFromBytes(qrkey);
     await shareFunction(
       text: text ?? 'Shared from ScanQR',
-      subject: 'QR code generated by ScanQR',
+      title: title,
+      subject: subject ?? 'QR code generated by ScanQR',
       thummbnailPath: XFile(filePath),
       files: [XFile(filePath)],
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    qrKey = GlobalKey();
   }
 
   //  Future<void> shareQr(GlobalKey qrKey, {String? text}) async {
