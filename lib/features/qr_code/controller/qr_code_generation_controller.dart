@@ -48,7 +48,6 @@ class QrCodeGenerationController extends GetxController {
   final GlobalKey qrKey = GlobalKey();
   final formKey = GlobalKey<FormState>();
 
-  List<String> qrDataList = ["URL", "Wi-Fi", "Contacts"];
 
   @override
   void onInit() {
@@ -92,6 +91,7 @@ class QrCodeGenerationController extends GetxController {
     } else {
       isSelected = name;
     }
+    qrData = "";
     update();
   }
 

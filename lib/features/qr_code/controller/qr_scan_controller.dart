@@ -15,15 +15,17 @@ class QrScanController extends GetxController {
   bool isDialogDisplayed = false;
   late MobileScannerController controller;
   final SecureStorageService secureStorageService = SecureStorageService();
-  WifiScanResult? qrScannedData;
+  QRCodeScanResult? qrScannedData;
   @override
   void onInit() {
     super.onInit();
     controller = MobileScannerController(
       autoStart: false,
-      formats: [BarcodeFormat.all, BarcodeFormat.qrCode],
+      formats: [BarcodeFormat.qrCode],
       facing: CameraFacing.back,
       detectionSpeed: DetectionSpeed.noDuplicates,
+      autoZoom: true,
+      returnImage: true,
     );
 
     startScanner(handleBarcode);
@@ -35,14 +37,14 @@ class QrScanController extends GetxController {
     qrKey = GlobalKey();
   }
 
-  Future<WifiScanResult?> handleBarcode(BarcodeCapture barcodes) async {
+  Future<QRCodeScanResult?> handleBarcode(BarcodeCapture barcodes) async {
     barcode = barcodes.barcodes.firstOrNull;
     if (barcode == null || barcode!.displayValue == null) {
       return null;
     }
 
     try {
-      final qrData = WifiScanResult.fromBarcode(barcode!);
+      final qrData = QRCodeScanResult.fromBarcode(barcode!);
       // log(qrData.toJson().toString());
 
       // WiFi

@@ -1,6 +1,6 @@
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-class WifiScanResult {
+class QRCodeScanResult {
   final String? displayValue;
   final String? rawValue;
   final BarcodeType? type;
@@ -17,7 +17,7 @@ class WifiScanResult {
   final GeoPointModel? geo;
   final CalendarEventModel? calendarEvent;
 
-  WifiScanResult({
+  QRCodeScanResult({
     this.ssid,
     this.password,
     this.displayValue,
@@ -33,20 +33,20 @@ class WifiScanResult {
     this.calendarEvent,
   });
 
-  factory WifiScanResult.fromBarcode(Barcode barcode) => WifiScanResult(
-    displayValue: barcode.displayValue,
-    rawValue: barcode.rawValue,
-    type: barcode.type,
-    wifi: barcode.wifi != null ? WifiModel.fromJson(barcode.wifi!) : null,
-    url: barcode.url != null ? UrlModel.fromJson(barcode.url!) : null,
+  factory QRCodeScanResult.fromBarcode(Barcode qrcode) => QRCodeScanResult(
+    displayValue: qrcode.displayValue,
+    rawValue: qrcode.rawValue,
+    type: qrcode.type,
+    wifi: qrcode.wifi != null ? WifiModel.fromJson(qrcode.wifi!) : null,
+    url: qrcode.url != null ? UrlModel.fromJson(qrcode.url!) : null,
     contactInfo:
-        barcode.contactInfo != null ? ContactInfoModel.fromJson(barcode.contactInfo!) : null,
-    email: barcode.email != null ? EmailModel.fromJson(barcode.email!) : null,
-    sms: barcode.sms != null ? SmsModel.fromJson(barcode.sms!) : null,
-    phone: barcode.phone != null ? PhoneModel.fromJson(barcode.phone!) : null,
-    geo: barcode.geoPoint != null ? GeoPointModel.fromJson(barcode.geoPoint!) : null,
+        qrcode.contactInfo != null ? ContactInfoModel.fromJson(qrcode.contactInfo!) : null,
+    email: qrcode.email != null ? EmailModel.fromJson(qrcode.email!) : null,
+    sms: qrcode.sms != null ? SmsModel.fromJson(qrcode.sms!) : null,
+    phone: qrcode.phone != null ? PhoneModel.fromJson(qrcode.phone!) : null,
+    geo: qrcode.geoPoint != null ? GeoPointModel.fromJson(qrcode.geoPoint!) : null,
     calendarEvent:
-        barcode.calendarEvent != null ? CalendarEventModel.fromJson(barcode.calendarEvent!) : null,
+        qrcode.calendarEvent != null ? CalendarEventModel.fromJson(qrcode.calendarEvent!) : null,
   );
 
   Map<String, dynamic> toJson() => {

@@ -17,13 +17,19 @@ AppBar buildAppBar(
   double? elevation,
   IconData? icon,
   bool? needToBack = true,
+  bool? automaticallyImplyLeading = false,
   Key? key,
 }) {
   final size = MediaQuery.of(context).size;
   return AppBar(
     key: key,
     centerTitle: centerTitle ?? false,
-    automaticallyImplyLeading: needToBack == true ? true : false,
+    automaticallyImplyLeading:
+        automaticallyImplyLeading == true
+            ? true
+            : needToBack == true
+            ? true
+            : false,
     toolbarHeight: size.height * 0.08,
     elevation: elevation ?? 5,
     leading:
@@ -35,7 +41,7 @@ AppBar buildAppBar(
                     Get.back();
                   },
               child: Icon(
-               icon?? Icons.arrow_back_ios,
+                icon ?? Icons.arrow_back_ios,
                 color:
                     arrowColor ??
                     (Theme.of(context).brightness == Brightness.dark ? whiteColor : whiteColor),

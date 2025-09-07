@@ -12,3 +12,4 @@ export 'custom/shimmer_custom_design.dart';
 export 'custom/custom_smart_refresher.dart';
 export 'custom/qr_image_widget.dart';
 export 'custom/menu_anchor_dropdown_widget.dart';
+export 'custom/expandable_text.dart';

@@ -30,7 +30,7 @@ Future<void> shareFunction({
     text: text,
     previewThumbnail: thummbnailPath,
     files: files,
-    uri: Uri.parse(uri ?? ''),
+    uri:text == null ?  Uri.parse(uri ?? ''):null,
   );
 
   final result = await SharePlus.instance.share(params);

@@ -1,14 +1,13 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:scan_qr/features/qr_scan/controller/qr_scan_controller.dart';
-import 'package:scan_qr/features/qr_scan/model/qr_scan_model.dart';
+import 'package:scan_qr/features/qr_code/controller/qr_scan_controller.dart';
+import 'package:scan_qr/features/qr_code/model/qr_scan_model.dart';
 
 import '../../../core/resources/export_resources.dart';
 import '../../../core/widgets/export_common_widget.dart';
@@ -82,6 +81,86 @@ class _QRScanScreenState extends State<QRScanScreen> {
               enableDrag: false,
               builder: (_) {
                 return contactDetailsBottomSheet(qrController.qrScannedData!);
+              },
+            ).then((_) {
+              qrController.isDialogDisplayed = false;
+              qrController.resetScanner();
+            });
+          }
+        } else if (qrController.qrScannedData!.email != null) {
+          if (!qrController.isDialogDisplayed) {
+            qrController.isDialogDisplayed = true;
+            showModalBottomSheet(
+              context: context,
+              isDismissible: true,
+              barrierColor: Colors.transparent,
+              enableDrag: false,
+              builder: (_) {
+                return emailDetailsBottomSheet(qrController.qrScannedData!);
+              },
+            ).then((_) {
+              qrController.isDialogDisplayed = false;
+              qrController.resetScanner();
+            });
+          }
+        } else if (qrController.qrScannedData!.sms != null) {
+          if (!qrController.isDialogDisplayed) {
+            qrController.isDialogDisplayed = true;
+            showModalBottomSheet(
+              context: context,
+              isDismissible: true,
+              barrierColor: Colors.transparent,
+              enableDrag: false,
+              builder: (_) {
+                return smsDetailsBottomSheet(qrController.qrScannedData!);
+              },
+            ).then((_) {
+              qrController.isDialogDisplayed = false;
+              qrController.resetScanner();
+            });
+          }
+        } else if (qrController.qrScannedData!.phone != null) {
+          if (!qrController.isDialogDisplayed) {
+            qrController.isDialogDisplayed = true;
+            showModalBottomSheet(
+              context: context,
+              isDismissible: true,
+              barrierColor: Colors.transparent,
+              enableDrag: false,
+              builder: (_) {
+                return phoneDetailsBottomSheet(qrController.qrScannedData!);
+              },
+            ).then((_) {
+              qrController.isDialogDisplayed = false;
+              qrController.resetScanner();
+            });
+          }
+        } else if (qrController.qrScannedData!.geo != null) {
+          if (!qrController.isDialogDisplayed) {
+            qrController.isDialogDisplayed = true;
+            showModalBottomSheet(
+              context: context,
+              isDismissible: true,
+              barrierColor: Colors.transparent,
+              enableDrag: false,
+              builder: (_) {
+                return geotDetailsBottomSheet(qrController.qrScannedData!);
+              },
+            ).then((_) {
+              qrController.isDialogDisplayed = false;
+              qrController.resetScanner();
+            });
+          }
+        } else if (qrController.qrScannedData!.calendarEvent != null) {
+          if (!qrController.isDialogDisplayed) {
+            qrController.isDialogDisplayed = true;
+            showModalBottomSheet(
+              context: context,
+              isDismissible: true,
+              barrierColor: Colors.transparent,
+              enableDrag: false,
+              builder: (_) {
+                return calenderEventsDetailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
               qrController.isDialogDisplayed = false;
@@ -289,8 +368,8 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  detailsBottomSheet(WifiScanResult qrData) {
-    return qrDetailsBottomSheet<WifiScanResult, ActionType>(
+  detailsBottomSheet(QRCodeScanResult qrData) {
+    return qrDetailsBottomSheet<QRCodeScanResult, ActionType>(
       model: qrData,
       title: "WiFi Details",
       actions: ActionType.values,
@@ -350,7 +429,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  urlDetailsBottomSheet(WifiScanResult qrData) {
+  urlDetailsBottomSheet(QRCodeScanResult qrData) {
     return qrDetailsBottomSheet<UrlModel, UrlActionType>(
       model: qrData.url!,
       title: "URL Link",
@@ -394,7 +473,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  contactDetailsBottomSheet(WifiScanResult qrData) {
+  contactDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return qrDetailsBottomSheet<ContactInfoModel, ContactActionType>(
@@ -494,7 +573,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  emailDetailsBottomSheet(WifiScanResult qrData) {
+  emailDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return qrDetailsBottomSheet<EmailModel, EmailActionType>(
@@ -579,7 +658,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  smsDetailsBottomSheet(WifiScanResult qrData) {
+  smsDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return qrDetailsBottomSheet<SmsModel, SmsActionType>(
@@ -649,7 +728,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  phoneDetailsBottomSheet(WifiScanResult qrData) {
+  phoneDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return qrDetailsBottomSheet<PhoneModel, PhoneActionType>(
@@ -704,7 +783,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  geotDetailsBottomSheet(WifiScanResult qrData) {
+  geotDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return qrDetailsBottomSheet<GeoPointModel, GeoActionType>(
@@ -714,7 +793,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
           contentBuilder:
               (url) => [
                 Text(
-                  'Latitude: ${qrData.contactInfo!.contactName}',
+                  'Latitude: ${qrData.geo!.latitude}°',
                   style: customTextStyle(
                     color: blackColor,
                     fontSize: 16,
@@ -725,7 +804,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                 config.verticalSpaceSmall(),
 
                 Text(
-                  'Longitude: ${qrData.contactInfo!.contactNumber}',
+                  'Longitude: ${qrData.geo!.longitude}°',
                   style: customTextStyle(
                     color: blackColor,
                     fontSize: 16,
@@ -737,7 +816,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
             GeoPointModel geoData = qrData.geo!;
             switch (type) {
               case GeoActionType.openMap:
-                assign(HeroIcons.phone, blueColor, () {
+                assign(HeroIcons.map_pin, blueColor, () {
                   if (geoData.latitude != null) {
                     if (Platform.isAndroid) {
                       urlLaunchMethod(
@@ -761,7 +840,10 @@ class _QRScanScreenState extends State<QRScanScreen> {
               case GeoActionType.share:
                 assign(HeroIcons.share, blueColor, () {
                   if (geoData.latitude != null) {
-                    qrController.shareQr(qrController.qrKey, text: geoData.latitude.toString());
+                    qrController.shareQr(
+                      qrController.qrKey,
+                      text: '${geoData.latitude},${geoData.longitude}',
+                    );
                   }
                 });
                 break;
@@ -778,7 +860,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  calenderEventsDetailsBottomSheet(WifiScanResult qrData) {
+  calenderEventsDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return qrDetailsBottomSheet<CalendarEventModel, CalendarEventActionType>(
@@ -788,7 +870,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
           contentBuilder:
               (url) => [
                 Text(
-                  'Event Title: ${qrData.contactInfo!.contactName}',
+                  'Event Title: ${qrData.calendarEvent!.summary}',
                   style: customTextStyle(
                     color: blackColor,
                     fontSize: 14,

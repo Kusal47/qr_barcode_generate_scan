@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:scan_qr/features/qr_scan/model/qr_scan_model.dart';
+import 'package:scan_qr/features/qr_code/model/qr_scan_model.dart';
 import '../constants/storage_constants.dart';
 
 class SecureStorageService {
@@ -157,7 +157,8 @@ class SecureStorageService {
             qrDataMap
                 .map((e) => Email(address: e['address'], subject: e['subject'], body: e['body']))
                 .toList();
-        return scannedData;
+        final uniqueData = {for (var val in scannedData) val.address: val}.values.toList();
+        return uniqueData;
       } else {
         return [];
       }
@@ -186,7 +187,9 @@ class SecureStorageService {
         List<dynamic> mapData = json.decode(data);
         List<SMS> scannedData =
             mapData.map((e) => SMS(phoneNumber: e['number'], message: e['message'])).toList();
-        return scannedData;
+        final uniqueData = {for (var val in scannedData) val.phoneNumber: val}.values.toList();
+
+        return uniqueData;
       } else {
         return [];
       }
@@ -214,7 +217,9 @@ class SecureStorageService {
       if (data != null) {
         List<dynamic> mapData = json.decode(data);
         List<Phone> scannedData = mapData.map((e) => Phone(number: e['number'])).toList();
-        return scannedData;
+        final uniqueData = {for (var val in scannedData) val.number: val}.values.toList();
+
+        return uniqueData;
       } else {
         return [];
       }
@@ -227,9 +232,11 @@ class SecureStorageService {
   // 🔹 Geo
   Future<void> saveGeoData(List<GeoPointModel> geoData) async {
     try {
-      String geoJson = json.encode(geoData.map((e) => e.toJson()).toList());
-      await writeSecureData(StorageConstants.geoHistory, geoJson);
-      log("Saved Geo data: $geoJson");
+      final uniqueData = {for (var val in geoData) val.latitude: val}.values.toList();
+
+      String dataJson = json.encode(uniqueData.map((e) => e.toJson()).toList());
+      await writeSecureData(StorageConstants.geoHistory, dataJson);
+      log("Saved Geo data: $dataJson");
     } catch (e) {
       log("Error saving Geo data: $e");
     }
@@ -244,7 +251,9 @@ class SecureStorageService {
             mapData
                 .map((e) => GeoPoint(latitude: e['latitude'], longitude: e['longitude']))
                 .toList();
-        return scannedData;
+        final uniqueData = {for (var val in scannedData) val.latitude: val}.values.toList();
+
+        return uniqueData;
       } else {
         return [];
       }
@@ -257,9 +266,11 @@ class SecureStorageService {
   // 🔹 Calendar Event
   Future<void> saveCalendarEventData(List<CalendarEventModel> eventData) async {
     try {
-      String eventJson = json.encode(eventData.map((e) => e.toJson()).toList());
-      await writeSecureData(StorageConstants.calendarEventHistory, eventJson);
-      log("Saved Calendar Event data: $eventJson");
+      final uniqueData = {for (var val in eventData) val.summary: val}.values.toList();
+
+      String dataJson = json.encode(uniqueData.map((e) => e.toJson()).toList());
+      await writeSecureData(StorageConstants.calendarEventHistory, dataJson);
+      log("Saved Calendar Event data: $dataJson");
     } catch (e) {
       log("Error saving Calendar Event data: $e");
     }
@@ -282,7 +293,9 @@ class SecureStorageService {
                   ),
                 )
                 .toList();
-        return scannedData;
+        final uniqueData = {for (var val in scannedData) val.summary: val}.values.toList();
+
+        return uniqueData;
       } else {
         return [];
       }
@@ -356,5 +369,10 @@ class SecureStorageService {
     await deleteSecureData(StorageConstants.urlHistory);
     await deleteSecureData(StorageConstants.wifiHistory);
     await deleteSecureData(StorageConstants.contactInfoHistory);
+    await deleteSecureData(StorageConstants.emailHistory);
+    await deleteSecureData(StorageConstants.smsHistory);
+    await deleteSecureData(StorageConstants.phoneHistory);
+    await deleteSecureData(StorageConstants.geoHistory);
+    await deleteSecureData(StorageConstants.calendarEventHistory);
   }
 }

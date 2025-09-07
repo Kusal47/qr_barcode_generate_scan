@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:scan_qr/core/resources/export_resources.dart';
-import 'package:scan_qr/features/qr_scan/model/qr_scan_model.dart';
+import 'package:scan_qr/features/qr_code/model/qr_scan_model.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/widgets/export_custom_widget.dart';
@@ -21,9 +21,20 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     getDeviceInfo();
-    fetchWifiHistory();
-    fetchUrlHistory();
-    fetchContactInfoHistory();
+    fetchAllHistory();
+  }
+
+  fetchAllHistory() async {
+    await fetchWifiHistory();
+    await fetchUrlHistory();
+    await fetchContactInfoHistory();
+    await fetchEmailHistory();
+    await fetchSmsHistory();
+    await fetchPhoneHistory();
+    await fetchGeoHistory();
+    await fetchCalendarEventHistory();
+
+    update();
   }
 
   Future<void> getDeviceInfo() async {
@@ -101,7 +112,6 @@ class HomeController extends GetxController {
   fetchContactInfoHistory() async {
     try {
       final contactInfoData = await secureStorageService.getContactInfoData();
-      log("contactInfoData: $contactInfoData");
       if (contactInfoData != null && contactInfoData.isNotEmpty) {
         for (var e in contactInfoData) {
           final ContactInfo data = ContactInfo(
@@ -206,7 +216,9 @@ class HomeController extends GetxController {
       if (geoData != null && geoData.isNotEmpty) {
         final data = GeoPoint(latitude: geoData[0].latitude, longitude: geoData[0].longitude);
         geoList.add(data);
-        geoHistory = geoList.map((e) => GeoPointModel.fromJson(e)).toList().reversed.toList();
+        final uniqueLocations = {for (var val in geoList) val.latitude: val}.values.toList();
+        geoHistory =
+            uniqueLocations.map((e) => GeoPointModel.fromJson(e)).toList().reversed.toList();
       } else {
         geoHistory = [];
       }
@@ -233,8 +245,9 @@ class HomeController extends GetxController {
           location: eventData[0].location,
         );
         calendarEventList.add(data);
+        final uniqueEvents = {for (var val in calendarEventList) val.summary: val}.values.toList();
         calendarEventHistory =
-            calendarEventList.map((e) => CalendarEventModel.fromJson(e)).toList().reversed.toList();
+            uniqueEvents.map((e) => CalendarEventModel.fromJson(e)).toList().reversed.toList();
       } else {
         calendarEventHistory = [];
       }
@@ -256,26 +269,36 @@ class HomeController extends GetxController {
     double? geo,
     String? calendarEvent,
   }) async {
-    all == true
-        ? await secureStorageService.deleteQrData()
-        : await secureStorageService.deleteIndividualQrData(
-          ssid: ssid,
-          url: url,
-          contactNumber: contactNumber,
-          email: email,
-          sms: sms,
-          phone: phone,
-          geo: geo,
-          calendarEvent: calendarEvent,
-        );
-    fetchWifiHistory();
-    fetchUrlHistory();
-    fetchContactInfoHistory();
-    fetchEmailHistory();
-    fetchSmsHistory();
-    fetchPhoneHistory();
-    fetchGeoHistory();
-    fetchCalendarEventHistory();
+    if (all) {
+      await secureStorageService.deleteQrData();
+
+      // Refetch all histories
+      for (var fetch in [fetchAllHistory]) {
+        fetch();
+      }
+    } else {
+      await secureStorageService.deleteIndividualQrData(
+        ssid: ssid,
+        url: url,
+        contactNumber: contactNumber,
+        email: email,
+        sms: sms,
+        phone: phone,
+        geo: geo,
+        calendarEvent: calendarEvent,
+      );
+
+      // Call only the relevant fetcher
+      (ssid != null ? fetchWifiHistory : null)?.call();
+      (url != null ? fetchUrlHistory : null)?.call();
+      (contactNumber != null ? fetchContactInfoHistory : null)?.call();
+      (email != null ? fetchEmailHistory : null)?.call();
+      (sms != null ? fetchSmsHistory : null)?.call();
+      (phone != null ? fetchPhoneHistory : null)?.call();
+      (geo != null ? fetchGeoHistory : null)?.call();
+      (calendarEvent != null ? fetchCalendarEventHistory : null)?.call();
+    }
+
     update();
   }
 

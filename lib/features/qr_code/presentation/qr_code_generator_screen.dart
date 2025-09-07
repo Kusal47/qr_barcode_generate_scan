@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
@@ -6,7 +7,7 @@ import 'package:scan_qr/core/constants/validators.dart';
 import 'package:scan_qr/core/resources/colors.dart';
 import 'package:scan_qr/core/widgets/export_common_widget.dart';
 import 'package:scan_qr/core/widgets/export_custom_widget.dart';
-import 'package:scan_qr/features/qr_scan/model/qr_generate_params.dart';
+import 'package:scan_qr/features/qr_code/model/qr_generate_params.dart';
 
 import '../controller/qr_code_generation_controller.dart';
 
@@ -103,7 +104,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                       context,
                                       color: blackColor,
                                       fontWeight: FontWeight.bold,
-                                      fontSize: config.appHeight(3),
+                                      fontSize: config.appHeight(2.5),
                                     ),
                                     config.verticalSpaceMedium(),
 
@@ -276,10 +277,14 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         controller: qgc.latitudeController,
                                         title: "Latitude",
                                         hintTxt: "Enter latitude",
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                            RegExp(r'^-?\d*\.?\d*'),
+                                          ),
+                                        ],
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.latitude = double.tryParse(
-                                            p0,
-                                          );
+                                          qgc.qrGenerateParams?.latitude = double.tryParse(p0);
                                         },
                                         validator: Validators.checkFieldEmpty,
                                       ),
@@ -288,10 +293,14 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         controller: qgc.longitudeController,
                                         title: "Longitude",
                                         hintTxt: "Enter longitude",
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                            RegExp(r'^-?\d*\.?\d*'),
+                                          ),
+                                        ],
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.longitude = double.tryParse(
-                                            p0 ,
-                                          );
+                                          qgc.qrGenerateParams?.longitude = double.tryParse(p0);
                                         },
                                         validator: Validators.checkFieldEmpty,
                                       ),
