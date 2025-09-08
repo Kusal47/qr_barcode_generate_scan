@@ -1,5 +1,8 @@
 
 
+import '../../features/barcode/model/barcode_model.dart';
+import '../../features/qr_code/model/qr_scan_model.dart';
+
 double? parseToDouble(dynamic value) {
   if (value is String) {
     return double.tryParse(value);
@@ -47,3 +50,16 @@ Stream<String> countdownTimer(Duration duration) async* {
   }
   yield "00:00"; // Timer ends
 }
+
+ DateTime getScannedAt(dynamic item) {
+    if (item is WifiModel) return item.scannedAt ?? DateTime.now();
+    if (item is UrlModel) return item.scannedAt ?? DateTime.now();
+    if (item is ContactInfoModel) return item.scannedAt ?? DateTime.now();
+    if (item is EmailModel) return item.scannedAt ?? DateTime.now();
+    if (item is SmsModel) return item.scannedAt ?? DateTime.now();
+    if (item is PhoneModel) return item.scannedAt ?? DateTime.now();
+    if (item is GeoPointModel) return item.scannedAt ?? DateTime.now();
+    if (item is CalendarEventModel) return item.scannedAt ?? DateTime.now();
+    if (item is BarcodeScanResult) return item.scannedAt ?? DateTime.now();
+    return DateTime.now();
+  }
