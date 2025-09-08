@@ -14,6 +14,8 @@ class UiAssets {
   static const String shimmerLoading = "${gifDir}loading.gif";
   static const String shimmer = "${gifDir}loading_card.gif";
   static const String successGif = "${gifDir}success_check_gif.gif";
+  static const String qrScanGif = "${gifDir}qr_transparent_scan_updown.gif";
+  static const String barcodeScanGif = "${gifDir}barcode_transparent_scan_updown.gif";
 
   //onboard
   static const String onboardScreen1 = "${onboardImgDir}onboard_1.png";

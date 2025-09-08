@@ -56,7 +56,7 @@ class _BarcodeGenerateScreenState extends State<BarcodeGenerateScreen> {
                           children: [
                             config.verticalSpaceSmall(),
                             Wrap(
-                              spacing: config.appHorizontalPaddingMedium(),
+                              spacing: config.appHorizontalPaddingSmall(),
                               runSpacing: config.appHorizontalPaddingSmall(),
                               children:
                                   BarcodeFormat.values
@@ -73,9 +73,9 @@ class _BarcodeGenerateScreenState extends State<BarcodeGenerateScreen> {
                                             size: config.appHeight(2.2),
                                           ),
                                           label: Text(
-                                            e.label,
+                                            e.label.toUpperCase(),
                                             style: customTextStyle(
-                                              fontSize: config.appHeight(2),
+                                              fontSize: config.appHeight(1.8),
                                               fontWeight: FontWeight.normal,
                                               color:
                                                   barcodeGC.isSelected == e.name
@@ -137,24 +137,9 @@ class _BarcodeGenerateScreenState extends State<BarcodeGenerateScreen> {
                       if (barcodeGC.barcodeData.isNotEmpty) ...[
                         RepaintBoundary(
                           key: barcodeGC.qrKey,
-                          child: FutureBuilder<Uint8List>(
-                            future: barcodeGC.generateBarcodeImage(
-                              barcodeGC.barcodeData,
-                              barcodeGC.barcodeGenerateParams!.format,
-                              config,
-                            ),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
-                                return customTitleText(
-                                  "Error generating barcode",
-                                  context,
-                                  color: redColor,
-                                );
-                              }
-                              return SvgPicture.memory(snapshot.data!);
-                            },
+                          child: displayBarcodeImage(
+                            config,
+                            params: barcodeGC.barcodeGenerateParams,
                           ),
                         ),
 
@@ -201,78 +186,86 @@ class _BarcodeGenerateScreenState extends State<BarcodeGenerateScreen> {
       // 1️⃣ Linear Barcodes (text-based)
       case BarcodeFormat.code128:
         return PrimaryFormField(
-          controller: barcodeGC.code128Controller,
           label: "Code 128",
           hintTxt: "",
           maxLines: 10,
           minLines: 10,
-          validator: Validators.checkFieldEmpty,
-          onSaved: (p0) => params.data = p0,
           keyboardType: TextInputType.multiline,
-          autovalidateMode: AutovalidateMode.disabled,
-
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
+          validator: (val) {
+            final regex = RegExp(r'^[\x00-\x7F]*$'); // all ASCII
+            if (val == null || val.isEmpty) return "Field cannot be empty";
+            if (!regex.hasMatch(val)) return "Invalid characters for Code 128";
+            return null;
+          },
+          onSaved: (p0) => params.data = p0,
         );
+
       case BarcodeFormat.code39:
         return PrimaryFormField(
-          controller: barcodeGC.code39Controller,
           label: "Code 39",
           hintTxt: "",
-          minLines: 10,
           maxLines: 10,
-
+          minLines: 10,
           keyboardType: TextInputType.multiline,
-          autovalidateMode: AutovalidateMode.disabled,
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
-          validator: Validators.checkFieldEmpty,
+          validator: (val) {
+            final regex = RegExp(r'^[0-9A-Z \-.\$/\+%]*$');
+            if (val == null || val.isEmpty) return "Field cannot be empty";
+            if (!regex.hasMatch(val)) return "Invalid characters for Code 39";
+            return null;
+          },
           onSaved: (p0) => params.data = p0,
         );
+
       case BarcodeFormat.code93:
         return PrimaryFormField(
-          controller: barcodeGC.code93Controller,
           label: "Code 93",
           hintTxt: "",
           maxLines: 10,
           minLines: 10,
           keyboardType: TextInputType.multiline,
-          autovalidateMode: AutovalidateMode.disabled,
-
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
-          validator: Validators.checkFieldEmpty,
+          validator: (val) {
+            final regex = RegExp(r'^[\x00-\x7F]*$'); // all ASCII
+            if (val == null || val.isEmpty) return "Field cannot be empty";
+            if (!regex.hasMatch(val)) return "Invalid characters for Code 93";
+            return null;
+          },
           onSaved: (p0) => params.data = p0,
         );
+
       case BarcodeFormat.codabar:
         return PrimaryFormField(
-          controller: barcodeGC.codabarController,
           label: "Codabar",
           hintTxt: "",
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          autovalidateMode: AutovalidateMode.disabled,
-
+          keyboardType: TextInputType.text,
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
-          validator: Validators.checkFieldEmpty,
+          validator: (val) {
+            final regex = RegExp(r'^[0-9A-D\-\$\:/\.\+]*$');
+            if (val == null || val.isEmpty) return "Field cannot be empty";
+            if (!regex.hasMatch(val)) return "Invalid characters for Codabar";
+            return null;
+          },
           onSaved: (p0) => params.data = p0,
         );
+
       case BarcodeFormat.itf:
         return PrimaryFormField(
-          controller: barcodeGC.itfController,
           label: "ITF",
           hintTxt: "",
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-
-          autovalidateMode: AutovalidateMode.disabled,
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
           validator: (val) {
-            if (val != null && val.length % 2 == 0) {
-              return "Please enter even length digits";
-            }
+            if (val == null || val.isEmpty) return "Field cannot be empty";
+            if (val.length % 2 != 0) return "Please enter an even number of digits";
+            if (!RegExp(r'^\d+$').hasMatch(val)) return "Only digits allowed";
             return null;
           },
           onSaved: (p0) => params.data = p0,
@@ -280,128 +273,87 @@ class _BarcodeGenerateScreenState extends State<BarcodeGenerateScreen> {
 
       // 2️⃣ 2D Barcodes
       case BarcodeFormat.dataMatrix:
-        return PrimaryFormField(
-          controller: barcodeGC.dataMatrixController,
-          label: "Data Matrix",
-          hintTxt: "",
-          maxLines: 10,
-          minLines: 10,
-          keyboardType: TextInputType.multiline,
-          autovalidateMode: AutovalidateMode.disabled,
-
-          outlineBorderColor: greyColor,
-          outlineBorderWidth: 2,
-          validator: Validators.checkFieldEmpty,
-          onSaved: (p0) => params.data = p0,
-        );
       case BarcodeFormat.pdf417:
-        return PrimaryFormField(
-          controller: barcodeGC.pdf417Controller,
-          label: "PDF417",
-          hintTxt: "",
-          maxLines: 10,
-          minLines: 10,
-          keyboardType: TextInputType.multiline,
-          autovalidateMode: AutovalidateMode.disabled,
-
-          outlineBorderColor: greyColor,
-          outlineBorderWidth: 2,
-          validator: Validators.checkFieldEmpty,
-          onSaved: (p0) => params.data = p0,
-        );
       case BarcodeFormat.aztec:
         return PrimaryFormField(
-          controller: barcodeGC.aztecController,
-          label: "Aztec",
+          label: params.format.toString().split('.').last,
           hintTxt: "",
           maxLines: 10,
           minLines: 10,
           keyboardType: TextInputType.multiline,
-          autovalidateMode: AutovalidateMode.disabled,
-
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
-          validator: Validators.checkFieldEmpty,
+          validator: (val) {
+            if (val == null || val.isEmpty) return "Field cannot be empty";
+            return null;
+          },
           onSaved: (p0) => params.data = p0,
         );
 
       // 3️⃣ Numeric Barcodes (length restricted)
       case BarcodeFormat.ean13:
         return PrimaryFormField(
-          controller: barcodeGC.ean13Controller,
           label: "EAN-13",
           hintTxt: "",
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          autovalidateMode: AutovalidateMode.disabled,
-
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
-          maxLength: 12,
-          validator: (value) {
-            if (value == null || value.length != 12) {
-              return "Enter exactly 12 digits";
-            }
+          maxLength: 13,
+          validator: (val) {
+            if (val == null || val.length != 13) return "Enter exactly 13 digits";
+            if (!RegExp(r'^\d+$').hasMatch(val)) return "Only digits allowed";
             return null;
           },
           onSaved: (p0) => params.data = p0,
         );
+
       case BarcodeFormat.ean8:
         return PrimaryFormField(
-          controller: barcodeGC.ean8Controller,
           label: "EAN-8",
           hintTxt: "",
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          autovalidateMode: AutovalidateMode.disabled,
-
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
-          maxLength: 7,
-          validator: (value) {
-            if (value == null || value.length != 7) {
-              return "Enter exactly 7 digits";
-            }
+          maxLength: 8,
+          validator: (val) {
+            if (val == null || val.length != 8) return "Enter exactly 8 digits";
+            if (!RegExp(r'^\d+$').hasMatch(val)) return "Only digits allowed";
             return null;
           },
           onSaved: (p0) => params.data = p0,
         );
+
       case BarcodeFormat.upcA:
         return PrimaryFormField(
-          controller: barcodeGC.upcAController,
           label: "UPC-A",
           hintTxt: "",
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          autovalidateMode: AutovalidateMode.disabled,
-
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
           maxLength: 12,
-          validator: (value) {
-            if (value == null || value.length != 12) {
-              return "";
-            }
+          validator: (val) {
+            if (val == null || val.length != 12) return "Enter exactly 12 digits";
+            if (!RegExp(r'^\d+$').hasMatch(val)) return "Only digits allowed";
             return null;
           },
           onSaved: (p0) => params.data = p0,
         );
+
       case BarcodeFormat.upcE:
         return PrimaryFormField(
-          controller: barcodeGC.upcEController,
-          label: "UPC-E Code",
+          label: "UPC-E",
           hintTxt: "",
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          autovalidateMode: AutovalidateMode.disabled,
-
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
           maxLength: 8,
-          validator: (value) {
-            if (value == null || value.length != 8) {
-              return "Enter exactly 8 digits";
-            }
+          validator: (val) {
+            if (val == null || val.length != 8) return "Enter exactly 8 digits";
+            if (!RegExp(r'^\d+$').hasMatch(val)) return "Only digits allowed";
             return null;
           },
           onSaved: (p0) => params.data = p0,
@@ -409,18 +361,18 @@ class _BarcodeGenerateScreenState extends State<BarcodeGenerateScreen> {
 
       default:
         return PrimaryFormField(
-          controller: barcodeGC.code128Controller,
           label: "Code 128",
           hintTxt: "",
           maxLines: 10,
           minLines: 10,
           keyboardType: TextInputType.multiline,
-
           outlineBorderColor: greyColor,
           outlineBorderWidth: 2,
-          validator: Validators.checkFieldEmpty,
+          validator: (val) {
+            if (val == null || val.isEmpty) return "Field cannot be empty";
+            return null;
+          },
           onSaved: (p0) => params.data = p0,
-          autovalidateMode: AutovalidateMode.disabled,
         );
     }
   }

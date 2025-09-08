@@ -11,20 +11,28 @@ import 'package:scan_qr/features/qr_code/model/qr_scan_model.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/widgets/export_custom_widget.dart';
+import '../../barcode/model/barcode_model.dart';
 
 class HomeController extends GetxController {
   String platformVersion = 'Unknown';
   int? visibleIndex;
   final SecureStorageService secureStorageService = SecureStorageService();
   final RefreshController refreshController = RefreshController();
+  late List historyList = [];
+  @override
   @override
   void onInit() {
     super.onInit();
     getDeviceInfo();
-    fetchAllHistory();
+    loadHistory();
   }
 
-  fetchAllHistory() async {
+  Future<void> loadHistory() async {
+    await fetchAllHistory();
+    combineHistory();
+  }
+
+  Future<void> fetchAllHistory() async {
     await fetchWifiHistory();
     await fetchUrlHistory();
     await fetchContactInfoHistory();
@@ -33,9 +41,33 @@ class HomeController extends GetxController {
     await fetchPhoneHistory();
     await fetchGeoHistory();
     await fetchCalendarEventHistory();
+    await fetchBarcodeHistory();
+  }
+
+  void combineHistory() {
+    // Combine all history
+    historyList = [
+      ...wifiHistory,
+      ...urlHistory,
+      ...contactHistory,
+      ...emailHistory,
+      ...smsHistory,
+      ...phoneHistory,
+      ...geoHistory,
+      ...calendarEventHistory,
+      ...barcodeHistory,
+    ];
+
+    // Sort by scannedAt descending (latest first)
+    historyList.sort((a, b) {
+      DateTime aTime = getScannedAt(a);
+      DateTime bTime = getScannedAt(b);
+      return bTime.compareTo(aTime); // descending
+    });
 
     update();
   }
+
 
   Future<void> getDeviceInfo() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -59,78 +91,40 @@ class HomeController extends GetxController {
     update();
   }
 
+  // 🔹 WiFi History
   List<WifiModel> wifiHistory = [];
-  List<WiFi> wifiList = [];
   fetchWifiHistory() async {
     try {
       final wifiData = await secureStorageService.getWifiData();
-      if (wifiData != null && wifiData.isNotEmpty) {
-        for (var i in wifiData) {
-          final WiFi data = WiFi(
-            ssid: i.ssid,
-            password: i.password,
-            encryptionType: i.encryptionType,
-          );
-          wifiList.add(data);
-        }
-        final uniqueWifiLists = {for (var val in wifiList) val.ssid: val}.values.toList();
-        wifiHistory = uniqueWifiLists.map((e) => WifiModel.fromJson(e)).toList().reversed.toList();
-      } else {
-        wifiHistory = [];
-      }
+      wifiHistory = wifiData?.reversed.toList() ?? [];
     } catch (e) {
-      log("Error while decoding data: $e");
+      log("Error fetching Wifi history: $e");
       wifiHistory = [];
     }
     update();
   }
 
+  // 🔹 URL History
   List<UrlModel> urlHistory = [];
-  List<UrlBookmark> urlList = [];
   fetchUrlHistory() async {
     try {
       final urlData = await secureStorageService.getUrlData();
-      if (urlData != null && urlData.isNotEmpty) {
-        for (var i in urlData) {
-          final UrlBookmark data = UrlBookmark(url: i.url, title: i.title);
-          urlList.add(data);
-        }
-        final uniqueUrlLists = {for (var val in urlList) val.url: val}.values.toList();
-        urlHistory = uniqueUrlLists.map((e) => UrlModel.fromJson(e)).toList().reversed.toList();
-      } else {
-        urlHistory = [];
-      }
+      urlHistory = urlData?.reversed.toList() ?? [];
     } catch (e) {
-      log("Error while decoding data: $e");
+      log("Error fetching URL history: $e");
       urlHistory = [];
     }
     update();
   }
 
+  // 🔹 Contact Info History
   List<ContactInfoModel> contactHistory = [];
-  List<ContactInfo> contactList = [];
   fetchContactInfoHistory() async {
     try {
-      final contactInfoData = await secureStorageService.getContactInfoData();
-      if (contactInfoData != null && contactInfoData.isNotEmpty) {
-        for (var e in contactInfoData) {
-          final ContactInfo data = ContactInfo(
-            name: PersonName(formattedName: e.name!.formattedName),
-            phones: [Phone(number: e.phones[0].number)],
-            emails: [Email(address: e.emails[0].address)],
-            addresses: [Address(addressLines: e.addresses[0].addressLines)],
-          );
-          contactList.add(data);
-        }
-        final uniqueContactLists =
-            {for (var val in contactList) val.phones[0].number: val}.values.toList();
-        contactHistory =
-            uniqueContactLists.map((e) => ContactInfoModel.fromJson(e)).toList().reversed.toList();
-      } else {
-        contactHistory = [];
-      }
+      final contactData = await secureStorageService.getContactInfoData();
+      contactHistory = contactData?.reversed.toList() ?? [];
     } catch (e) {
-      log("Error while decoding data: $e");
+      log("Error fetching Contact Info history: $e");
       contactHistory = [];
     }
     update();
@@ -138,23 +132,10 @@ class HomeController extends GetxController {
 
   // 🔹 Email History
   List<EmailModel> emailHistory = [];
-  List<Email> emailList = [];
-
   fetchEmailHistory() async {
     try {
       final emailData = await secureStorageService.getEmailData();
-      if (emailData != null && emailData.isNotEmpty) {
-        final data = Email(
-          address: emailData[0].address,
-          subject: emailData[0].subject,
-          body: emailData[0].body,
-        );
-        emailList.add(data);
-        final uniqueEmails = {for (var val in emailList) val.address: val}.values.toList();
-        emailHistory = uniqueEmails.map((e) => EmailModel.fromJson(e)).toList().reversed.toList();
-      } else {
-        emailHistory = [];
-      }
+      emailHistory = emailData?.reversed.toList() ?? [];
     } catch (e) {
       log("Error fetching Email history: $e");
       emailHistory = [];
@@ -164,19 +145,10 @@ class HomeController extends GetxController {
 
   // 🔹 SMS History
   List<SmsModel> smsHistory = [];
-  List<SMS> smsList = [];
-
   fetchSmsHistory() async {
     try {
       final smsData = await secureStorageService.getSmsData();
-      if (smsData != null && smsData.isNotEmpty) {
-        final data = SMS(phoneNumber: smsData[0].phoneNumber, message: smsData[0].message);
-        smsList.add(data);
-        final uniqueSms = {for (var val in smsList) val.phoneNumber: val}.values.toList();
-        smsHistory = uniqueSms.map((e) => SmsModel.fromJson(e)).toList().reversed.toList();
-      } else {
-        smsHistory = [];
-      }
+      smsHistory = smsData?.reversed.toList() ?? [];
     } catch (e) {
       log("Error fetching SMS history: $e");
       smsHistory = [];
@@ -186,19 +158,10 @@ class HomeController extends GetxController {
 
   // 🔹 Phone History
   List<PhoneModel> phoneHistory = [];
-  List<Phone> phoneList = [];
-
   fetchPhoneHistory() async {
     try {
       final phoneData = await secureStorageService.getPhoneData();
-      if (phoneData != null && phoneData.isNotEmpty) {
-        final data = Phone(number: phoneData[0].number);
-        phoneList.add(data);
-        final uniquePhones = {for (var val in phoneList) val.number: val}.values.toList();
-        phoneHistory = uniquePhones.map((e) => PhoneModel.fromJson(e)).toList().reversed.toList();
-      } else {
-        phoneHistory = [];
-      }
+      phoneHistory = phoneData?.reversed.toList() ?? [];
     } catch (e) {
       log("Error fetching Phone history: $e");
       phoneHistory = [];
@@ -208,20 +171,10 @@ class HomeController extends GetxController {
 
   // 🔹 Geo History
   List<GeoPointModel> geoHistory = [];
-  List<GeoPoint> geoList = [];
-
   fetchGeoHistory() async {
     try {
       final geoData = await secureStorageService.getGeoData();
-      if (geoData != null && geoData.isNotEmpty) {
-        final data = GeoPoint(latitude: geoData[0].latitude, longitude: geoData[0].longitude);
-        geoList.add(data);
-        final uniqueLocations = {for (var val in geoList) val.latitude: val}.values.toList();
-        geoHistory =
-            uniqueLocations.map((e) => GeoPointModel.fromJson(e)).toList().reversed.toList();
-      } else {
-        geoHistory = [];
-      }
+      geoHistory = geoData?.reversed.toList() ?? [];
     } catch (e) {
       log("Error fetching Geo history: $e");
       geoHistory = [];
@@ -231,29 +184,34 @@ class HomeController extends GetxController {
 
   // 🔹 Calendar Event History
   List<CalendarEventModel> calendarEventHistory = [];
-  List<CalendarEvent> calendarEventList = [];
-
   fetchCalendarEventHistory() async {
     try {
       final eventData = await secureStorageService.getCalendarEventData();
-      if (eventData != null && eventData.isNotEmpty) {
-        final data = CalendarEvent(
-          summary: eventData[0].summary,
-          description: eventData[0].description,
-          start: eventData[0].start,
-          end: eventData[0].end,
-          location: eventData[0].location,
-        );
-        calendarEventList.add(data);
-        final uniqueEvents = {for (var val in calendarEventList) val.summary: val}.values.toList();
-        calendarEventHistory =
-            uniqueEvents.map((e) => CalendarEventModel.fromJson(e)).toList().reversed.toList();
-      } else {
-        calendarEventHistory = [];
-      }
+      calendarEventHistory = eventData?.reversed.toList() ?? [];
     } catch (e) {
       log("Error fetching Calendar Event history: $e");
       calendarEventHistory = [];
+    }
+    update();
+  }
+
+  // 🔹Barcode History
+  List<BarcodeScanResult> barcodeHistory = [];
+  List<BarcodeScanResult> fetchedBarcodeHistory = [];
+
+  fetchBarcodeHistory() async {
+    try {
+      final barcodeData = await secureStorageService.getBarcodeData();
+      if (barcodeData != null && barcodeData.isNotEmpty) {
+        final uniqueBarcodes = {for (var val in barcodeData) val.displayValue: val}.values.toList();
+
+        barcodeHistory = uniqueBarcodes.reversed.toList();
+      } else {
+        barcodeHistory = [];
+      }
+    } catch (e) {
+      log("Error fetching barcode history: $e");
+      barcodeHistory = [];
     }
     update();
   }
@@ -268,12 +226,13 @@ class HomeController extends GetxController {
     String? phone,
     double? geo,
     String? calendarEvent,
+    String? barcode,
   }) async {
     if (all) {
       await secureStorageService.deleteQrData();
 
       // Refetch all histories
-      for (var fetch in [fetchAllHistory]) {
+      for (var fetch in [loadHistory]) {
         fetch();
       }
     } else {
@@ -286,6 +245,7 @@ class HomeController extends GetxController {
         phone: phone,
         geo: geo,
         calendarEvent: calendarEvent,
+        barcode: barcode,
       );
 
       // Call only the relevant fetcher
@@ -297,6 +257,7 @@ class HomeController extends GetxController {
       (phone != null ? fetchPhoneHistory : null)?.call();
       (geo != null ? fetchGeoHistory : null)?.call();
       (calendarEvent != null ? fetchCalendarEventHistory : null)?.call();
+      (barcode != null ? fetchBarcodeHistory : null)?.call();
     }
 
     update();
@@ -304,7 +265,7 @@ class HomeController extends GetxController {
 
   GlobalKey qrKey = GlobalKey();
   Future<void> shareQr(GlobalKey qrkey, {String? text, String? subject, String? title}) async {
-    final filePath = await shareQrFromBytes(qrkey);
+    final filePath = await shareScannedValueFromBytes(qrkey);
     await shareFunction(
       text: text ?? 'Shared from ScanQR',
       title: title,
