@@ -9,4 +9,5 @@ class StorageConstants {
   static const phoneHistory = "PHONE_HISTORY";
   static const geoHistory = "GEO_HISTORY";
   static const calendarEventHistory = "CALENDAR_EVENT_HISTORY";
+  static const barcodeCodeHistory = "BARCODE_CODE_HISTORY";
 }
