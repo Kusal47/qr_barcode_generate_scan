@@ -25,6 +25,7 @@ class UiAssets {
   //images
   static const String user = "${imageDir}user.png";
   static const String imagePlaceholder = "${imageDir}image_placeholder.png";
+  static const String qrSearch = "${imageDir}qr_search.png";
 
   //icons
   static const String addButton = "${iconDir}add-button.png";

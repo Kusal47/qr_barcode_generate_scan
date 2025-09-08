@@ -221,15 +221,23 @@ class _HomePageState extends State<HomePage> {
 
                       hc.refreshController.refreshCompleted();
                     },
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
-                            child:
-                                hc.historyList.isEmpty
-                                    ? customTextMessages('No history found!', context)
-                                    : ListView.builder(
+                    child: Padding(
+                      padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
+                      child:
+                          hc.historyList.isEmpty
+                              ? SizedBox(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(UiAssets.qrSearch, height: config.appHeight(30)),
+                                    customTextMessages('No history found!', context),
+                                  ],
+                                ),
+                              )
+                              : SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    ListView.builder(
                                       shrinkWrap: true,
                                       physics: NeverScrollableScrollPhysics(),
                                       itemCount: hc.historyList.length,
@@ -1288,10 +1296,10 @@ class _HomePageState extends State<HomePage> {
                                         }
                                       },
                                     ),
-                          ),
-                          config.verticalSpaceCustom(0.3),
-                        ],
-                      ),
+                                    config.verticalSpaceCustom(0.3),
+                                  ],
+                                ),
+                              ),
                     ),
                   ),
                 ),
