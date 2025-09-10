@@ -1,17 +1,14 @@
 import 'dart:developer';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:scan_qr/features/barcode/model/barcode_model.dart';
-import '../../../core/resources/export_resources.dart';
-import '../../../core/widgets/export_common_widget.dart';
-import '../../../core/widgets/export_custom_widget.dart';
+import '../../../../core/resources/export_resources.dart';
+import '../../../../core/widgets/export_common_widget.dart';
+import '../../../../core/widgets/export_custom_widget.dart';
+import '../../model/scan_code_result_model.dart';
 import '../controller/barcode_controller.dart';
-import '../controller/barcode_generation_controller.dart';
 
 class BarcodeScanScreen extends StatefulWidget {
   const BarcodeScanScreen({super.key});
@@ -255,10 +252,10 @@ class _BarcodeScanScreenState extends State<BarcodeScanScreen> {
     );
   }
 
-  detailsBottomSheet(BarcodeScanResult barcodeData) {
+  detailsBottomSheet(ScannedCodeResultModel barcodeData) {
     return BaseWidget(
       builder: (context, config, themeData) {
-        return scanDetailsBottomSheet<BarcodeScanResult, BarCodeActionType>(
+        return scanDetailsBottomSheet<ScannedCodeResultModel, BarCodeActionType>(
           model: barcodeData,
           title: "Barcode Details",
           actions: BarCodeActionType.values,
@@ -274,7 +271,7 @@ class _BarcodeScanScreenState extends State<BarcodeScanScreen> {
                     ),
                     children: [
                       TextSpan(
-                        text: barcodeData.format.name.toUpperCase(),
+                        text: barcodeData.format!.name.toUpperCase(),
                         style: customTextStyle(
                           color: blackColor,
                           fontSize: config.appHeight(2),
@@ -314,7 +311,7 @@ class _BarcodeScanScreenState extends State<BarcodeScanScreen> {
                   barcodeController.shareQr(
                     barcodeController.barcodeKey,
                     text:
-                        '\nType: ${barcodeData.format.name.toUpperCase()}\nValue: ${barcodeData.displayValue}\n',
+                        '\nType: ${barcodeData.format!.name.toUpperCase()}\nValue: ${barcodeData.displayValue}\n',
                   );
                 });
                 break;

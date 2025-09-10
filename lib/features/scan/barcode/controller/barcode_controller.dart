@@ -1,14 +1,14 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:scan_qr/core/resources/export_resources.dart';
+import 'package:scan_qr/features/scan/model/scan_code_result_model.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../../core/widgets/export_custom_widget.dart';
-import '../../home/controller/home_controller.dart';
-import '../model/barcode_model.dart';
+import '../../../../core/widgets/export_custom_widget.dart';
+import '../../../home/controller/home_controller.dart';
+import '../../model/scanned_value_to_map_model.dart';
 
 class BarcodeScanController extends GetxController {
   Barcode? barcode;
@@ -17,7 +17,7 @@ class BarcodeScanController extends GetxController {
   bool isDialogDisplayed = false;
   late MobileScannerController controller;
   final SecureStorageService secureStorageService = SecureStorageService();
-  BarcodeScanResult? barcodeScannedData;
+  ScannedCodeResultModel? barcodeScannedData;
 
   Uint8List? imageBytes;
   @override
@@ -47,41 +47,51 @@ class BarcodeScanController extends GetxController {
     startScanner(handleBarcode);
   }
 
-  resetScanner() {
-    stopScanner();
-    startScanner(handleBarcode);
+  Future<void> resetScanner() async {
+    barcodeScannedData = null;
+    imageBytes = null;
     barcodeKey = GlobalKey();
+    await stopScanner();
+    startScanner(handleBarcode);
+    update();
   }
 
-  Future<BarcodeScanResult?> handleBarcode(BarcodeCapture barcodes) async {
+  Future<ScannedCodeResultModel?> handleBarcode(BarcodeCapture barcodes) async {
     barcode = barcodes.barcodes.firstOrNull;
     if (barcode == null || barcode!.displayValue == null) {
       return null;
     }
 
     try {
-      final barcodeData = BarcodeScanResult.fromBarcode(barcode!);
+      final scannedData = ScannedRawValueModel.fromBarcode(barcode!);
+      final barcodeData = ScannedCodeResultModel(
+        displayValue: scannedData.displayValue,
+        rawValue: scannedData.rawValue,
+        format: scannedData.format,
+        type: scannedData.type,
+        wifi: scannedData.wifi,
+        url: scannedData.url,
+        contactInfo: scannedData.contactInfo,
+        email: scannedData.email,
+        sms: scannedData.sms,
+        phone: scannedData.phone,
+        geo: scannedData.geo,
+        calendarEvent: scannedData.calendarEvent,
+        timestamp: DateTime.now(),
+        isBarcode: true,
+      );
       imageBytes = barcodes.image;
-      log(barcodeData.toJson().toString());
-      if (barcodeData.displayValue != null && barcodeData.format.toString().isNotEmpty) {
-        await secureStorageService.saveBarcodeData([barcodeData]);
-        Get.find<HomeController>().loadHistory();
-        stopScanner();
-        return barcodeData;
-      } else {
-        return null;
-      }
+
+      await secureStorageService.saveScannedValue(barcodeData);
+      Get.find<HomeController>().loadHistory();
+      stopScanner();
+      return barcodeData;
     } catch (e) {
       return null;
     }
   }
 
   void startScanner(Function(BarcodeCapture) onDetect) {
-    if (barcodeScannedData != null) {
-      barcodeScannedData = null;
-      imageBytes = null;
-      update();
-    }
     controller.start();
     subscription = controller.barcodes.listen(onDetect);
   }

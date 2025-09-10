@@ -1,114 +1,61 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:scan_qr/features/scan/model/scan_code_result_model.dart';
 
 class QRGenerateParams {
-  String? url;
-  String? urlTitle;
+  WifiModel? wifi;
+  UrlModel? url;
+  ContactInfoModel? contactInfoModel;
+  EmailModel? email;
+  SmsModel? sms;
+  PhoneModel? phone;
+  GeoPointModel? geo;
+  CalendarEventModel? calendarEvent;
+  QRType? qrType;
 
-  // Contact
-  String? contactNumber;
-  String? contactName;
-  String? contactEmail;
-  String? contactAddress;
-
-  // WiFi
-  String? ssid;
-  String? password;
-  String? wifiType;
-
-  // Email
-  String? emailAddress;
-  String? emailSubject;
-  String? emailBody;
-
-  // SMS
-  String? smsNumber;
-  String? smsMessage;
-
-  // Phone
-  String? phoneNumber;
-
-  // Geo
-  double? latitude;
-  double? longitude;
-
-  // Calendar
-  String? eventTitle;
-  String? eventDescription;
-  String? eventLocation;
-  DateTime? eventStart;
-  DateTime? eventEnd;
-  // String? eventStatus;
-  // String? eventOrganizer;
-
-  Enum? qrType;
-
-  QRGenerateParams({
-    this.url,
-    this.urlTitle,
-    this.ssid,
-    this.password,
-    this.wifiType,
-    this.contactNumber,
-    this.contactName,
-    this.contactEmail,
-    this.contactAddress,
-    this.qrType,
-    this.emailAddress,
-    this.emailSubject,
-    this.emailBody,
-    this.smsNumber,
-    this.smsMessage,
-    this.phoneNumber,
-    this.latitude,
-    this.longitude,
-    this.eventTitle,
-    this.eventDescription,
-    this.eventLocation,
-    this.eventStart,
-    this.eventEnd,
-  });
+  QRGenerateParams({this.url, this.qrType});
 
   String generateQrString() {
     switch (qrType) {
       case QRType.wifi:
-        return 'WIFI:T:$wifiType;S:$ssid;P:$password;;';
+        return 'WIFI:T:${wifi!.wifiType};S:${wifi!.ssid};P:${wifi!.password};;';
 
       case QRType.url:
-        return url ?? '';
+        return url?.url ?? '';
 
       case QRType.contactInfo:
         return '''
 BEGIN:VCARD
 VERSION:3.0
-FN:$contactName
-TEL:$contactNumber
-EMAIL:$contactEmail
-ADR:$contactAddress
+FN:${contactInfoModel!.contactName}
+TEL:${contactInfoModel!.contactNumber}
+EMAIL:${contactInfoModel!.contactEmail}
+ADR:${contactInfoModel!.contactAddress}
 END:VCARD
 ''';
 
       case QRType.emails:
-        return 'MATMSG:TO:$emailAddress;SUB:$emailSubject;BODY:$emailBody;;';
+        return 'MATMSG:TO:${email!.address};SUB${email!.subject};BODY:${email!.subject};;';
 
       case QRType.sms:
-        return 'SMSTO:$smsNumber:$smsMessage';
+        return 'SMSTO:${sms!.number}:${sms!.message}';
 
       case QRType.phone:
-        return 'TEL:$phoneNumber';
+        return 'TEL:${phone!.number}';
 
       case QRType.geo:
-        return 'GEO:$latitude,$longitude';
+        return 'GEO:${geo!.latitude},${geo!.longitude}';
 
       case QRType.calendarEvent:
         return '''
 BEGIN:VEVENT
-SUMMARY:${eventTitle ?? ''}
-DESCRIPTION:${eventDescription ?? ''}
-LOCATION:${eventLocation ?? ''}
-DTSTART:${eventStart != null ? _formatDate(eventStart!) : ''}
-DTEND:${eventEnd != null ? _formatDate(eventEnd!) : ''}
+SUMMARY:${calendarEvent!.summary ?? ''}
+DESCRIPTION:${calendarEvent!.description ?? ''}
+LOCATION:${calendarEvent!.location ?? ''}
+DTSTART:${calendarEvent!.start != null ? _formatDate(calendarEvent!.start!) : ''}
+DTEND:${calendarEvent!.end != null ? _formatDate(calendarEvent!.end!) : ''}
 END:VEVENT
 ''';
       // STATUS:${eventStatus ?? ''}
@@ -169,6 +116,29 @@ extension QRTypeIcon on QRType {
         return HeroIcons.map_pin;
       case QRType.calendarEvent:
         return HeroIcons.calendar_days;
+    }
+  }
+}
+
+extension BarcodeTypeFormat on QRType {
+  BarcodeType? toBarcodeType() {
+    switch (this) {
+      case QRType.wifi:
+        return BarcodeType.wifi;
+      case QRType.url:
+        return BarcodeType.url;
+      case QRType.contactInfo:
+        return BarcodeType.contactInfo;
+      case QRType.emails:
+        return BarcodeType.email;
+      case QRType.sms:
+        return BarcodeType.sms;
+      case QRType.phone:
+        return BarcodeType.phone;
+      case QRType.geo:
+        return BarcodeType.geo;
+      case QRType.calendarEvent:
+        return BarcodeType.calendarEvent;
     }
   }
 }

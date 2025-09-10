@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:scan_qr/core/widgets/common/toast.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../core/resources/export_resources.dart';
-import '../../../core/widgets/export_common_widget.dart';
-import '../../../core/widgets/export_custom_widget.dart';
+import '../../../../core/resources/export_resources.dart';
+import '../../../../core/widgets/export_common_widget.dart';
+import '../../../../core/widgets/export_custom_widget.dart';
+import '../../model/scan_code_result_model.dart';
 import '../model/qr_generate_params.dart';
 
 class QrCodeGenerationController extends GetxController {
@@ -61,8 +62,27 @@ class QrCodeGenerationController extends GetxController {
     }
   }
 
+  final SecureStorageService secureStorageService = SecureStorageService();
   generateQr(QRGenerateParams qrGenerateParams) async {
     qrData = qrGenerateParams.generateQrString().toString();
+    final saveQRData = ScannedCodeResultModel(
+      displayValue: qrData,
+      rawValue: qrData,
+      format:  BarcodeFormat.qrCode,
+      type: qrGenerateParams.qrType?.toBarcodeType(),
+
+      wifi: qrGenerateParams.wifi,
+      url: qrGenerateParams.url,
+      contactInfo: qrGenerateParams.contactInfoModel,
+      email: qrGenerateParams.email,
+      sms: qrGenerateParams.sms,
+      phone: qrGenerateParams.phone,
+      geo: qrGenerateParams.geo,
+      calendarEvent: qrGenerateParams.calendarEvent,
+      timestamp: DateTime.now(),
+     
+    );
+    await secureStorageService.saveScannedValue( saveQRData);
     update();
   }
 
@@ -112,10 +132,10 @@ class QrCodeGenerationController extends GetxController {
 
         // Save to params
         if (isStart) {
-          qrGenerateParams!.eventStart = finalDateTime;
+          qrGenerateParams!.calendarEvent?.start = finalDateTime;
           eventStartController.text = formatDateTime(finalDateTime, dateTimeOnly: true);
         } else {
-          qrGenerateParams!.eventEnd = finalDateTime;
+          qrGenerateParams!.calendarEvent?.end = finalDateTime;
           eventEndController.text = formatDateTime(finalDateTime, dateTimeOnly: true);
         }
 

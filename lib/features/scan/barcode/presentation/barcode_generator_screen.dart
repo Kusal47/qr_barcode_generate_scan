@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:scan_qr/core/constants/validators.dart';
 import 'package:scan_qr/core/resources/colors.dart';
 import 'package:scan_qr/core/widgets/export_common_widget.dart';
 import 'package:scan_qr/core/widgets/export_custom_widget.dart';
-import 'package:scan_qr/features/barcode/model/barcode_generate_params.dart';
+import 'package:scan_qr/features/scan/barcode/model/barcode_generate_params.dart';
 
 import '../controller/barcode_generation_controller.dart';
 
@@ -118,7 +116,7 @@ class _BarcodeGenerateScreenState extends State<BarcodeGenerateScreen> {
                                       onPressed: () {
                                         if (barcodeGC.formKey.currentState!.validate()) {
                                           barcodeGC.formKey.currentState!.save();
-                                          barcodeGC.generateQr(barcodeGC.barcodeGenerateParams!);
+                                          barcodeGC.generateBarcode(barcodeGC.barcodeGenerateParams!);
                                         }
                                       },
                                       label: "Generate QR",

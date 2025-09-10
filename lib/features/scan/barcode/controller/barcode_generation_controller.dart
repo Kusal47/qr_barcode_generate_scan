@@ -4,9 +4,10 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../core/resources/export_resources.dart';
-import '../../../core/widgets/export_common_widget.dart';
-import '../../../core/widgets/export_custom_widget.dart';
+import '../../../../core/resources/export_resources.dart';
+import '../../../../core/widgets/export_common_widget.dart';
+import '../../../../core/widgets/export_custom_widget.dart';
+import '../../model/scan_code_result_model.dart';
 import '../model/barcode_generate_params.dart';
 
 import 'dart:typed_data';
@@ -33,8 +34,16 @@ class BarcodeGenerationController extends GetxController {
     }
   }
 
-  generateQr(BarcodeGenerateParams barcodeGenerateParams) async {
+  final SecureStorageService secureStorageService = SecureStorageService();
+  generateBarcode(BarcodeGenerateParams barcodeGenerateParams) async {
     barcodeData = barcodeGenerateParams.generateBarcodeString().toString();
+    final saveQRData = ScannedCodeResultModel(
+      displayValue: barcodeData,
+      rawValue: barcodeData,
+      format: barcodeGenerateParams.format,
+      timestamp: DateTime.now(),
+    );
+    await secureStorageService.saveScannedValue(saveQRData);
     update();
   }
 
@@ -63,7 +72,7 @@ class BarcodeGenerationController extends GetxController {
       isSelected = name;
     }
     barcodeData = "";
-      formKey.currentState?.reset();
+    formKey.currentState?.reset();
 
     update();
   }
