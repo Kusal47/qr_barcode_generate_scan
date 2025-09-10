@@ -1,20 +1,16 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:scan_qr/core/routes/app_pages.dart';
 import 'package:scan_qr/core/widgets/export_custom_widget.dart';
-import 'package:scan_qr/features/barcode/model/barcode_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/resources/export_resources.dart';
 import '../../../core/widgets/export_common_widget.dart';
-import '../../barcode/controller/barcode_generation_controller.dart';
-import '../../qr_code/model/qr_scan_model.dart';
+import '../../scan/model/scan_code_result_model.dart';
 import '../controller/home_controller.dart';
 import 'animated_text.dart';
 
@@ -244,14 +240,14 @@ class _HomePageState extends State<HomePage> {
                                       itemBuilder: (_, index) {
                                         bool isVisible = hc.visibleIndex == index;
                                         final dataList = hc.historyList[index];
-                                        if (dataList is WifiModel) {
+                                        if (dataList.wifi is WifiModel) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
                                             ),
                                             child: customListTileWidget(
                                               context,
-                                              'Wifi Name: ${dataList.ssid}',
+                                              'Wifi Name: ${dataList.wifi!.ssid}',
                                               containerColor: greyColor.withOpacity(0.3),
                                               leadingWidget: Icon(
                                                 Icons.wifi_password_outlined,
@@ -267,8 +263,8 @@ class _HomePageState extends State<HomePage> {
                                                     viewQrDialog(
                                                       context,
                                                       config,
-                                                      "SSID: ${dataList.ssid}\nPassword: ${dataList.password}\nWifi Type: ${dataList.wifiType}",
-                                                      wifiData: dataList,
+                                                      "SSID: ${dataList.wifi!.ssid}\nPassword: ${dataList.wifi!.password}\nWifi Type: ${dataList.wifi!.wifiType}",
+                                                      scannedData: dataList,
                                                     );
                                                   } else if (value == 'delete') {
                                                     showDialog(
@@ -279,7 +275,9 @@ class _HomePageState extends State<HomePage> {
                                                             content:
                                                                 'Are you sure you want to delete this wifi?',
                                                             onYesPressed: () {
-                                                              hc.deleteQRData(ssid: dataList.ssid!);
+                                                              hc.deleteQRData(
+                                                                ssid: dataList.wifi!.ssid!,
+                                                              );
                                                               Get.back();
                                                             },
                                                           ),
@@ -337,7 +335,7 @@ class _HomePageState extends State<HomePage> {
                                                     children: [
                                                       Expanded(
                                                         child: AnimatedTextAnimation(
-                                                          text: dataList.password!,
+                                                          text: dataList.wifi!.password ?? '',
                                                           isVisible: isVisible,
                                                           textStyle: customTextStyle(
                                                             color:
@@ -366,13 +364,13 @@ class _HomePageState extends State<HomePage> {
                                                     ],
                                                   ),
                                                   Text(
-                                                    'Wifi Type: ${dataList.wifiType}',
+                                                    'Wifi Type: ${dataList.wifi!.wifiType}',
                                                     style: customTextStyle(color: darkGreyColor),
                                                   ),
                                                   config.verticalSpaceSmall(),
                                                   Text(
                                                     formatDateTime(
-                                                      dataList.scannedAt!,
+                                                      dataList.timestamp!,
                                                       dateTimeOnly: true,
                                                     ),
                                                     style: customTextStyle(
@@ -383,20 +381,20 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList is UrlModel) {
+                                        } else if (dataList.url is UrlModel) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
                                             ),
                                             child: customListTileWidget(
                                               context,
-                                              'Title: ${dataList.url != null && dataList.url!.isNotEmpty ? Uri.tryParse(dataList.url!)?.host ?? dataList.url : 'N/A'}',
+                                              'Title: ${dataList.url != null && dataList.url!.url != null ? Uri.tryParse(dataList.url!.url!)?.host ?? dataList.url!.url : 'N/A'}',
 
                                               subtitle: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Url: ${dataList.url}',
+                                                    'Url: ${dataList.url!.url ?? 'N/A'}',
                                                     style: customTextStyle(
                                                       color: darkGreyColor,
                                                       overflow: TextOverflow.visible,
@@ -405,7 +403,7 @@ class _HomePageState extends State<HomePage> {
                                                   config.verticalSpaceSmall(),
                                                   Text(
                                                     formatDateTime(
-                                                      dataList.scannedAt!,
+                                                      dataList.timestamp!,
                                                       dateTimeOnly: true,
                                                     ),
                                                     style: customTextStyle(
@@ -427,8 +425,9 @@ class _HomePageState extends State<HomePage> {
                                                     viewQrDialog(
                                                       context,
                                                       config,
-                                                      urlData: dataList,
-                                                      "${dataList.url}",
+                                                      scannedData: dataList,
+
+                                                      "${dataList.url!.url}",
                                                     );
                                                   } else if (value == 'delete') {
                                                     showDialog(
@@ -439,7 +438,9 @@ class _HomePageState extends State<HomePage> {
                                                             content:
                                                                 'Are you sure you want to delete this URL?',
                                                             onYesPressed: () {
-                                                              hc.deleteQRData(url: dataList.url);
+                                                              hc.deleteQRData(
+                                                                url: dataList.url!.url!,
+                                                              );
                                                               Get.back();
                                                             },
                                                           ),
@@ -490,34 +491,34 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList is ContactInfoModel) {
+                                        } else if (dataList.contactInfo is ContactInfoModel) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
                                             ),
                                             child: customListTileWidget(
                                               context,
-                                              'Name: ${dataList.contactName != null && dataList.contactName!.isNotEmpty ? dataList.contactName : 'N/A'}',
+                                              'Name: ${dataList.contactInfo!.contactName != null && dataList.contactInfo!.contactName!.isNotEmpty ? dataList.contactInfo!.contactName : 'N/A'}',
 
                                               subtitle: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Phone: ${dataList.contactNumber}',
+                                                    'Phone: ${dataList.contactInfo!.contactNumber}',
                                                     style: customTextStyle(
                                                       color: darkGreyColor,
                                                       overflow: TextOverflow.visible,
                                                     ),
                                                   ),
                                                   Text(
-                                                    'Email: ${dataList.contactEmail}',
+                                                    'Email: ${dataList.contactInfo!.contactEmail}',
                                                     style: customTextStyle(
                                                       color: darkGreyColor,
                                                       overflow: TextOverflow.visible,
                                                     ),
                                                   ),
                                                   Text(
-                                                    'Address: ${dataList.contactAddress}',
+                                                    'Address: ${dataList.contactInfo!.contactAddress}',
                                                     style: customTextStyle(
                                                       color: darkGreyColor,
                                                       overflow: TextOverflow.visible,
@@ -526,7 +527,7 @@ class _HomePageState extends State<HomePage> {
                                                   config.verticalSpaceSmall(),
                                                   Text(
                                                     formatDateTime(
-                                                      dataList.scannedAt!,
+                                                      dataList.timestamp!,
                                                       dateTimeOnly: true,
                                                     ),
                                                     style: customTextStyle(
@@ -548,8 +549,8 @@ class _HomePageState extends State<HomePage> {
                                                     viewQrDialog(
                                                       context,
                                                       config,
-                                                      contactInfoData: dataList,
-                                                      'Name: ${dataList.contactName}, Phone: ${dataList.contactNumber}, E-mail: ${dataList.contactEmail} Address: ${dataList.contactAddress}',
+                                                      scannedData: dataList,
+                                                      'Name: ${dataList.contactInfo!.contactName}, Phone: ${dataList.contactInfo!.contactNumber}, E-mail: ${dataList.contactInfo!.contactEmail} Address: ${dataList.contactInfo!.contactAddress}',
                                                     );
                                                   } else if (value == 'delete') {
                                                     showDialog(
@@ -562,7 +563,9 @@ class _HomePageState extends State<HomePage> {
                                                             onYesPressed: () {
                                                               hc.deleteQRData(
                                                                 contactNumber:
-                                                                    dataList.contactNumber,
+                                                                    dataList
+                                                                        .contactInfo!
+                                                                        .contactNumber,
                                                               );
                                                               Get.back();
                                                             },
@@ -614,14 +617,14 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList is EmailModel) {
+                                        } else if (dataList.email is EmailModel) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
                                             ),
                                             child: customListTileWidget(
                                               context,
-                                              'Email: ${dataList.address ?? 'N/A'}',
+                                              'Email: ${dataList.email!.address ?? 'N/A'}',
                                               subtitle: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
@@ -637,7 +640,7 @@ class _HomePageState extends State<HomePage> {
                                                       ),
                                                       children: <TextSpan>[
                                                         TextSpan(
-                                                          text: dataList.subject ?? 'N/A',
+                                                          text: dataList.email!.subject ?? 'N/A',
                                                           style: customTextStyle(
                                                             fontSize: 12,
                                                             fontWeight: FontWeight.normal,
@@ -649,13 +652,13 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                   config.verticalSpaceSmall(),
                                                   ExpandableTextWidget(
-                                                    text: dataList.body ?? 'N/A',
+                                                    text: dataList.email!.body ?? 'N/A',
                                                     trimLength: 100,
                                                   ),
                                                   config.verticalSpaceSmall(),
                                                   Text(
                                                     formatDateTime(
-                                                      dataList.scannedAt!,
+                                                      dataList.timestamp!,
                                                       dateTimeOnly: true,
                                                     ),
                                                     style: customTextStyle(
@@ -676,8 +679,8 @@ class _HomePageState extends State<HomePage> {
                                                     viewQrDialog(
                                                       context,
                                                       config,
-                                                      emailData: dataList,
-                                                      'Email: ${dataList.address}, Subject: ${dataList.subject}, Body: ${dataList.body}',
+                                                      scannedData: dataList,
+                                                      'Email: ${dataList.email!.address}, Subject: ${dataList.email!.subject}, Body: ${dataList.email!.body}',
                                                     );
                                                   } else if (value == 'delete') {
                                                     showDialog(
@@ -689,7 +692,7 @@ class _HomePageState extends State<HomePage> {
                                                                 'Are you sure you want to delete this email?',
                                                             onYesPressed: () {
                                                               hc.deleteQRData(
-                                                                email: dataList.address,
+                                                                email: dataList.email!.address,
                                                               );
                                                               Get.back();
                                                             },
@@ -741,28 +744,27 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList is SmsModel) {
+                                        } else if (dataList.sms is SmsModel) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
                                             ),
                                             child: customListTileWidget(
                                               context,
-                                              'To: ${dataList.number ?? 'N/A'}',
+                                              'To: ${dataList.sms!.number ?? 'N/A'}',
                                               subtitle: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                    'Message: ${dataList.message ?? 'N/A'}',
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor,
-                                                      overflow: TextOverflow.visible,
-                                                    ),
+                                                  ExpandableTextWidget(
+                                                    text:
+                                                        'Message: ${dataList.sms!.message ?? 'N/A'}',
+                                                    trimLength: 100,
                                                   ),
+
                                                   config.verticalSpaceSmall(),
                                                   Text(
                                                     formatDateTime(
-                                                      dataList.scannedAt!,
+                                                      dataList.timestamp!,
                                                       dateTimeOnly: true,
                                                     ),
                                                     style: customTextStyle(
@@ -783,8 +785,8 @@ class _HomePageState extends State<HomePage> {
                                                     viewQrDialog(
                                                       context,
                                                       config,
-                                                      smsData: dataList,
-                                                      'To: ${dataList.number}, Message: ${dataList.message}',
+                                                      scannedData: dataList,
+                                                      'To: ${dataList.sms!.number}, Message: ${dataList.sms!.message}',
                                                     );
                                                   } else if (value == 'delete') {
                                                     showDialog(
@@ -795,105 +797,8 @@ class _HomePageState extends State<HomePage> {
                                                             content:
                                                                 'Are you sure you want to delete this SMS?',
                                                             onYesPressed: () {
-                                                              hc.deleteQRData(sms: dataList.number);
-                                                              Get.back();
-                                                            },
-                                                          ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_qr',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              HeroIcons.qr_code,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View QR',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                              ),
-                                            ),
-                                          );
-                                        } else if (dataList is PhoneModel) {
-                                          return Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
-                                            ),
-                                            child: customListTileWidget(
-                                              context,
-                                              'Phone: ${dataList.number ?? 'N/A'}',
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: Icon(
-                                                Icons.phone_outlined,
-                                                color: theme.primaryColor,
-                                              ),
-                                              subtitle: Column(
-                                                children: [
-                                                  config.verticalSpaceSmall(),
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.scannedAt!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
-                                                onSelected: (value) {
-                                                  if (value == 'view_qr') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      phoneData: dataList,
-                                                      'Phone: ${dataList.number}',
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this phone number?',
-                                                            onYesPressed: () {
                                                               hc.deleteQRData(
-                                                                phone: dataList.number,
+                                                                sms: dataList.sms!.number,
                                                               );
                                                               Get.back();
                                                             },
@@ -945,7 +850,106 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList is GeoPointModel) {
+                                        } else if (dataList.phone is PhoneModel) {
+                                          return Padding(
+                                            padding: EdgeInsets.all(
+                                              config.appHorizontalPaddingMedium(),
+                                            ),
+                                            child: customListTileWidget(
+                                              context,
+                                              'Phone: ${dataList.phone!.number ?? 'N/A'}',
+                                              containerColor: greyColor.withOpacity(0.3),
+                                              leadingWidget: Icon(
+                                                Icons.phone_outlined,
+                                                color: theme.primaryColor,
+                                              ),
+                                              subtitle: Column(
+                                                children: [
+                                                  config.verticalSpaceSmall(),
+                                                  Text(
+                                                    formatDateTime(
+                                                      dataList.timestamp!,
+                                                      dateTimeOnly: true,
+                                                    ),
+                                                    style: customTextStyle(
+                                                      color: darkGreyColor.withOpacity(0.5),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              trailing: PopupMenuButton<String>(
+                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                                onSelected: (value) {
+                                                  if (value == 'view_qr') {
+                                                    viewQrDialog(
+                                                      context,
+                                                      config,
+                                                      scannedData: dataList,
+                                                      'Phone: ${dataList.phone!.number}',
+                                                    );
+                                                  } else if (value == 'delete') {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder:
+                                                          (context) => CustomAlertDialog(
+                                                            tilte: 'Delete',
+                                                            content:
+                                                                'Are you sure you want to delete this phone number?',
+                                                            onYesPressed: () {
+                                                              hc.deleteQRData(
+                                                                phone: dataList.phone!.number,
+                                                              );
+                                                              Get.back();
+                                                            },
+                                                          ),
+                                                    );
+                                                  }
+                                                },
+                                                itemBuilder:
+                                                    (context) => [
+                                                      PopupMenuItem(
+                                                        value: 'view_qr',
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(
+                                                              HeroIcons.qr_code,
+                                                              color: blackColor,
+                                                              size: config.appHeight(4),
+                                                            ),
+                                                            config.horizontalSpaceSmall(),
+                                                            Text(
+                                                              'View QR',
+                                                              style: customTextStyle(
+                                                                fontSize: config.appHeight(2.2),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      PopupMenuItem(
+                                                        value: 'delete',
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.delete,
+                                                              color: redColor,
+                                                              size: config.appHeight(4),
+                                                            ),
+                                                            config.horizontalSpaceSmall(),
+                                                            Text(
+                                                              'Delete',
+                                                              style: customTextStyle(
+                                                                fontSize: config.appHeight(2.2),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                              ),
+                                            ),
+                                          );
+                                        } else if (dataList.geo is GeoPointModel) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -957,7 +961,7 @@ class _HomePageState extends State<HomePage> {
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Latitude: ${dataList.latitude}°',
+                                                    'Latitude: ${dataList.geo!.latitude}°',
                                                     style: customTextStyle(
                                                       fontWeight: FontWeight.normal,
                                                       fontSize: config.appHeight(2),
@@ -966,7 +970,7 @@ class _HomePageState extends State<HomePage> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    'Longitude: ${dataList.longitude}°',
+                                                    'Longitude: ${dataList.geo!.longitude}°',
                                                     style: customTextStyle(
                                                       fontWeight: FontWeight.normal,
                                                       fontSize: config.appHeight(2),
@@ -977,7 +981,7 @@ class _HomePageState extends State<HomePage> {
                                                   config.verticalSpaceSmall(),
                                                   Text(
                                                     formatDateTime(
-                                                      dataList.scannedAt!,
+                                                      dataList.timestamp!,
                                                       dateTimeOnly: true,
                                                     ),
                                                     style: customTextStyle(
@@ -998,8 +1002,8 @@ class _HomePageState extends State<HomePage> {
                                                     viewQrDialog(
                                                       context,
                                                       config,
-                                                      geoData: dataList,
-                                                      'Latitude: ${dataList.latitude}, Longitude: ${dataList.longitude}',
+                                                      scannedData: dataList,
+                                                      'Latitude: ${dataList.geo!.latitude}, Longitude: ${dataList.geo!.longitude}',
                                                     );
                                                   } else if (value == 'delete') {
                                                     showDialog(
@@ -1011,7 +1015,7 @@ class _HomePageState extends State<HomePage> {
                                                                 'Are you sure you want to delete this geo location?',
                                                             onYesPressed: () {
                                                               hc.deleteQRData(
-                                                                geo: dataList.latitude,
+                                                                geo: dataList.geo!.latitude,
                                                               );
                                                               Get.back();
                                                             },
@@ -1063,37 +1067,37 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList is CalendarEventModel) {
+                                        } else if (dataList.calendarEvent is CalendarEventModel) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
                                             ),
                                             child: customListTileWidget(
                                               context,
-                                              'Event: ${dataList.summary ?? 'N/A'}',
+                                              'Event: ${dataList.calendarEvent!.summary ?? 'N/A'}',
                                               subtitle: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Description: ${dataList.description ?? 'N/A'}',
+                                                    'Description: ${dataList.calendarEvent!.description ?? 'N/A'}',
                                                     style: customTextStyle(color: darkGreyColor),
                                                   ),
                                                   Text(
-                                                    'Location: ${dataList.location ?? 'N/A'}',
+                                                    'Location: ${dataList.calendarEvent!.location ?? 'N/A'}',
                                                     style: customTextStyle(color: darkGreyColor),
                                                   ),
                                                   Text(
-                                                    'Start: ${formatDateTime(dataList.start!)}',
+                                                    'Start: ${formatDateTime(dataList.calendarEvent!.start!)}',
                                                     style: customTextStyle(color: darkGreyColor),
                                                   ),
                                                   Text(
-                                                    'End: ${formatDateTime(dataList.end!)}',
+                                                    'End: ${formatDateTime(dataList.calendarEvent!.end!)}',
                                                     style: customTextStyle(color: darkGreyColor),
                                                   ),
                                                   config.verticalSpaceSmall(),
                                                   Text(
                                                     formatDateTime(
-                                                      dataList.scannedAt!,
+                                                      dataList.timestamp!,
                                                       dateTimeOnly: true,
                                                     ),
                                                     style: customTextStyle(
@@ -1114,8 +1118,8 @@ class _HomePageState extends State<HomePage> {
                                                     viewQrDialog(
                                                       context,
                                                       config,
-                                                      calendarEventData: dataList,
-                                                      'Event: ${dataList.summary}, Location: ${dataList.location}, Start: ${formatDateTime(dataList.start!)}, End: ${formatDateTime(dataList.end!)}',
+                                                      scannedData: dataList,
+                                                      'Event: ${dataList.calendarEvent!.summary}, Location: ${dataList.calendarEvent!.location}, Start: ${formatDateTime(dataList.calendarEvent!.start!)}, End: ${formatDateTime(dataList.calendarEvent!.end!)}',
                                                     );
                                                   } else if (value == 'delete') {
                                                     showDialog(
@@ -1127,7 +1131,8 @@ class _HomePageState extends State<HomePage> {
                                                                 'Are you sure you want to delete this calendar event?',
                                                             onYesPressed: () {
                                                               hc.deleteQRData(
-                                                                calendarEvent: dataList.summary,
+                                                                calendarEvent:
+                                                                    dataList.calendarEvent!.summary,
                                                               );
                                                               Get.back();
                                                             },
@@ -1179,7 +1184,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList is BarcodeScanResult) {
+                                        } else if (dataList.isBarcode == true) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -1205,7 +1210,7 @@ class _HomePageState extends State<HomePage> {
                                                   config.verticalSpaceSmall(),
                                                   Text(
                                                     formatDateTime(
-                                                      dataList.scannedAt!,
+                                                      dataList.timestamp!,
                                                       dateTimeOnly: true,
                                                     ),
                                                     style: customTextStyle(
@@ -1226,7 +1231,7 @@ class _HomePageState extends State<HomePage> {
                                                     viewQrDialog(
                                                       context,
                                                       config,
-                                                      barcodeData: dataList,
+                                                      scannedData: dataList,
                                                       "${dataList.displayValue}",
                                                     );
                                                   } else if (value == 'delete') {
@@ -1313,15 +1318,7 @@ class _HomePageState extends State<HomePage> {
     BuildContext context,
     SizeConfig config,
     String data, {
-    UrlModel? urlData,
-    WifiModel? wifiData,
-    ContactInfoModel? contactInfoData,
-    EmailModel? emailData,
-    SmsModel? smsData,
-    PhoneModel? phoneData,
-    GeoPointModel? geoData,
-    CalendarEventModel? calendarEventData,
-    BarcodeScanResult? barcodeData,
+    ScannedCodeResultModel? scannedData,
   }) {
     return showDialog(
       context: context,
@@ -1335,8 +1332,8 @@ class _HomePageState extends State<HomePage> {
                     RepaintBoundary(
                       key: hc.qrKey,
                       child:
-                          barcodeData != null
-                              ? displayBarcodeImage(config, barcodeData: barcodeData)
+                          scannedData!.isBarcode != null
+                              ? displayBarcodeImage(config, barcodeData: scannedData)
                               : drawQrImage(data),
                     ),
                     config.verticalSpaceSmall(),
@@ -1353,7 +1350,7 @@ class _HomePageState extends State<HomePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children:
-                          urlData != null
+                          scannedData.url != null
                               ? List.generate(UrlActionType.values.length, (index) {
                                 IconData? icon;
                                 Color? color;
@@ -1363,7 +1360,7 @@ class _HomePageState extends State<HomePage> {
                                     icon = HeroIcons.globe_alt;
                                     color = blueColor;
                                     onTap = () async {
-                                      urlLaunchMethod(urlData.url!);
+                                      urlLaunchMethod(scannedData.url!.url!);
                                     };
                                     break;
                                   case UrlActionType.copy:
@@ -1371,7 +1368,7 @@ class _HomePageState extends State<HomePage> {
                                     color = greenishColor;
 
                                     onTap = () {
-                                      copyToClipboard(context, urlData.url!);
+                                      copyToClipboard(context, scannedData.url!.url!);
                                     };
 
                                     break;
@@ -1379,7 +1376,7 @@ class _HomePageState extends State<HomePage> {
                                     icon = HeroIcons.share;
                                     color = blueColor;
                                     onTap = () async {
-                                      hc.shareQr(hc.qrKey, text: urlData.url);
+                                      hc.shareQr(hc.qrKey, text: scannedData.url!.url);
                                     };
                                     break;
                                   case UrlActionType.close:
@@ -1398,7 +1395,7 @@ class _HomePageState extends State<HomePage> {
                                   radius: config.appHeight(3),
                                 );
                               })
-                              : wifiData != null
+                              : scannedData.wifi != null
                               ? List.generate(ActionType.values.length, (index) {
                                 IconData? icon;
                                 Color? color;
@@ -1410,9 +1407,9 @@ class _HomePageState extends State<HomePage> {
                                     onTap = () async {
                                       if (Platform.isAndroid) {
                                         await connectToWifi(
-                                          wifiData.ssid!,
-                                          wifiData.password!,
-                                          wifiData.wifiType!,
+                                          scannedData.wifi!.ssid!,
+                                          scannedData.wifi!.password!,
+                                          scannedData.wifi!.wifiType!,
                                         );
                                       } else {
                                         final uri = Uri.parse("App-Prefs:root=WIFI");
@@ -1425,7 +1422,7 @@ class _HomePageState extends State<HomePage> {
                                     color = blueAccent;
 
                                     onTap = () {
-                                      copyToClipboard(context, wifiData.password!);
+                                      copyToClipboard(context, scannedData.wifi!.password!);
                                     };
 
                                     break;
@@ -1436,7 +1433,7 @@ class _HomePageState extends State<HomePage> {
                                       hc.shareQr(
                                         hc.qrKey,
                                         text:
-                                            'Wi-Fi Credentials:\n\nSSID: ${wifiData.ssid}\nPassword: ${wifiData.password}\nSecurity Type: ${wifiData.wifiType}',
+                                            'Wi-Fi Credentials:\n\nSSID: ${scannedData.wifi!.ssid}\nPassword: ${scannedData.wifi!.password}\nSecurity Type: ${scannedData.wifi!.wifiType}',
                                       );
                                     };
                                     break;
@@ -1456,7 +1453,7 @@ class _HomePageState extends State<HomePage> {
                                   radius: config.appHeight(3),
                                 );
                               })
-                              : contactInfoData != null
+                              : scannedData.contactInfo != null
                               ? List.generate(ContactActionType.values.length, (index) {
                                 IconData? icon;
                                 Color? color;
@@ -1466,8 +1463,10 @@ class _HomePageState extends State<HomePage> {
                                     icon = HeroIcons.phone;
                                     color = blueColor;
                                     onTap = () async {
-                                      if (contactInfoData.contactNumber != null) {
-                                        urlLaunchMethod('tel:${contactInfoData.contactNumber}');
+                                      if (scannedData.contactInfo!.contactNumber != null) {
+                                        urlLaunchMethod(
+                                          'tel:${scannedData.contactInfo!.contactNumber}',
+                                        );
                                       } else {
                                         showErrorToast('Phone number not found');
                                       }
@@ -1478,8 +1477,10 @@ class _HomePageState extends State<HomePage> {
                                     color = greenishColor;
 
                                     onTap = () {
-                                      if (contactInfoData.contactEmail != null) {
-                                        urlLaunchMethod('mailto:${contactInfoData.contactEmail}');
+                                      if (scannedData.contactInfo!.contactEmail != null) {
+                                        urlLaunchMethod(
+                                          'mailto:${scannedData.contactInfo!.contactEmail}',
+                                        );
                                       }
                                     };
 
@@ -1490,7 +1491,7 @@ class _HomePageState extends State<HomePage> {
                                     onTap = () async {
                                       copyToClipboard(
                                         context,
-                                        'Name: ${contactInfoData.contactName}, Phone: ${contactInfoData.contactNumber}, E-mail: ${contactInfoData.contactEmail} Address: ${contactInfoData.contactAddress}',
+                                        'Name: ${scannedData.contactInfo!.contactName}, Phone: ${scannedData.contactInfo!.contactNumber}, E-mail: ${scannedData.contactInfo!.contactEmail} Address: ${scannedData.contactInfo!.contactAddress}',
                                       );
                                     };
                                     break;
@@ -1510,7 +1511,7 @@ class _HomePageState extends State<HomePage> {
                                   radius: config.appHeight(3),
                                 );
                               })
-                              : emailData != null
+                              : scannedData.email != null
                               ? List.generate(EmailActionType.values.length, (index) {
                                 IconData? icon;
                                 Color? color;
@@ -1520,9 +1521,9 @@ class _HomePageState extends State<HomePage> {
                                     icon = HeroIcons.envelope;
                                     color = blueColor;
                                     onTap = () async {
-                                      if (emailData.address != null) {
+                                      if (scannedData.email!.address != null) {
                                         urlLaunchMethod(
-                                          'mailto:${emailData.address}?subject=${Uri.encodeComponent(emailData.subject ?? '')}&body=${Uri.encodeComponent(emailData.body ?? '')}',
+                                          'mailto:${scannedData.email!.address}?subject=${Uri.encodeComponent(scannedData.email!.subject ?? '')}&body=${Uri.encodeComponent(scannedData.email!.body ?? '')}',
                                         );
                                       } else {
                                         showErrorToast('Phone number not found');
@@ -1534,12 +1535,12 @@ class _HomePageState extends State<HomePage> {
                                     color = greenishColor;
 
                                     onTap = () {
-                                      if (emailData.address != null) {
+                                      if (scannedData.email!.address != null) {
                                         hc.shareQr(
                                           hc.qrKey,
-                                          text: emailData.body,
-                                          subject: emailData.subject,
-                                          title: emailData.address,
+                                          text: scannedData.email!.body,
+                                          subject: scannedData.email!.subject,
+                                          title: scannedData.email!.address,
                                         );
                                       }
                                     };
@@ -1551,7 +1552,7 @@ class _HomePageState extends State<HomePage> {
                                     onTap = () async {
                                       copyToClipboard(
                                         context,
-                                        'Email: ${emailData.address}, Subject: ${emailData.subject}, Body: ${emailData.body}',
+                                        'Email: ${scannedData.email!.address}, Subject: ${scannedData.email!.subject}, Body: ${scannedData.email!.body}',
                                       );
                                     };
                                     break;
@@ -1571,7 +1572,7 @@ class _HomePageState extends State<HomePage> {
                                   radius: config.appHeight(3),
                                 );
                               })
-                              : smsData != null
+                              : scannedData.sms != null
                               ? List.generate(SmsActionType.values.length, (index) {
                                 IconData? icon;
                                 Color? color;
@@ -1581,9 +1582,9 @@ class _HomePageState extends State<HomePage> {
                                     icon = CupertinoIcons.chat_bubble;
                                     color = blueColor;
                                     onTap = () async {
-                                      if (smsData.number != null) {
+                                      if (scannedData.sms!.number != null) {
                                         urlLaunchMethod(
-                                          'sms:${smsData.number}?body=${Uri.encodeComponent(smsData.message ?? '')}',
+                                          'sms:${scannedData.sms!.number}?body=${Uri.encodeComponent(scannedData.sms!.message ?? '')}',
                                         );
                                       } else {
                                         showErrorToast('Phone number not found');
@@ -1595,12 +1596,12 @@ class _HomePageState extends State<HomePage> {
                                     color = greenishColor;
 
                                     onTap = () {
-                                      if (smsData.number != null) {
+                                      if (scannedData.sms!.number != null) {
                                         hc.shareQr(
                                           hc.qrKey,
-                                          text: smsData.message,
-                                          subject: smsData.number,
-                                          title: smsData.number,
+                                          text: scannedData.sms!.message,
+                                          subject: scannedData.sms!.number,
+                                          title: scannedData.sms!.number,
                                         );
                                       }
                                     };
@@ -1612,7 +1613,7 @@ class _HomePageState extends State<HomePage> {
                                     onTap = () async {
                                       copyToClipboard(
                                         context,
-                                        'SMS: ${smsData.number}, Message: ${smsData.message}',
+                                        'SMS: ${scannedData.sms!.number}, Message: ${scannedData.sms!.message}',
                                       );
                                     };
                                     break;
@@ -1632,7 +1633,7 @@ class _HomePageState extends State<HomePage> {
                                   radius: config.appHeight(3),
                                 );
                               })
-                              : phoneData != null
+                              : scannedData.phone != null
                               ? List.generate(PhoneActionType.values.length, (index) {
                                 IconData? icon;
                                 Color? color;
@@ -1642,8 +1643,8 @@ class _HomePageState extends State<HomePage> {
                                     icon = HeroIcons.phone;
                                     color = blueColor;
                                     onTap = () async {
-                                      if (phoneData.number != null) {
-                                        urlLaunchMethod('tel:${phoneData.number}');
+                                      if (scannedData.phone!.number != null) {
+                                        urlLaunchMethod('tel:${scannedData.phone!.number}');
                                       } else {
                                         showErrorToast('Phone number not found');
                                       }
@@ -1654,8 +1655,8 @@ class _HomePageState extends State<HomePage> {
                                     color = greenishColor;
 
                                     onTap = () {
-                                      if (phoneData.number != null) {
-                                        hc.shareQr(hc.qrKey, text: phoneData.number);
+                                      if (scannedData.phone!.number != null) {
+                                        hc.shareQr(hc.qrKey, text: scannedData.phone!.number);
                                       }
                                     };
 
@@ -1664,7 +1665,7 @@ class _HomePageState extends State<HomePage> {
                                     icon = HeroIcons.clipboard_document_list;
                                     color = blueColor;
                                     onTap = () async {
-                                      copyToClipboard(context, '${phoneData.number}');
+                                      copyToClipboard(context, '${scannedData.phone!.number}');
                                     };
                                     break;
                                   case PhoneActionType.close:
@@ -1683,7 +1684,7 @@ class _HomePageState extends State<HomePage> {
                                   radius: config.appHeight(3),
                                 );
                               })
-                              : geoData != null
+                              : scannedData.geo != null
                               ? List.generate(GeoActionType.values.length, (index) {
                                 IconData? icon;
                                 Color? color;
@@ -1693,14 +1694,14 @@ class _HomePageState extends State<HomePage> {
                                     icon = HeroIcons.map;
                                     color = blueColor;
                                     onTap = () async {
-                                      if (geoData.latitude != null) {
+                                      if (scannedData.geo!.latitude != null) {
                                         if (Platform.isAndroid) {
                                           urlLaunchMethod(
-                                            'geo:${geoData.latitude},${geoData.longitude}?q=${geoData.latitude},${geoData.longitude}',
+                                            'geo:${scannedData.geo!.latitude},${scannedData.geo!.longitude}?q=${scannedData.geo!.latitude},${scannedData.geo!.longitude}',
                                           );
                                         } else {
                                           urlLaunchMethod(
-                                            'https://maps.apple.com/?q=${geoData.latitude},${geoData.longitude}',
+                                            'https://maps.apple.com/?q=${scannedData.geo!.latitude},${scannedData.geo!.longitude}',
                                           );
                                         }
                                       } else {
@@ -1713,8 +1714,11 @@ class _HomePageState extends State<HomePage> {
                                     color = greenishColor;
 
                                     onTap = () {
-                                      if (geoData.latitude != null) {
-                                        hc.shareQr(hc.qrKey, text: geoData.latitude.toString());
+                                      if (scannedData.geo!.latitude != null) {
+                                        hc.shareQr(
+                                          hc.qrKey,
+                                          text: scannedData.geo!.latitude.toString(),
+                                        );
                                       }
                                     };
 
@@ -1725,7 +1729,7 @@ class _HomePageState extends State<HomePage> {
                                     onTap = () async {
                                       copyToClipboard(
                                         context,
-                                        '${geoData.latitude},${geoData.longitude}',
+                                        '${scannedData.geo!.latitude},${scannedData.geo!.longitude}',
                                       );
                                     };
                                     break;
@@ -1745,7 +1749,7 @@ class _HomePageState extends State<HomePage> {
                                   radius: config.appHeight(3),
                                 );
                               })
-                              : calendarEventData != null
+                              : scannedData.calendarEvent != null
                               ? List.generate(CalendarEventActionType.values.length, (index) {
                                 IconData? icon;
                                 Color? color;
@@ -1759,19 +1763,19 @@ class _HomePageState extends State<HomePage> {
                                       // Direct URL launch for adding event isn't standard, usually use a plugin.
                                       // Example: Use Google Calendar URL
                                       final start = Uri.encodeComponent(
-                                        calendarEventData.start!.toIso8601String(),
+                                        scannedData.calendarEvent!.start!.toIso8601String(),
                                       );
                                       final end = Uri.encodeComponent(
-                                        calendarEventData.end!.toIso8601String(),
+                                        scannedData.calendarEvent!.end!.toIso8601String(),
                                       );
                                       final title = Uri.encodeComponent(
-                                        calendarEventData.summary ?? '',
+                                        scannedData.calendarEvent!.summary ?? '',
                                       );
                                       final details = Uri.encodeComponent(
-                                        calendarEventData.description ?? '',
+                                        scannedData.calendarEvent!.description ?? '',
                                       );
                                       final location = Uri.encodeComponent(
-                                        calendarEventData.location ?? '',
+                                        scannedData.calendarEvent!.location ?? '',
                                       );
                                       final googleCalendarUrl =
                                           'https://www.google.com/calendar/render?action=TEMPLATE&text=$title&dates=$start/$end&details=$details&location=$location';
@@ -1784,7 +1788,7 @@ class _HomePageState extends State<HomePage> {
                                     color = greenishColor;
                                     onTap = () async {
                                       final text =
-                                          'Event: ${calendarEventData.summary}\nLocation: ${calendarEventData.location}\nStart: ${calendarEventData.start}\nEnd: ${calendarEventData.end}\nDetails: ${calendarEventData.description}';
+                                          'Event: ${scannedData.calendarEvent!.summary}\nLocation: ${scannedData.calendarEvent!.location}\nStart: ${scannedData.calendarEvent!.start}\nEnd: ${scannedData.calendarEvent!.end}\nDetails: ${scannedData.calendarEvent!.description}';
                                       hc.shareQr(hc.qrKey, text: text);
                                     };
                                     break;
@@ -1794,7 +1798,7 @@ class _HomePageState extends State<HomePage> {
                                     color = blueColor;
                                     onTap = () {
                                       final text =
-                                          'Event: ${calendarEventData.summary}\nLocation: ${calendarEventData.location}\nStart: ${calendarEventData.start}\nEnd: ${calendarEventData.end}\nDetails: ${calendarEventData.description}';
+                                          'Event: ${scannedData.calendarEvent!.summary}\nLocation: ${scannedData.calendarEvent!.location}\nStart: ${scannedData.calendarEvent!.start}\nEnd: ${scannedData.calendarEvent!.end}\nDetails: ${scannedData.calendarEvent!.description}';
                                       copyToClipboard(context, text);
                                     };
                                     break;
@@ -1816,7 +1820,7 @@ class _HomePageState extends State<HomePage> {
                                   radius: config.appHeight(3),
                                 );
                               })
-                              : barcodeData != null
+                              : scannedData.isBarcode == true
                               ? List.generate(BarCodeActionType.values.length, (index) {
                                 IconData? icon;
                                 Color? color;
@@ -1828,7 +1832,7 @@ class _HomePageState extends State<HomePage> {
                                     color = blueColor;
                                     onTap = () async {
                                       final uri = Uri.parse(
-                                        "https://www.google.com/search?q=${Uri.encodeFull(barcodeData.displayValue!)}",
+                                        "https://www.google.com/search?q=${Uri.encodeFull(scannedData.displayValue!)}",
                                       );
                                       await urlLaunchMethod(uri.toString());
                                     };
@@ -1839,7 +1843,7 @@ class _HomePageState extends State<HomePage> {
                                     color = greenishColor;
                                     onTap = () async {
                                       final text =
-                                          '\nType: ${barcodeData.format.name}\nValue: ${barcodeData.displayValue}\n';
+                                          '\nType: ${scannedData.format!.name}\nValue: ${scannedData.displayValue}\n';
                                       hc.shareQr(hc.qrKey, text: text);
                                     };
                                     break;
@@ -1848,7 +1852,7 @@ class _HomePageState extends State<HomePage> {
                                     icon = HeroIcons.clipboard_document_list;
                                     color = blueColor;
                                     onTap = () {
-                                      final text = barcodeData.displayValue!;
+                                      final text = scannedData.displayValue!;
                                       copyToClipboard(context, text);
                                     };
                                     break;

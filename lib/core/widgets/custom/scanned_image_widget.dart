@@ -12,10 +12,10 @@ import 'package:scan_qr/core/resources/export_resources.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:scan_qr/features/barcode/model/barcode_generate_params.dart';
+import 'package:scan_qr/features/scan/barcode/model/barcode_generate_params.dart';
+import 'package:scan_qr/features/scan/model/scan_code_result_model.dart';
 
-import '../../../features/barcode/controller/barcode_generation_controller.dart';
-import '../../../features/barcode/model/barcode_model.dart';
+import '../../../features/scan/barcode/controller/barcode_generation_controller.dart';
 import '../export_custom_widget.dart';
 
 Widget drawQrImage(String data) {
@@ -136,7 +136,7 @@ Future<Uint8List> generatePdfFromImage(Uint8List imageBytes) async {
 
 FutureBuilder<Uint8List> displayBarcodeImage(
   SizeConfig config, {
-  BarcodeScanResult? barcodeData,
+  ScannedCodeResultModel? barcodeData,
   BarcodeGenerateParams? params,
 }) {
   return FutureBuilder<Uint8List>(
@@ -147,7 +147,7 @@ FutureBuilder<Uint8List> displayBarcodeImage(
             ).generateBarcodeImage(params.data!, params.format, config)
             : Get.put(
               BarcodeGenerationController(),
-            ).generateBarcodeImage(barcodeData!.displayValue!, barcodeData.format, config),
+            ).generateBarcodeImage(barcodeData!.displayValue!, barcodeData.format!, config),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Center(child: CircularProgressIndicator());
