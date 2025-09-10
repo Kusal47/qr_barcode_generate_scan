@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/resources/export_resources.dart';
 import '../../../../core/widgets/export_common_widget.dart';
 import '../../../../core/widgets/export_custom_widget.dart';
+import '../../../home/controller/home_controller.dart';
 import '../../model/scan_code_result_model.dart';
 import '../model/barcode_generate_params.dart';
 
@@ -40,10 +41,23 @@ class BarcodeGenerationController extends GetxController {
     final saveQRData = ScannedCodeResultModel(
       displayValue: barcodeData,
       rawValue: barcodeData,
+      wifi: null,
+      url: null,
+      calendarEvent: null,
+      contactInfo: null,
+      email: null,
+      phone: null,
+      sms: null,
+      geo: null,
+      ssid: null,
+      password: null,
       format: barcodeGenerateParams.format,
       timestamp: DateTime.now(),
+      isBarcode: true,
     );
     await secureStorageService.saveScannedValue(saveQRData);
+    Get.find<HomeController>().loadHistory();
+
     update();
   }
 

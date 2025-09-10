@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/resources/export_resources.dart';
 import '../../../../core/widgets/export_common_widget.dart';
 import '../../../../core/widgets/export_custom_widget.dart';
+import '../../../home/controller/home_controller.dart';
 import '../../model/scan_code_result_model.dart';
 import '../model/qr_generate_params.dart';
 
@@ -45,7 +46,6 @@ class QrCodeGenerationController extends GetxController {
   final eventEndController = TextEditingController();
   QRGenerateParams? qrGenerateParams = QRGenerateParams();
   String qrData = "";
-
   final GlobalKey qrKey = GlobalKey();
   final formKey = GlobalKey<FormState>();
 
@@ -63,26 +63,86 @@ class QrCodeGenerationController extends GetxController {
   }
 
   final SecureStorageService secureStorageService = SecureStorageService();
-  generateQr(QRGenerateParams qrGenerateParams) async {
-    qrData = qrGenerateParams.generateQrString().toString();
+  void setValueinModel() {
+    qrGenerateParams = QRGenerateParams(
+      qrType: qrGenerateParams?.qrType,
+      wifi:
+          wifiNamecontroller.text.isNotEmpty
+              ? WifiModel(
+                ssid: wifiNamecontroller.text,
+                password: wifiPasswordcontroller.text,
+                wifiType: typeController.text,
+              )
+              : null,
+
+      url: urlcontroller.text.isNotEmpty ? UrlModel(url: urlcontroller.text) : null,
+      contactInfoModel:
+          contactNamecontroller.text.isNotEmpty
+              ? ContactInfoModel(
+                contactName: contactNamecontroller.text,
+                contactNumber: contactNumbercontroller.text,
+                contactEmail: contactEmailcontroller.text,
+                contactAddress: contactAddresscontroller.text,
+              )
+              : null,
+      email:
+          emailAddressController.text.isNotEmpty
+              ? EmailModel(
+                address: emailAddressController.text,
+                subject: emailSubjectController.text,
+                body: emailBodyController.text,
+              )
+              : null,
+      sms:
+          smsNumberController.text.isNotEmpty
+              ? SmsModel(number: smsNumberController.text, message: smsMessageController.text)
+              : null,
+      phone:
+          phoneNumberController.text.isNotEmpty
+              ? PhoneModel(number: phoneNumberController.text)
+              : null,
+      geo:
+          latitudeController.text.isNotEmpty
+              ? GeoPointModel(
+                latitude: double.tryParse(latitudeController.text),
+                longitude: double.tryParse(longitudeController.text),
+              )
+              : null,
+      calendarEvent:
+          eventTitleController.text.isNotEmpty
+              ? CalendarEventModel(
+                summary: eventTitleController.text,
+                description: eventDescriptionController.text,
+                location: eventLocationController.text,
+                start: startDate,
+                end: endDate,
+              )
+              : null,
+    );
+    update();
+  }
+
+  generateQr(QRGenerateParams qrGenerateParamsData) async {
+    qrData = qrGenerateParamsData.generateQrString().toString();
     final saveQRData = ScannedCodeResultModel(
       displayValue: qrData,
       rawValue: qrData,
-      format:  BarcodeFormat.qrCode,
-      type: qrGenerateParams.qrType?.toBarcodeType(),
+      format: BarcodeFormat.qrCode,
+      type: qrGenerateParamsData.qrType?.toBarcodeType(),
 
-      wifi: qrGenerateParams.wifi,
-      url: qrGenerateParams.url,
-      contactInfo: qrGenerateParams.contactInfoModel,
-      email: qrGenerateParams.email,
-      sms: qrGenerateParams.sms,
-      phone: qrGenerateParams.phone,
-      geo: qrGenerateParams.geo,
-      calendarEvent: qrGenerateParams.calendarEvent,
+      wifi: qrGenerateParamsData.wifi,
+      url: qrGenerateParamsData.url,
+      contactInfo: qrGenerateParamsData.contactInfoModel,
+      email: qrGenerateParamsData.email,
+      sms: qrGenerateParamsData.sms,
+      phone: qrGenerateParams!.phone,
+      geo: qrGenerateParamsData.geo,
+      calendarEvent: qrGenerateParamsData.calendarEvent,
       timestamp: DateTime.now(),
-     
     );
-    await secureStorageService.saveScannedValue( saveQRData);
+    await secureStorageService.saveScannedValue(saveQRData);
+    Get.find<HomeController>().loadHistory();
+
     update();
   }
 
@@ -110,10 +170,13 @@ class QrCodeGenerationController extends GetxController {
     } else {
       isSelected = name;
     }
+    resetControllers();
     qrData = "";
     update();
   }
 
+  DateTime? startDate;
+  DateTime? endDate;
   Future<void> eventDatePicker({bool isStart = false}) async {
     final DateTime? pickedDate = await datePicker(Get.context!);
 
@@ -132,16 +195,40 @@ class QrCodeGenerationController extends GetxController {
 
         // Save to params
         if (isStart) {
-          qrGenerateParams!.calendarEvent?.start = finalDateTime;
+          startDate = finalDateTime;
           eventStartController.text = formatDateTime(finalDateTime, dateTimeOnly: true);
         } else {
-          qrGenerateParams!.calendarEvent?.end = finalDateTime;
+          endDate = finalDateTime;
           eventEndController.text = formatDateTime(finalDateTime, dateTimeOnly: true);
         }
 
         update();
       }
     }
+  }
+
+  resetControllers() {
+    urlcontroller.clear();
+    typeController.clear();
+    wifiNamecontroller.clear();
+    wifiPasswordcontroller.clear();
+    contactNamecontroller.clear();
+    contactNumbercontroller.clear();
+    contactEmailcontroller.clear();
+    contactAddresscontroller.clear();
+    emailAddressController.clear();
+    emailSubjectController.clear();
+    emailBodyController.clear();
+    smsNumberController.clear();
+    smsMessageController.clear();
+    phoneNumberController.clear();
+    latitudeController.clear();
+    longitudeController.clear();
+    eventTitleController.clear();
+    eventDescriptionController.clear();
+    eventLocationController.clear();
+    eventStartController.clear();
+    eventEndController.clear();
   }
 
   @override

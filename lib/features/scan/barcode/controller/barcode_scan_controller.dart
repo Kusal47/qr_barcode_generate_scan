@@ -48,11 +48,11 @@ class BarcodeScanController extends GetxController {
   }
 
   Future<void> resetScanner() async {
+    await stopScanner();
     barcodeScannedData = null;
     imageBytes = null;
     barcodeKey = GlobalKey();
-    await stopScanner();
-    startScanner(handleBarcode);
+    await startScanner(handleBarcode);
     update();
   }
 
@@ -91,7 +91,7 @@ class BarcodeScanController extends GetxController {
     }
   }
 
-  void startScanner(Function(BarcodeCapture) onDetect) {
+  startScanner(Function(BarcodeCapture) onDetect) {
     controller.start();
     subscription = controller.barcodes.listen(onDetect);
   }

@@ -35,10 +35,10 @@ class QrScanController extends GetxController {
   }
 
   Future<void> resetScanner() async {
+    await stopScanner();
     qrScannedData = null;
     qrImageBytes = null;
     qrKey = GlobalKey();
-    await stopScanner();
     await startScanner(handleBarcode);
     update();
   }

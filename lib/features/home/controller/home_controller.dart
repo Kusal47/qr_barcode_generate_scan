@@ -86,9 +86,7 @@ class HomeController extends GetxController {
   }) async {
     if (all) {
       await secureStorageService.deleteQrData();
-      for (var fetch in [loadHistory]) {
-        fetch();
-      }
+      await loadHistory();
     } else {
       await secureStorageService.deleteIndividualQrData(
         (ssid ?? url ?? contactNumber ?? email ?? sms ?? phone ?? geo ?? calendarEvent ?? barcode)

@@ -240,7 +240,7 @@ class _HomePageState extends State<HomePage> {
                                       itemBuilder: (_, index) {
                                         bool isVisible = hc.visibleIndex == index;
                                         final dataList = hc.historyList[index];
-                                        if (dataList.wifi is WifiModel) {
+                                        if (dataList.wifi != null) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -381,7 +381,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList.url is UrlModel) {
+                                        } else if (dataList.url != null) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -491,7 +491,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList.contactInfo is ContactInfoModel) {
+                                        } else if (dataList.contactInfo != null) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -617,7 +617,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList.email is EmailModel) {
+                                        } else if (dataList.email != null) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -744,7 +744,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList.sms is SmsModel) {
+                                        } else if (dataList.sms != null) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -850,7 +850,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList.phone is PhoneModel) {
+                                        } else if (dataList.phone != null) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -949,7 +949,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList.geo is GeoPointModel) {
+                                        } else if (dataList.geo != null) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -1067,7 +1067,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           );
-                                        } else if (dataList.calendarEvent is CalendarEventModel) {
+                                        } else if (dataList.calendarEvent != null) {
                                           return Padding(
                                             padding: EdgeInsets.all(
                                               config.appHorizontalPaddingMedium(),
@@ -1078,23 +1078,34 @@ class _HomePageState extends State<HomePage> {
                                               subtitle: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                    'Description: ${dataList.calendarEvent!.description ?? 'N/A'}',
-                                                    style: customTextStyle(color: darkGreyColor),
-                                                  ),
+                                                  config.verticalSpaceVerySmall(),
+
                                                   Text(
                                                     'Location: ${dataList.calendarEvent!.location ?? 'N/A'}',
                                                     style: customTextStyle(color: darkGreyColor),
                                                   ),
+                                                  config.verticalSpaceVerySmall(),
+
                                                   Text(
                                                     'Start: ${formatDateTime(dataList.calendarEvent!.start!)}',
                                                     style: customTextStyle(color: darkGreyColor),
                                                   ),
+                                                  config.verticalSpaceVerySmall(),
+
                                                   Text(
                                                     'End: ${formatDateTime(dataList.calendarEvent!.end!)}',
                                                     style: customTextStyle(color: darkGreyColor),
                                                   ),
+                                                  config.verticalSpaceVerySmall(),
+
+                                                  ExpandableTextWidget(
+                                                    text:
+                                                        dataList.calendarEvent!.description ??
+                                                        'N/A',
+                                                    trimLength: 50,
+                                                  ),
                                                   config.verticalSpaceSmall(),
+
                                                   Text(
                                                     formatDateTime(
                                                       dataList.timestamp!,

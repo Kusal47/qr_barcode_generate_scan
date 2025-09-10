@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../resources/export_resources.dart';
@@ -32,23 +33,33 @@ class _ExpandableTextWidgetState extends State<ExpandableTextWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          displayText,
-          style: customTextStyle(color: darkGreyColor, overflow: TextOverflow.visible),
-        ),
-        if (widget.text.length > widget.trimLength)
-          GestureDetector(
-            onTap: () => setState(() => isExpanded = !isExpanded),
-            child: Text(
-              isExpanded ? ' Show less' : ' Show more',
-              style: customTextStyle(
-                fontSize: 12,
-                color: primaryColor,
-                fontWeight: FontWeight.bold,
-                overflow: TextOverflow.visible,
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: displayText,
+                style: customTextStyle(
+                  color: darkGreyColor,
+                  overflow: TextOverflow.visible,
+                  fontSize: 12,
+                ),
               ),
-            ),
+              if (widget.text.length > widget.trimLength)
+                TextSpan(
+                  recognizer:
+                      TapGestureRecognizer()
+                        ..onTap = () => setState(() => isExpanded = !isExpanded),
+                  text: isExpanded ? ' Show less' : ' Show more',
+                  style: customTextStyle(
+                    fontSize: 12,
+                    color: primaryColor,
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+            ],
           ),
+        ),
       ],
     );
   }

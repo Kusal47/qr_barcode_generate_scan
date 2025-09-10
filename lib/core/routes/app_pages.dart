@@ -1,7 +1,7 @@
 
 import 'package:get/get.dart';
 import 'package:scan_qr/features/scan/barcode/presentation/barcode_generator_screen.dart';
-import 'package:scan_qr/features/scan/barcode/presentation/barcode_page.dart';
+import 'package:scan_qr/features/scan/barcode/presentation/barcode_scan_page.dart';
 import 'package:scan_qr/features/home/presentation/home_page.dart';
 
 import '../../features/onboarding/presentation/onboarding_page.dart';

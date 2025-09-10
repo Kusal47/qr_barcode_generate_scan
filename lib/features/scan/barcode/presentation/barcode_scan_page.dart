@@ -8,7 +8,7 @@ import '../../../../core/resources/export_resources.dart';
 import '../../../../core/widgets/export_common_widget.dart';
 import '../../../../core/widgets/export_custom_widget.dart';
 import '../../model/scan_code_result_model.dart';
-import '../controller/barcode_controller.dart';
+import '../controller/barcode_scan_controller.dart';
 
 class BarcodeScanScreen extends StatefulWidget {
   const BarcodeScanScreen({super.key});
@@ -317,8 +317,8 @@ class _BarcodeScanScreenState extends State<BarcodeScanScreen> {
                 break;
               case BarCodeActionType.close:
                 assign(Icons.close, redColor, () {
-                  Get.back();
                   barcodeController.resetScanner();
+                  Get.back();
                 });
                 break;
             }

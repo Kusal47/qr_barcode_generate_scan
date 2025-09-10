@@ -15,7 +15,17 @@ class QRGenerateParams {
   CalendarEventModel? calendarEvent;
   QRType? qrType;
 
-  QRGenerateParams({this.url, this.qrType});
+  QRGenerateParams({
+    this.url,
+    this.wifi,
+    this.calendarEvent,
+    this.email,
+    this.sms,
+    this.contactInfoModel,
+    this.geo,
+    this.phone,
+    this.qrType,
+  });
 
   String generateQrString() {
     switch (qrType) {
