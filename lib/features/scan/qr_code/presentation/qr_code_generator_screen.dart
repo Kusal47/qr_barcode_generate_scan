@@ -180,8 +180,10 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Contact No.",
                                         hintTxt: "Enter contact number",
                                         onSaved: (p0) {
-                                          qgc.contactNumbercontroller.text = p0.completeNumber;
+                                          qgc.contactNumbercontroller.text = p0.number;
+                                          qgc.completeContactNumber = p0.completeNumber;
                                         },
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                         validator: Validators.checkPhoneNumberField,
                                       ),
                                       config.verticalSpaceSmall(),
@@ -247,8 +249,10 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         hintTxt: "Enter recipient phone number",
                                         validator: Validators.checkPhoneNumberField,
                                         onSaved: (p0) {
-                                          qgc.smsNumberController.text = p0.completeNumber;
+                                          qgc.smsNumberController.text = p0.number;
+                                          qgc.completeSmsNumber = p0.completeNumber;
                                         },
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                       ),
                                       config.verticalSpaceSmall(),
                                       PrimaryFormField(
@@ -269,8 +273,10 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         hintTxt: "Enter phone number",
                                         validator: Validators.checkPhoneNumberField,
                                         onSaved: (p0) {
-                                          qgc.phoneNumberController.text = p0.completeNumber;
+                                          qgc.phoneNumberController.text = p0.number;
+                                          qgc.completePhoneNumber = p0.completeNumber;
                                         },
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                       ),
                                     ]
                                     // 📍 Geo

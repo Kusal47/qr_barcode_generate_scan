@@ -92,6 +92,7 @@ class HomeController extends GetxController {
         (ssid ?? url ?? contactNumber ?? email ?? sms ?? phone ?? geo ?? calendarEvent ?? barcode)
             .toString(),
       );
+      loadHistory();
     }
 
     update();

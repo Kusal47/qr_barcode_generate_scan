@@ -52,10 +52,7 @@ class SecureStorageService {
         List<ScannedCodeResultModel> list =
             decoded.map((e) => ScannedCodeResultModel.fromJson(e)).toList();
 
-        // Ensure uniqueness again
-        final uniqueData = {for (var val in list) val.uniqueKey: val}.values.toList();
-
-        return uniqueData;
+        return list;
       }
       return [];
     } catch (e) {

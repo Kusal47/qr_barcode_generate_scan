@@ -65,10 +65,10 @@ class ScannedCodeResultModel {
     }
 
     return ScannedCodeResultModel(
-      displayValue: json['displayValue'],
-      rawValue: json['rawValue'],
+      displayValue: json['displayValue'] ?? "",
+      rawValue: json['rawValue'] ?? "",
       format: barcodeFormat,
-      type: BarcodeType.values[json['type']],
+      type: json['type'] != null ? BarcodeType.values[json['type']] : BarcodeType.unknown,
       wifi: json['wifi'] != null ? WifiModel.fromJson(json['wifi']) : null,
       url: json['url'] != null ? UrlModel.fromJson(json['url']) : null,
       contactInfo:

@@ -17,6 +17,7 @@ class QrCodeGenerationController extends GetxController {
   final TextEditingController wifiPasswordcontroller = TextEditingController();
   final TextEditingController contactNamecontroller = TextEditingController();
   final TextEditingController contactNumbercontroller = TextEditingController();
+  String completeContactNumber = "";
   final TextEditingController contactEmailcontroller = TextEditingController();
   final TextEditingController contactAddresscontroller = TextEditingController();
   final TextEditingController textController = TextEditingController();
@@ -29,10 +30,12 @@ class QrCodeGenerationController extends GetxController {
 
   // 💬 SMS
   final smsNumberController = TextEditingController();
+  String completeSmsNumber = "";
   final smsMessageController = TextEditingController();
 
   // ☎ Phone
   final phoneNumberController = TextEditingController();
+  String completePhoneNumber = "";
 
   // 📍 Geo
   final latitudeController = TextEditingController();
@@ -80,7 +83,7 @@ class QrCodeGenerationController extends GetxController {
           contactNamecontroller.text.isNotEmpty
               ? ContactInfoModel(
                 contactName: contactNamecontroller.text,
-                contactNumber: contactNumbercontroller.text,
+                contactNumber: completeContactNumber,
                 contactEmail: contactEmailcontroller.text,
                 contactAddress: contactAddresscontroller.text,
               )
@@ -95,12 +98,9 @@ class QrCodeGenerationController extends GetxController {
               : null,
       sms:
           smsNumberController.text.isNotEmpty
-              ? SmsModel(number: smsNumberController.text, message: smsMessageController.text)
+              ? SmsModel(number: completeSmsNumber, message: smsMessageController.text)
               : null,
-      phone:
-          phoneNumberController.text.isNotEmpty
-              ? PhoneModel(number: phoneNumberController.text)
-              : null,
+      phone: phoneNumberController.text.isNotEmpty ? PhoneModel(number: completePhoneNumber) : null,
       geo:
           latitudeController.text.isNotEmpty
               ? GeoPointModel(
@@ -142,7 +142,7 @@ class QrCodeGenerationController extends GetxController {
     );
     await secureStorageService.saveScannedValue(saveQRData);
     Get.find<HomeController>().loadHistory();
-
+   
     update();
   }
 
@@ -170,8 +170,9 @@ class QrCodeGenerationController extends GetxController {
     } else {
       isSelected = name;
     }
-    resetControllers();
     qrData = "";
+    resetControllers();
+    formKey.currentState?.reset();
     update();
   }
 

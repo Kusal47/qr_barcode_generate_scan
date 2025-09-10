@@ -864,6 +864,7 @@ class _HomePageState extends State<HomePage> {
                                                 color: theme.primaryColor,
                                               ),
                                               subtitle: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   config.verticalSpaceSmall(),
                                                   Text(
