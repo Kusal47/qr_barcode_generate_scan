@@ -10,6 +10,7 @@ export 'custom/custom_title.dart';
 export 'custom/list_tiles_widget.dart';
 export 'custom/shimmer_custom_design.dart';
 export 'custom/custom_smart_refresher.dart';
-export 'custom/qr_image_widget.dart';
+export 'custom/scanned_image_widget.dart';
 export 'custom/menu_anchor_dropdown_widget.dart';
 export 'custom/expandable_text.dart';
+export 'custom/custom_scan_detail_bottomsheet.dart';

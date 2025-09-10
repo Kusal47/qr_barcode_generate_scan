@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:scan_qr/features/qr_code/model/qr_scan_model.dart';
+import '../../features/barcode/model/barcode_model.dart';
 import '../constants/storage_constants.dart';
 
 class SecureStorageService {
@@ -22,6 +23,7 @@ class SecureStorageService {
     await _storage.delete(key: key);
   }
 
+  //TODO: QR CODE STORAGE
   Future<void> saveWifiData(List<WifiModel> wifiData) async {
     try {
       final uniqueWifi = {for (var val in wifiData) val.ssid: val}.values.toList();
@@ -34,28 +36,12 @@ class SecureStorageService {
     }
   }
 
-  Future<List<WiFi>>? getWifiData() async {
+  Future<List<WifiModel>?> getWifiData() async {
     try {
       String? qrData = await readSecureData(StorageConstants.wifiHistory);
       if (qrData != null) {
         List<dynamic> qrDataMap = json.decode(qrData);
-        List<WiFi> scannedWifiList =
-            qrDataMap
-                .map(
-                  (e) => WiFi(
-                    ssid: e['ssid'],
-                    password: e['password'],
-                    encryptionType:
-                        e['wifiType'] == 'WPA'
-                            ? EncryptionType.wpa
-                            : e['wifiType'] == 'WEP'
-                            ? EncryptionType.wep
-                            : e['wifiType'] == 'None'
-                            ? EncryptionType.open
-                            : EncryptionType.unknown,
-                  ),
-                )
-                .toList();
+        List<WifiModel> scannedWifiList = qrDataMap.map((e) => WifiModel.fromJson(e)).toList();
         final uniqueWifi = {for (var val in scannedWifiList) val.ssid: val}.values.toList();
         return uniqueWifi;
       } else {
@@ -79,13 +65,13 @@ class SecureStorageService {
     }
   }
 
-  Future<List<UrlBookmark>>? getUrlData() async {
+  Future<List<UrlModel>>? getUrlData() async {
     try {
       String? qrData = await readSecureData(StorageConstants.urlHistory);
       if (qrData != null) {
         List<dynamic> qrDataMap = json.decode(qrData);
-        List<UrlBookmark> scannedUrlList =
-            qrDataMap.map((e) => UrlBookmark(url: e['url'], title: e['title'])).toList();
+        List<UrlModel> scannedUrlList =
+            qrDataMap.map((e) => UrlModel.fromJson(e)).toList();
         return scannedUrlList;
       } else {
         return [];
@@ -108,22 +94,15 @@ class SecureStorageService {
     }
   }
 
-  Future<List<ContactInfo>>? getContactInfoData() async {
+  Future<List<ContactInfoModel>>? getContactInfoData() async {
     try {
       String? qrData = await readSecureData(StorageConstants.contactInfoHistory);
       if (qrData != null) {
         List<dynamic> qrDataMap = json.decode(qrData);
-        List<ContactInfo> scannedContactInfoList =
+        List<ContactInfoModel> scannedContactInfoList =
             qrDataMap
                 .map(
-                  (e) => ContactInfo(
-                    name: PersonName(formattedName: e['contactName']),
-                    phones: [Phone(number: e['contactNumber'])],
-                    emails: [Email(address: e['contactEmail'])],
-                    addresses: [
-                      Address(addressLines: [e['contactAddress']]),
-                    ],
-                  ),
+                  (e) => ContactInfoModel.fromJson(e),
                 )
                 .toList();
         return scannedContactInfoList;
@@ -148,14 +127,14 @@ class SecureStorageService {
     }
   }
 
-  Future<List<Email>?> getEmailData() async {
+  Future<List<EmailModel>?> getEmailData() async {
     try {
       String? data = await readSecureData(StorageConstants.emailHistory);
       if (data != null) {
         List<dynamic> qrDataMap = json.decode(data);
-        List<Email> scannedData =
+        List<EmailModel> scannedData =
             qrDataMap
-                .map((e) => Email(address: e['address'], subject: e['subject'], body: e['body']))
+                .map((e) => EmailModel.fromJson(e))
                 .toList();
         final uniqueData = {for (var val in scannedData) val.address: val}.values.toList();
         return uniqueData;
@@ -180,14 +159,14 @@ class SecureStorageService {
     }
   }
 
-  Future<List<SMS>?> getSmsData() async {
+  Future<List<SmsModel>?> getSmsData() async {
     try {
       String? data = await readSecureData(StorageConstants.smsHistory);
       if (data != null) {
         List<dynamic> mapData = json.decode(data);
-        List<SMS> scannedData =
-            mapData.map((e) => SMS(phoneNumber: e['number'], message: e['message'])).toList();
-        final uniqueData = {for (var val in scannedData) val.phoneNumber: val}.values.toList();
+        List<SmsModel> scannedData =
+            mapData.map((e) => SmsModel.fromJson(e)).toList();
+        final uniqueData = {for (var val in scannedData) val.number: val}.values.toList();
 
         return uniqueData;
       } else {
@@ -211,12 +190,12 @@ class SecureStorageService {
     }
   }
 
-  Future<List<Phone>?> getPhoneData() async {
+  Future<List<PhoneModel>?> getPhoneData() async {
     try {
       String? data = await readSecureData(StorageConstants.phoneHistory);
       if (data != null) {
         List<dynamic> mapData = json.decode(data);
-        List<Phone> scannedData = mapData.map((e) => Phone(number: e['number'])).toList();
+        List<PhoneModel> scannedData = mapData.map((e) => PhoneModel.fromJson(e)).toList();
         final uniqueData = {for (var val in scannedData) val.number: val}.values.toList();
 
         return uniqueData;
@@ -242,14 +221,14 @@ class SecureStorageService {
     }
   }
 
-  Future<List<GeoPoint>?> getGeoData() async {
+  Future<List<GeoPointModel>?> getGeoData() async {
     try {
       String? data = await readSecureData(StorageConstants.geoHistory);
       if (data != null) {
         List<dynamic> mapData = json.decode(data);
-        List<GeoPoint> scannedData =
+        List<GeoPointModel> scannedData =
             mapData
-                .map((e) => GeoPoint(latitude: e['latitude'], longitude: e['longitude']))
+                .map((e) => GeoPointModel.fromJson( e))
                 .toList();
         final uniqueData = {for (var val in scannedData) val.latitude: val}.values.toList();
 
@@ -276,21 +255,16 @@ class SecureStorageService {
     }
   }
 
-  Future<List<CalendarEvent>?> getCalendarEventData() async {
+  Future<List<CalendarEventModel>?> getCalendarEventData() async {
     try {
       String? data = await readSecureData(StorageConstants.calendarEventHistory);
       if (data != null) {
         List<dynamic> mapData = json.decode(data);
 
-        List<CalendarEvent> scannedData =
+        List<CalendarEventModel> scannedData =
             mapData
                 .map(
-                  (e) => CalendarEvent(
-                    summary: e['title'],
-                    description: e['description'],
-                    start: e['startDate'],
-                    end: e['endDate'],
-                  ),
+                  (e) => CalendarEventModel.fromJson(e),
                 )
                 .toList();
         final uniqueData = {for (var val in scannedData) val.summary: val}.values.toList();
@@ -301,6 +275,43 @@ class SecureStorageService {
       }
     } catch (e) {
       log("Error getting Calendar Event data: $e");
+      return [];
+    }
+  }
+  // TODO: BARCODE STORAGE
+
+  Future<void> saveBarcodeData(List<BarcodeScanResult> barcodeData) async {
+    try {
+      final existingData = await getBarcodeData();
+      if (existingData != null) {
+        barcodeData.addAll(existingData);
+      }
+      final uniqueData = {for (var val in barcodeData) val.displayValue: val}.values.toList();
+
+      String dataJson = json.encode(uniqueData.map((e) => e.toJson()).toList());
+      await writeSecureData(StorageConstants.barcodeCodeHistory, dataJson);
+      log("Saved Barcode data: $dataJson");
+    } catch (e) {
+      log("Error saving Barcode data: $e");
+    }
+  }
+
+  Future<List<BarcodeScanResult>?> getBarcodeData() async {
+    try {
+      String? data = await readSecureData(StorageConstants.barcodeCodeHistory);
+      if (data != null) {
+        List<dynamic> mapData = json.decode(data);
+
+        List<BarcodeScanResult> scannedData =
+            mapData.map((e) => BarcodeScanResult.fromJson(e)).toList();
+        final uniqueData = {for (var val in scannedData) val.displayValue: val}.values.toList();
+        log("Unique data: ${uniqueData.length}");
+        return uniqueData;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      log("Error getting Barcode data: $e");
       return [];
     }
   }
@@ -315,50 +326,71 @@ class SecureStorageService {
     String? phone,
     double? geo,
     String? calendarEvent,
+    String? barcode,
   }) async {
     try {
-      if (ssid != null && ssid.isNotEmpty) {
-        final data = await getWifiData();
-        List<WifiModel> wifiData = data!.map((e) => WifiModel.fromJson(e)).toList();
-        wifiData.removeWhere((element) => element.ssid == ssid);
-        await saveWifiData(wifiData);
-      } else if (url != null && url.isNotEmpty) {
-        final data = await getUrlData();
-        List<UrlModel> urlData = data!.map((e) => UrlModel.fromJson(e)).toList();
-        urlData.removeWhere((element) => element.url == url);
-        await saveUrlData(urlData);
-      } else if (contactNumber != null && contactNumber.isNotEmpty) {
-        final data = await getContactInfoData();
-        List<ContactInfoModel> contactInfoData =
-            data!.map((e) => ContactInfoModel.fromJson(e)).toList();
-        contactInfoData.removeWhere((element) => element.contactNumber == contactNumber);
-        await saveContactInfoData(contactInfoData);
-      } else if (email != null && email.isNotEmpty) {
-        final data = await getEmailData();
-        List<EmailModel> emailData = data!.map((e) => EmailModel.fromJson(e)).toList();
-        emailData.removeWhere((element) => element.address == email);
-        await saveEmailData(emailData);
-      } else if (sms != null && sms.isNotEmpty) {
-        final data = await getSmsData();
-        List<SmsModel> smsData = data!.map((e) => SmsModel.fromJson(e)).toList();
-        smsData.removeWhere((element) => element.number == sms);
-        await saveSmsData(smsData);
-      } else if (phone != null && phone.isNotEmpty) {
-        final data = await getPhoneData();
-        List<PhoneModel> phoneData = data!.map((e) => PhoneModel.fromJson(e)).toList();
-        phoneData.removeWhere((element) => element.number == phone);
-        await savePhoneData(phoneData);
-      } else if (geo != null && geo != 0) {
-        final data = await getGeoData();
-        List<GeoPointModel> geoData = data!.map((e) => GeoPointModel.fromJson(e)).toList();
-        geoData.removeWhere((element) => element.latitude == geo);
-        await saveGeoData(geoData);
-      } else if (calendarEvent != null && calendarEvent.isNotEmpty) {
-        final data = await getCalendarEventData();
-        List<CalendarEventModel> calendarEventData =
-            data!.map((e) => CalendarEventModel.fromJson(e)).toList();
-        calendarEventData.removeWhere((element) => element.summary == calendarEvent);
-        await saveCalendarEventData(calendarEventData);
+      final deletions = <Future<void> Function()>[
+        if (ssid != null && ssid.isNotEmpty)
+          () async {
+            final data = (await getWifiData())!.map((e) => WifiModel.fromJson(e.toJson())).toList();
+            data.removeWhere((e) => e.ssid == ssid);
+            await saveWifiData(data);
+          },
+        if (url != null && url.isNotEmpty)
+          () async {
+            final data = (await getUrlData())!.map((e) => UrlModel.fromJson(e.toJson())).toList();
+            data.removeWhere((e) => e.url == url);
+            await saveUrlData(data);
+          },
+        if (contactNumber != null && contactNumber.isNotEmpty)
+          () async {
+            final data =
+                (await getContactInfoData())!.map((e) => ContactInfoModel.fromJson(e.toJson())).toList();
+            data.removeWhere((e) => e.contactNumber == contactNumber);
+            await saveContactInfoData(data);
+          },
+        if (email != null && email.isNotEmpty)
+          () async {
+            final data = (await getEmailData())!.map((e) => EmailModel.fromJson(e.toJson())).toList();
+            data.removeWhere((e) => e.address == email);
+            await saveEmailData(data);
+          },
+        if (sms != null && sms.isNotEmpty)
+          () async {
+            final data = (await getSmsData())!.map((e) => SmsModel.fromJson(e.toJson())).toList();
+            data.removeWhere((e) => e.number == sms);
+            await saveSmsData(data);
+          },
+        if (phone != null && phone.isNotEmpty)
+          () async {
+            final data = (await getPhoneData())!.map((e) => PhoneModel.fromJson(e.toJson())).toList();
+            data.removeWhere((e) => e.number == phone);
+            await savePhoneData(data);
+          },
+        if (geo != null && geo != 0)
+          () async {
+            final data = (await getGeoData())!.map((e) => GeoPointModel.fromJson(e.toJson())).toList();
+            data.removeWhere((e) => e.latitude == geo);
+            await saveGeoData(data);
+          },
+        if (calendarEvent != null && calendarEvent.isNotEmpty)
+          () async {
+            final data =
+                (await getCalendarEventData())!.map((e) => CalendarEventModel.fromJson(e.toJson())).toList();
+            data.removeWhere((e) => e.summary == calendarEvent);
+            await saveCalendarEventData(data);
+          },
+        if (barcode != null && barcode.isNotEmpty)
+          () async {
+            final data = (await getBarcodeData())!;
+            data.removeWhere((e) => e.displayValue == barcode);
+            await saveBarcodeData(data);
+          },
+      ];
+
+      // Execute first matching deletion
+      if (deletions.isNotEmpty) {
+        await deletions.first();
       }
     } catch (e) {
       log("Error while deleting data: $e");
@@ -374,5 +406,6 @@ class SecureStorageService {
     await deleteSecureData(StorageConstants.phoneHistory);
     await deleteSecureData(StorageConstants.geoHistory);
     await deleteSecureData(StorageConstants.calendarEventHistory);
+    await deleteSecureData(StorageConstants.barcodeCodeHistory);
   }
 }

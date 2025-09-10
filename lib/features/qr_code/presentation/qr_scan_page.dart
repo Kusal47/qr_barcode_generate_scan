@@ -34,7 +34,6 @@ class _QRScanScreenState extends State<QRScanScreen> {
 
     try {
       qrController.qrScannedData = await qrController.handleBarcode(barcodes);
-      log(qrController.qrScannedData.toString());
 
       if (qrController.qrScannedData != null) {
         if (qrController.qrScannedData!.wifi != null) {
@@ -218,27 +217,30 @@ class _QRScanScreenState extends State<QRScanScreen> {
                         fit: BoxFit.cover,
                         onDetect: _handleBarcode,
                       ),
-                      CustomPaint(
-                        painter: FadePainter(),
-                        child: Center(
-                          child: Container(
-                            decoration:
-                                qrController.qrScannedData != null
-                                    ? null
-                                    : BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(color: orangeColor, width: 3),
+                      Center(
+                        child: Container(
+                          height: config.appHeight(40),
+                          decoration:
+                              qc.qrScannedData != null
+                                  ? null
+                                  : BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(UiAssets.qrScanGif),
+                                      fit: BoxFit.contain,
                                     ),
-                            height: size.height * 0.235,
-                            width: size.height * 0.235,
-                            child:
-                                qrController.qrScannedData != null
-                                    ? RepaintBoundary(
-                                      key: qrController.qrKey,
-                                      child: drawQrImage(qrController.qrScannedData!.displayValue!),
-                                    )
-                                    : null,
-                          ),
+                                  ),
+
+                          child:
+                              qc.qrScannedData != null
+                                  ?
+                                  // qc.qrImageBytes != null
+                                  //     ? Image.memory(qc.qrImageBytes!, fit: BoxFit.fill)
+                                  //     :
+                                  RepaintBoundary(
+                                    key: qc.qrKey,
+                                    child: drawQrImage(qc.qrScannedData!.displayValue!),
+                                  )
+                                  : null,
                         ),
                       ),
 
@@ -369,7 +371,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
   }
 
   detailsBottomSheet(QRCodeScanResult qrData) {
-    return qrDetailsBottomSheet<QRCodeScanResult, ActionType>(
+    return scanDetailsBottomSheet<QRCodeScanResult, ActionType>(
       model: qrData,
       title: "WiFi Details",
       actions: ActionType.values,
@@ -430,13 +432,13 @@ class _QRScanScreenState extends State<QRScanScreen> {
   }
 
   urlDetailsBottomSheet(QRCodeScanResult qrData) {
-    return qrDetailsBottomSheet<UrlModel, UrlActionType>(
+    return scanDetailsBottomSheet<UrlModel, UrlActionType>(
       model: qrData.url!,
       title: "URL Link",
       actions: UrlActionType.values,
       contentBuilder:
           (url) => [
-            if (url.title != null)
+            if (url.title != null && url.title!.isNotEmpty)
               Text(
                 "Title: ${url.title}",
                 style: customTextStyle(
@@ -445,7 +447,10 @@ class _QRScanScreenState extends State<QRScanScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            Text("URL: ${url.url}", style: customTextStyle()),
+            Text(
+              "URL: ${url.url}",
+              style: customTextStyle(color: blackColor, fontSize: 16, fontWeight: FontWeight.w500),
+            ),
           ],
       actionBuilder: (type, assign) {
         switch (type) {
@@ -476,7 +481,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
   contactDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
-        return qrDetailsBottomSheet<ContactInfoModel, ContactActionType>(
+        return scanDetailsBottomSheet<ContactInfoModel, ContactActionType>(
           model: qrData.contactInfo!,
           title: "Contact Details",
           actions: ContactActionType.values,
@@ -576,7 +581,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
   emailDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
-        return qrDetailsBottomSheet<EmailModel, EmailActionType>(
+        return scanDetailsBottomSheet<EmailModel, EmailActionType>(
           model: qrData.email!,
           title: "Email Details",
           actions: EmailActionType.values,
@@ -586,7 +591,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                   'Email: ${qrData.email!.address}',
                   style: customTextStyle(
                     color: blackColor,
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -597,7 +602,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                   'Subject: ${qrData.email!.subject}',
                   style: customTextStyle(
                     color: blackColor,
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -661,7 +666,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
   smsDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
-        return qrDetailsBottomSheet<SmsModel, SmsActionType>(
+        return scanDetailsBottomSheet<SmsModel, SmsActionType>(
           model: qrData.sms!,
           title: "SMS Details",
           actions: SmsActionType.values,
@@ -731,7 +736,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
   phoneDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
-        return qrDetailsBottomSheet<PhoneModel, PhoneActionType>(
+        return scanDetailsBottomSheet<PhoneModel, PhoneActionType>(
           model: qrData.phone!,
           title: "Phone Details",
           actions: PhoneActionType.values,
@@ -786,7 +791,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
   geotDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
-        return qrDetailsBottomSheet<GeoPointModel, GeoActionType>(
+        return scanDetailsBottomSheet<GeoPointModel, GeoActionType>(
           model: qrData.geo!,
           title: "Location Details",
           actions: GeoActionType.values,
@@ -863,7 +868,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
   calenderEventsDetailsBottomSheet(QRCodeScanResult qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
-        return qrDetailsBottomSheet<CalendarEventModel, CalendarEventActionType>(
+        return scanDetailsBottomSheet<CalendarEventModel, CalendarEventActionType>(
           model: qrData.calendarEvent!,
           title: "Calendar Event Details",
           actions: CalendarEventActionType.values,
@@ -873,7 +878,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                   'Event Title: ${qrData.calendarEvent!.summary}',
                   style: customTextStyle(
                     color: blackColor,
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -913,15 +918,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                 ),
                 config.verticalSpaceSmall(),
 
-                Text(
-                  '${qrData.calendarEvent!.description}',
-                  style: customTextStyle(
-                    color: blackColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    overflow: TextOverflow.visible,
-                  ),
-                ),
+                ExpandableTextWidget(text: '${qrData.calendarEvent!.description}'),
 
                 config.verticalSpaceSmall(),
               ],
@@ -966,101 +963,4 @@ class _QRScanScreenState extends State<QRScanScreen> {
       },
     );
   }
-}
-
-Widget qrDetailsBottomSheet<M, A>({
-  required M model,
-  required String title,
-  required List<A> actions,
-  required List<Widget> Function(M model) contentBuilder,
-  required void Function(A type, void Function(IconData, Color, Function()) assign) actionBuilder,
-}) {
-  return BaseWidget(
-    builder: (context, config, theme) {
-      return Container(
-        width: double.maxFinite,
-        decoration: const BoxDecoration(
-          color: whiteColor,
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          shape: BoxShape.rectangle,
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(config.appHorizontalPaddingLarge()),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              customTitleText(title, context),
-              config.verticalSpaceMedium(),
-
-              // Build content dynamically
-              ...contentBuilder(model),
-
-              config.verticalSpaceMedium(),
-
-              // Build actions dynamically
-              buildActionRow<A>(actions: actions, config: config, onActionTap: actionBuilder),
-
-              config.verticalSpaceMedium(),
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
-
-Widget buildActionRow<T>({
-  required List<T> actions,
-  required SizeConfig config,
-  required void Function(T type, void Function(IconData icon, Color color, Function() onTap) assign)
-  onActionTap,
-}) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
-    children:
-        actions.map<Widget>((type) {
-          IconData? icon;
-          Color? color;
-          Function()? onTap;
-
-          onActionTap(type, (i, c, f) {
-            icon = i;
-            color = c;
-            onTap = f;
-          });
-
-          return circleAvatarMethodCustom(
-            config,
-            null,
-            onTap: onTap,
-            child: Icon(icon, color: color, size: config.appHeight(3)),
-            radius: config.appHeight(3),
-          );
-        }).toList(),
-  );
-}
-
-class FadePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.black.withOpacity(0.5)
-          ..style = PaintingStyle.fill
-          ..blendMode = BlendMode.dstOver;
-
-    final rect = Rect.fromLTWH((size.width - 180) / 2, (size.height - 180) / 2, 180, 180);
-
-    final path =
-        Path()
-          ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-          ..addRRect(RRect.fromRectAndRadius(rect, const Radius.circular(20)))
-          ..fillType = PathFillType.evenOdd;
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

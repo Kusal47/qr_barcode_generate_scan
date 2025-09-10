@@ -24,8 +24,6 @@ extension BarcodeFormatLabel on BarcodeFormat {
         return "Code 93";
       case BarcodeFormat.codabar:
         return "Codabar";
-      case BarcodeFormat.dataMatrix:
-        return "Data Matrix";
       case BarcodeFormat.ean13:
         return "EAN-13";
       case BarcodeFormat.ean8:
@@ -36,6 +34,8 @@ extension BarcodeFormatLabel on BarcodeFormat {
         return "UPC-A";
       case BarcodeFormat.upcE:
         return "UPC-E";
+      case BarcodeFormat.dataMatrix:
+        return "Data Matrix";
       case BarcodeFormat.pdf417:
         return "PDF417";
       case BarcodeFormat.aztec:

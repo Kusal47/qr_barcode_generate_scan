@@ -9,8 +9,6 @@ class QRCodeScanResult {
   final String? password;
   final UrlModel? url;
   final ContactInfoModel? contactInfo;
-
-  // New types
   final EmailModel? email;
   final SmsModel? sms;
   final PhoneModel? phone;
@@ -33,22 +31,6 @@ class QRCodeScanResult {
     this.calendarEvent,
   });
 
-  factory QRCodeScanResult.fromBarcode(Barcode qrcode) => QRCodeScanResult(
-    displayValue: qrcode.displayValue,
-    rawValue: qrcode.rawValue,
-    type: qrcode.type,
-    wifi: qrcode.wifi != null ? WifiModel.fromJson(qrcode.wifi!) : null,
-    url: qrcode.url != null ? UrlModel.fromJson(qrcode.url!) : null,
-    contactInfo:
-        qrcode.contactInfo != null ? ContactInfoModel.fromJson(qrcode.contactInfo!) : null,
-    email: qrcode.email != null ? EmailModel.fromJson(qrcode.email!) : null,
-    sms: qrcode.sms != null ? SmsModel.fromJson(qrcode.sms!) : null,
-    phone: qrcode.phone != null ? PhoneModel.fromJson(qrcode.phone!) : null,
-    geo: qrcode.geoPoint != null ? GeoPointModel.fromJson(qrcode.geoPoint!) : null,
-    calendarEvent:
-        qrcode.calendarEvent != null ? CalendarEventModel.fromJson(qrcode.calendarEvent!) : null,
-  );
-
   Map<String, dynamic> toJson() => {
     'displayValue': displayValue,
     'rawValue': rawValue,
@@ -62,6 +44,22 @@ class QRCodeScanResult {
     'geo': geo?.toJson(),
     'calendarEvent': calendarEvent?.toJson(),
   };
+
+  factory QRCodeScanResult.fromJson(Map<String, dynamic> json) => QRCodeScanResult(
+    displayValue: json['displayValue'],
+    rawValue: json['rawValue'],
+    type: BarcodeType.values[json['type']],
+    wifi: json['wifi'] != null ? WifiModel.fromJson(json['wifi']) : null,
+    url: json['url'] != null ? UrlModel.fromJson(json['url']) : null,
+    contactInfo:
+        json['contactInfo'] != null ? ContactInfoModel.fromJson(json['contactInfo']) : null,
+    email: json['email'] != null ? EmailModel.fromJson(json['email']) : null,
+    sms: json['sms'] != null ? SmsModel.fromJson(json['sms']) : null,
+    phone: json['phone'] != null ? PhoneModel.fromJson(json['phone']) : null,
+    geo: json['geo'] != null ? GeoPointModel.fromJson(json['geo']) : null,
+    calendarEvent:
+        json['calendarEvent'] != null ? CalendarEventModel.fromJson(json['calendarEvent']) : null,
+  );
 }
 
 // 🔹 New Models
@@ -70,46 +68,78 @@ class EmailModel {
   String? address;
   String? subject;
   String? body;
+  DateTime? scannedAt;
 
-  EmailModel({this.address, this.subject, this.body});
+  EmailModel({this.address, this.subject, this.body, this.scannedAt});
 
-  factory EmailModel.fromJson(Email data) =>
-      EmailModel(address: data.address, subject: data.subject, body: data.body);
+EmailModel.fromJson(Map<String, dynamic> data)
+      : address = data['address'],
+        subject = data['subject'],
+        body = data['body'],
+        scannedAt = data['scannedAt'] != null
+            ? DateTime.parse(data['scannedAt'])
+            : DateTime.now();
 
-  Map<String, dynamic> toJson() => {'address': address, 'subject': subject, 'body': body};
+  Map<String, dynamic> toJson() => {
+    'address': address,
+    'subject': subject,
+    'body': body,
+    'scannedAt': scannedAt!.toIso8601String(),
+  };
 }
 
 class SmsModel {
   String? number;
   String? message;
+  DateTime? scannedAt;
 
-  SmsModel({this.number, this.message});
+  SmsModel({this.number, this.message, this.scannedAt});
 
-  factory SmsModel.fromJson(SMS data) => SmsModel(number: data.phoneNumber, message: data.message);
-
-  Map<String, dynamic> toJson() => {'number': number, 'message': message};
+ SmsModel.fromJson(Map<String, dynamic> data)
+      : number = data['number'],
+        message = data['message'],
+        scannedAt = data['scannedAt'] != null
+            ? DateTime.parse(data['scannedAt'])
+            : DateTime.now();
+  Map<String, dynamic> toJson() => {
+    'number': number,
+    'message': message,
+    'scannedAt': scannedAt!.toIso8601String(),
+  };
 }
 
 class PhoneModel {
   String? number;
+  DateTime? scannedAt;
 
-  PhoneModel({this.number});
+  PhoneModel({this.number, this.scannedAt});
 
-  factory PhoneModel.fromJson(Phone data) => PhoneModel(number: data.number);
-
-  Map<String, dynamic> toJson() => {'number': number};
+  PhoneModel.fromJson(Map<String, dynamic> data)
+      : number = data['number'],
+        scannedAt = data['scannedAt'] != null
+            ? DateTime.parse(data['scannedAt'])
+            : DateTime.now();
+  Map<String, dynamic> toJson() => {'number': number, 'scannedAt': scannedAt!.toIso8601String()};
 }
 
 class GeoPointModel {
   double? latitude;
   double? longitude;
+  DateTime? scannedAt;
 
-  GeoPointModel({this.latitude, this.longitude});
+  GeoPointModel({this.latitude, this.longitude, this.scannedAt});
 
-  factory GeoPointModel.fromJson(GeoPoint data) =>
-      GeoPointModel(latitude: data.latitude, longitude: data.longitude);
-
-  Map<String, dynamic> toJson() => {'latitude': latitude, 'longitude': longitude};
+  GeoPointModel.fromJson(Map<String, dynamic> data)
+      : latitude = data['latitude'],
+        longitude = data['longitude'],
+        scannedAt = data['scannedAt'] != null
+            ? DateTime.parse(data['scannedAt'])
+            : DateTime.now();
+  Map<String, dynamic> toJson() => {
+    'latitude': latitude,
+    'longitude': longitude,
+    'scannedAt': scannedAt!.toIso8601String(),
+  };
 }
 
 class CalendarEventModel {
@@ -120,18 +150,26 @@ class CalendarEventModel {
   DateTime? end;
   // String? organizer;
   // String? status;
+  DateTime? scannedAt;
 
-  CalendarEventModel({this.summary, this.description, this.location, this.start, this.end});
+  CalendarEventModel({
+    this.summary,
+    this.description,
+    this.location,
+    this.start,
+    this.end,
+    this.scannedAt,
+  });
 
-  factory CalendarEventModel.fromJson(CalendarEvent data) => CalendarEventModel(
-    summary: data.summary,
-    description: data.description,
-    location: data.location,
-    start: data.start,
-    end: data.end,
-    // organizer: data.organizer,
-    // status: data.status,
-  );
+  CalendarEventModel.fromJson(Map<String, dynamic> data)
+      : summary = data['summary'],
+        description = data['description'],
+        location = data['location'],
+        start = data['start'] != null ? DateTime.parse(data['start']) : null,
+        end = data['end'] != null ? DateTime.parse(data['end']) : null,
+        scannedAt = data['scannedAt'] != null
+            ? DateTime.parse(data['scannedAt'])
+            : DateTime.now();
 
   Map<String, dynamic> toJson() => {
     'summary': summary,
@@ -139,6 +177,7 @@ class CalendarEventModel {
     'location': location,
     'start': start?.toIso8601String(),
     'end': end?.toIso8601String(),
+    'scannedAt': scannedAt!.toIso8601String(),
     // 'organizer': organizer,
     // 'status': status,
   };
@@ -147,39 +186,44 @@ class CalendarEventModel {
 class UrlModel {
   String? url;
   String? title;
-  UrlModel({this.url, this.title});
+  DateTime? scannedAt;
 
-  factory UrlModel.fromJson(UrlBookmark data) => UrlModel(url: data.url, title: data.title);
-  Map<String, dynamic> toJson() => {'url': url, 'title': title};
+  UrlModel({this.url, this.title, this.scannedAt});
+
+  UrlModel.fromJson(Map<String, dynamic> data)
+      : url = data['url'],
+        title = data['title'],
+        scannedAt = data['scannedAt'] != null
+            ? DateTime.parse(data['scannedAt'])
+            : DateTime.now();
+  Map<String, dynamic> toJson() => {
+    'url': url,
+    'title': title,
+    'scannedAt': scannedAt!.toIso8601String(),
+  };
 }
 
 class WifiModel {
   String? ssid;
   String? password;
   String? wifiType;
+  DateTime? scannedAt;
 
-  WifiModel({this.ssid, this.password, this.wifiType});
+  WifiModel({this.ssid, this.password, this.wifiType, this.scannedAt});
+ WifiModel.fromJson(Map<String, dynamic> data)
+      : ssid = data['ssid'],
+        password = data['password'],
+        wifiType = data['wifiType'],
+        scannedAt = data['scannedAt'] != null
+            ? DateTime.parse(data['scannedAt'])
+            : DateTime.now();
 
-  factory WifiModel.fromJson(WiFi data) {
-    final encryption = data.encryptionType;
-    String type;
-    switch (encryption) {
-      case EncryptionType.open:
-        type = 'None';
-        break;
-      case EncryptionType.wep:
-        type = 'WEP';
-        break;
-      case EncryptionType.wpa:
-        type = 'WPA';
-        break;
-      default:
-        type = 'Unknown';
-    }
-    return WifiModel(ssid: data.ssid ?? '', password: data.password ?? '', wifiType: type);
-  }
-
-  Map<String, dynamic> toJson() => {'ssid': ssid, 'password': password, 'wifiType': wifiType};
+  Map<String, dynamic> toJson() => {
+    'ssid': ssid,
+    'password': password,
+    'wifiType': wifiType,
+    'scannedAt': scannedAt!.toIso8601String(),
+  };
 }
 
 class ContactInfoModel {
@@ -187,19 +231,30 @@ class ContactInfoModel {
   String? contactNumber;
   String? contactEmail;
   String? contactAddress;
-  ContactInfoModel({this.contactName, this.contactNumber, this.contactEmail, this.contactAddress});
+  DateTime? scannedAt;
 
-  factory ContactInfoModel.fromJson(ContactInfo data) => ContactInfoModel(
-    contactName: '${data.name!.formattedName}'.toString(),
-    contactNumber: data.phones[0].number,
-    contactEmail: data.emails[0].address,
-    contactAddress: data.addresses[0].addressLines[0],
-  );
+  ContactInfoModel({
+    this.contactName,
+    this.contactNumber,
+    this.contactEmail,
+    this.contactAddress,
+    this.scannedAt,
+  });
+
+  ContactInfoModel.fromJson(Map<String, dynamic> data)
+      : contactName = data['contactName'],
+        contactNumber = data['contactNumber'],
+        contactEmail = data['contactEmail'],
+        contactAddress = data['contactAddress'],
+        scannedAt = data['scannedAt'] != null
+            ? DateTime.parse(data['scannedAt'])
+            : DateTime.now();
   Map<String, dynamic> toJson() => {
     'contactName': contactName,
     'contactNumber': contactNumber,
     'contactEmail': contactEmail,
     'contactAddress': contactAddress,
+    'scannedAt': scannedAt!.toIso8601String(),
   };
 }
 

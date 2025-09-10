@@ -6,6 +6,6 @@ export 'copy_to_clipboard.dart';
 export 'date_formatter.dart';
 export 'form_data_list.dart';
 export 'secure_storage_functions.dart';
-export 'common__functions.dart';
-export 'qr_action_funtions.dart';
+export 'helper_functions.dart';
+export 'scan_action_funtions.dart';
 
