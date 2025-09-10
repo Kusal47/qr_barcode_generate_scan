@@ -1,12 +1,12 @@
 
 import 'package:get/get.dart';
-import 'package:scan_qr/features/barcode/presentation/barcode_generator_screen.dart';
-import 'package:scan_qr/features/barcode/presentation/barcode_page.dart';
+import 'package:scan_qr/features/scan/barcode/presentation/barcode_generator_screen.dart';
+import 'package:scan_qr/features/scan/barcode/presentation/barcode_page.dart';
 import 'package:scan_qr/features/home/presentation/home_page.dart';
 
 import '../../features/onboarding/presentation/onboarding_page.dart';
-import '../../features/qr_code/presentation/qr_code_generator_screen.dart';
-import '../../features/qr_code/presentation/qr_scan_page.dart';
+import '../../features/scan/qr_code/presentation/qr_code_generator_screen.dart';
+import '../../features/scan/qr_code/presentation/qr_scan_page.dart';
 import '../../features/splash/presentation/splash_page.dart';
 
 part 'app_routes.dart';
