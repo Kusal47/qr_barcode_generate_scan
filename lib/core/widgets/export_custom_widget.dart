@@ -14,3 +14,4 @@ export 'custom/scanned_image_widget.dart';
 export 'custom/menu_anchor_dropdown_widget.dart';
 export 'custom/expandable_text.dart';
 export 'custom/custom_scan_detail_bottomsheet.dart';
+export 'custom/custom_qr_barcode_view.dart.dart';

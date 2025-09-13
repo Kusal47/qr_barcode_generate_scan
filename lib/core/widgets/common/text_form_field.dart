@@ -52,6 +52,7 @@ class PrimaryFormField extends HookWidget {
   final Color? outlineBorderColor;
   final double? outlineBorderWidth;
   final BorderRadius? borderRadius;
+  final FocusNode? focusNode;
 
   const PrimaryFormField({
     super.key,
@@ -96,6 +97,7 @@ class PrimaryFormField extends HookWidget {
     this.outlineBorderColor,
     this.outlineBorderWidth,
     this.borderRadius,
+    this.focusNode,
   });
 
   @override
@@ -122,6 +124,7 @@ class PrimaryFormField extends HookWidget {
           child: SizedBox(height: size.height * 0.005),
         ),
         TextFormField(
+          focusNode: focusNode,
           onTapOutside: (event) {
             FocusScopeNode currentFocus = FocusScope.of(context);
             if (!currentFocus.hasPrimaryFocus) {
