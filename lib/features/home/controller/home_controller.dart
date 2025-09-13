@@ -19,7 +19,8 @@ class HomeController extends GetxController {
   List<ScannedCodeResultModel> historyList = [];
   List<ScannedCodeResultModel> searchedList = [];
   final searchController = TextEditingController();
-  @override
+  final searchFocusNode = FocusNode();
+
   @override
   void onInit() {
     super.onInit();
@@ -101,14 +102,13 @@ class HomeController extends GetxController {
   }) async {
     if (all) {
       await secureStorageService.deleteQrData();
-      await loadHistory();
     } else {
       await secureStorageService.deleteIndividualQrData(
         (ssid ?? url ?? contactNumber ?? email ?? sms ?? phone ?? geo ?? calendarEvent ?? barcode)
             .toString(),
       );
-      loadHistory();
     }
+    await loadHistory();
 
     update();
   }

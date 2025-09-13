@@ -607,15 +607,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                 ),
                 config.verticalSpaceSmall(),
 
-                Text(
-                  '${qrData.email!.body}',
-                  style: customTextStyle(
-                    color: blackColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    overflow: TextOverflow.visible,
-                  ),
-                ),
+                ExpandableTextWidget(text: '${qrData.email!.body}'),
               ],
           actionBuilder: (type, assign) {
             EmailModel emailData = qrData.email!;
@@ -825,7 +817,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                       );
                     }
                   } else {
-                    showErrorToast('Phone number not found');
+                    showErrorToast('Location not found');
                   }
                 });
                 break;
