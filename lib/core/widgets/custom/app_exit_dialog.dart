@@ -115,7 +115,6 @@ Future<bool> showSwitchPopup(BuildContext context) async {
           tilte: 'App Exit',
           content: 'Are you sure you want to exit the app?',
           onYesPressed: () {
-            // Navigator.push(context, MaterialPageRoute(builder: (context) => const MoreDealsApps()));
             Navigator.of(context).pop(true);
           },
           onNoPressed: () => Navigator.of(context).pop(false),

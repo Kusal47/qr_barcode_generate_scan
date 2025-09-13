@@ -11,6 +11,8 @@ abstract class Routes {
   static const generateQr = _Paths.generateQr;
   static const barcodescanScreen = _Paths.barcodescanScreen;
   static const generateBarcode = _Paths.generateBarcode;
+  static const searchHistoryScreen = _Paths.searchHistoryScreen;
+
 }
 
 abstract class _Paths {
@@ -21,4 +23,5 @@ abstract class _Paths {
   static const generateQr = '/generate_qr-screen';
   static const barcodescanScreen = '/barcodescan-screen';
   static const generateBarcode = '/generate_barcode-screen';
+  static const searchHistoryScreen = '/search-history-screen';
 }

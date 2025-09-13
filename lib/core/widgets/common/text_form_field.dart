@@ -51,6 +51,8 @@ class PrimaryFormField extends HookWidget {
   final AutovalidateMode? autovalidateMode;
   final Color? outlineBorderColor;
   final double? outlineBorderWidth;
+  final BorderRadius? borderRadius;
+  final FocusNode? focusNode;
 
   const PrimaryFormField({
     super.key,
@@ -94,6 +96,8 @@ class PrimaryFormField extends HookWidget {
     this.autovalidateMode,
     this.outlineBorderColor,
     this.outlineBorderWidth,
+    this.borderRadius,
+    this.focusNode,
   });
 
   @override
@@ -120,6 +124,7 @@ class PrimaryFormField extends HookWidget {
           child: SizedBox(height: size.height * 0.005),
         ),
         TextFormField(
+          focusNode: focusNode,
           onTapOutside: (event) {
             FocusScopeNode currentFocus = FocusScope.of(context);
             if (!currentFocus.hasPrimaryFocus) {
@@ -204,7 +209,7 @@ class PrimaryFormField extends HookWidget {
                 fillColor ??
                 (Theme.of(context).brightness == Brightness.dark ? whiteColor : whiteColor),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(radius ?? 5)),
+              borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(radius ?? 5)),
               borderSide:
                   hideBorder!
                       ? BorderSide.none
@@ -215,7 +220,7 @@ class PrimaryFormField extends HookWidget {
                       ),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(radius ?? 5)),
+              borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(radius ?? 5)),
               borderSide:
                   hideBorder!
                       ? BorderSide.none
@@ -228,12 +233,12 @@ class PrimaryFormField extends HookWidget {
             enabledBorder:
                 enabledBorder ??
                 OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(radius ?? 5)),
+                  borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(radius ?? 5)),
                   borderSide:
                       hideBorder!
                           ? BorderSide.none
                           : BorderSide(
-                            width:outlineBorderWidth?? 1,
+                            width: outlineBorderWidth ?? 1,
                             color:
                                 outlineBorderColor ??
                                 (Theme.of(context).brightness == Brightness.dark
@@ -244,12 +249,12 @@ class PrimaryFormField extends HookWidget {
             focusedBorder:
                 focusedBorder ??
                 OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(radius ?? 5)),
+                  borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(radius ?? 5)),
                   borderSide:
                       hideBorder!
                           ? BorderSide.none
                           : BorderSide(
-                            width: outlineBorderWidth??1,
+                            width: outlineBorderWidth ?? 1,
                             color:
                                 outlineBorderColor ??
                                 (Theme.of(context).brightness == Brightness.dark
@@ -260,7 +265,7 @@ class PrimaryFormField extends HookWidget {
             disabledBorder:
                 disabledBorder ??
                 OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(radius ?? 5),
+                  borderRadius: borderRadius ?? BorderRadius.circular(radius ?? 5),
                   borderSide:
                       hideBorder!
                           ? BorderSide.none
@@ -270,7 +275,7 @@ class PrimaryFormField extends HookWidget {
                                 (Theme.of(context).brightness == Brightness.dark
                                     ? whiteColor
                                     : blackColor),
-                            width:outlineBorderWidth?? 1,
+                            width: outlineBorderWidth ?? 1,
                           ),
                 ),
           ),

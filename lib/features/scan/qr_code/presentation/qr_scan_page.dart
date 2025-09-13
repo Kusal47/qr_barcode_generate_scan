@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,12 +5,12 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:scan_qr/features/qr_code/controller/qr_scan_controller.dart';
-import 'package:scan_qr/features/qr_code/model/qr_scan_model.dart';
+import 'package:scan_qr/features/scan/qr_code/controller/qr_scan_controller.dart';
+import 'package:scan_qr/features/scan/model/scan_code_result_model.dart';
 
-import '../../../core/resources/export_resources.dart';
-import '../../../core/widgets/export_common_widget.dart';
-import '../../../core/widgets/export_custom_widget.dart';
+import '../../../../core/resources/export_resources.dart';
+import '../../../../core/widgets/export_common_widget.dart';
+import '../../../../core/widgets/export_custom_widget.dart';
 
 class QRScanScreen extends StatefulWidget {
   const QRScanScreen({super.key});
@@ -350,7 +349,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                               'Please Scan QR to get credentials',
                               textAlign: TextAlign.center,
                               style: customTextStyle(
-                                fontSize: 14,
+                                fontSize: config.appHeight(1.8),
                                 fontWeight: FontWeight.bold,
                                 color: whiteColor,
                                 overflow: TextOverflow.visible,
@@ -370,8 +369,8 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  detailsBottomSheet(QRCodeScanResult qrData) {
-    return scanDetailsBottomSheet<QRCodeScanResult, ActionType>(
+  detailsBottomSheet(ScannedCodeResultModel qrData) {
+    return scanDetailsBottomSheet<ScannedCodeResultModel, ActionType>(
       model: qrData,
       title: "WiFi Details",
       actions: ActionType.values,
@@ -431,7 +430,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  urlDetailsBottomSheet(QRCodeScanResult qrData) {
+  urlDetailsBottomSheet(ScannedCodeResultModel qrData) {
     return scanDetailsBottomSheet<UrlModel, UrlActionType>(
       model: qrData.url!,
       title: "URL Link",
@@ -478,7 +477,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  contactDetailsBottomSheet(QRCodeScanResult qrData) {
+  contactDetailsBottomSheet(ScannedCodeResultModel qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return scanDetailsBottomSheet<ContactInfoModel, ContactActionType>(
@@ -578,7 +577,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  emailDetailsBottomSheet(QRCodeScanResult qrData) {
+  emailDetailsBottomSheet(ScannedCodeResultModel qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return scanDetailsBottomSheet<EmailModel, EmailActionType>(
@@ -608,15 +607,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                 ),
                 config.verticalSpaceSmall(),
 
-                Text(
-                  '${qrData.email!.body}',
-                  style: customTextStyle(
-                    color: blackColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    overflow: TextOverflow.visible,
-                  ),
-                ),
+                ExpandableTextWidget(text: '${qrData.email!.body}'),
               ],
           actionBuilder: (type, assign) {
             EmailModel emailData = qrData.email!;
@@ -663,7 +654,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  smsDetailsBottomSheet(QRCodeScanResult qrData) {
+  smsDetailsBottomSheet(ScannedCodeResultModel qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return scanDetailsBottomSheet<SmsModel, SmsActionType>(
@@ -682,14 +673,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                 ),
 
                 config.verticalSpaceSmall(),
-                Text(
-                  'Message: ${qrData.sms!.message}',
-                  style: customTextStyle(
-                    color: blackColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                ExpandableTextWidget(text: 'Message: ${qrData.sms!.message}', trimLength: 100),
               ],
           actionBuilder: (type, assign) {
             SmsModel smsData = qrData.sms!;
@@ -733,7 +717,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  phoneDetailsBottomSheet(QRCodeScanResult qrData) {
+  phoneDetailsBottomSheet(ScannedCodeResultModel qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return scanDetailsBottomSheet<PhoneModel, PhoneActionType>(
@@ -788,7 +772,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  geotDetailsBottomSheet(QRCodeScanResult qrData) {
+  geotDetailsBottomSheet(ScannedCodeResultModel qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return scanDetailsBottomSheet<GeoPointModel, GeoActionType>(
@@ -833,7 +817,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                       );
                     }
                   } else {
-                    showErrorToast('Phone number not found');
+                    showErrorToast('Location not found');
                   }
                 });
                 break;
@@ -865,7 +849,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     );
   }
 
-  calenderEventsDetailsBottomSheet(QRCodeScanResult qrData) {
+  calenderEventsDetailsBottomSheet(ScannedCodeResultModel qrData) {
     return BaseWidget(
       builder: (context, config, theme) {
         return scanDetailsBottomSheet<CalendarEventModel, CalendarEventActionType>(

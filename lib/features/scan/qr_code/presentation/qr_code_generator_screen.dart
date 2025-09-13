@@ -7,7 +7,7 @@ import 'package:scan_qr/core/constants/validators.dart';
 import 'package:scan_qr/core/resources/colors.dart';
 import 'package:scan_qr/core/widgets/export_common_widget.dart';
 import 'package:scan_qr/core/widgets/export_custom_widget.dart';
-import 'package:scan_qr/features/qr_code/model/qr_generate_params.dart';
+import 'package:scan_qr/features/scan/qr_code/model/qr_generate_params.dart';
 
 import '../controller/qr_code_generation_controller.dart';
 
@@ -36,11 +36,13 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                     .firstWhere(
                       (e) => e.name.toLowerCase() == qgc.isSelected.toLowerCase(),
                       orElse: () {
+                        qgc.qrGenerateParams?.qrType = QRType.wifi;
                         qgc.toggleSelected(QRType.wifi.name.toString());
                         return QRType.wifi;
-                      }, // fallback value
+                      },
                     )
                     .label;
+
             return Scaffold(
               appBar: buildAppBar(context, "QR Generator"),
               body: SingleChildScrollView(
@@ -70,7 +72,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           label: Text(
                                             e.label.capitalizeFirst!,
                                             style: customTextStyle(
-                                              fontSize: 14,
+                                              fontSize: config.appHeight(1.8),
                                               fontWeight: FontWeight.normal,
                                               color:
                                                   qgc.isSelected == e.name
@@ -115,7 +117,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Url Link",
                                         hintTxt: "Enter Url Link to generate QR",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.url = p0;
+                                          qgc.urlcontroller.text = p0;
                                         },
                                         validator: Validators.checkUrlField,
                                       ),
@@ -133,7 +135,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                             ].map((e) => e.toUpperCase()).toList(),
                                         itemToString: (p0) => p0,
                                         onSelected: (value) {
-                                          qgc.qrGenerateParams?.wifiType = value;
+                                          qgc.typeController.text = value;
                                           setState(() {});
                                         },
                                         textcontroller: qgc.typeController,
@@ -144,7 +146,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Wi-fi SSID",
                                         hintTxt: "Enter wi-fi ssid",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.ssid = p0;
+                                          qgc.wifiNamecontroller.text = p0;
                                         },
                                         validator: Validators.checkFieldEmpty,
                                       ),
@@ -155,7 +157,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           title: "Wi-fi Password",
                                           hintTxt: "Enter wi-fi password",
                                           onSaved: (p0) {
-                                            qgc.qrGenerateParams?.password = p0;
+                                            qgc.wifiPasswordcontroller.text = p0;
                                           },
                                           validator: Validators.checkFieldEmpty,
                                         ),
@@ -168,7 +170,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Full Name",
                                         hintTxt: "Enter first and last name",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.contactName = p0;
+                                          qgc.contactNamecontroller.text = p0;
                                         },
                                         validator: Validators.checkFieldEmpty,
                                       ),
@@ -178,8 +180,10 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Contact No.",
                                         hintTxt: "Enter contact number",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.contactNumber = p0.completeNumber;
+                                          qgc.contactNumbercontroller.text = p0.number;
+                                          qgc.completeContactNumber = p0.completeNumber;
                                         },
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                         validator: Validators.checkPhoneNumberField,
                                       ),
                                       config.verticalSpaceSmall(),
@@ -189,7 +193,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         hintTxt: "Enter your e-mail",
                                         validator: Validators.checkEmailField,
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.contactEmail = p0;
+                                          qgc.contactEmailcontroller.text = p0;
                                         },
                                       ),
                                       config.verticalSpaceSmall(),
@@ -198,7 +202,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Address",
                                         hintTxt: "Enter your address",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.contactAddress = p0;
+                                          qgc.contactAddresscontroller.text = p0;
                                         },
                                         validator: Validators.checkFieldEmpty,
                                       ),
@@ -211,7 +215,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         hintTxt: "Enter recipient email",
                                         validator: Validators.checkEmailField,
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.emailAddress = p0;
+                                          qgc.emailAddressController.text = p0;
                                         },
                                       ),
                                       config.verticalSpaceSmall(),
@@ -221,7 +225,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Subject",
                                         hintTxt: "Enter email subject",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.emailSubject = p0;
+                                          qgc.emailSubjectController.text = p0;
                                         },
                                       ),
                                       config.verticalSpaceSmall(),
@@ -232,7 +236,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Body",
                                         hintTxt: "Enter email body",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.emailBody = p0;
+                                          qgc.emailBodyController.text = p0;
                                         },
                                         keyboardType: TextInputType.multiline,
                                       ),
@@ -245,8 +249,10 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         hintTxt: "Enter recipient phone number",
                                         validator: Validators.checkPhoneNumberField,
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.smsNumber = p0.completeNumber;
+                                          qgc.smsNumberController.text = p0.number;
+                                          qgc.completeSmsNumber = p0.completeNumber;
                                         },
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                       ),
                                       config.verticalSpaceSmall(),
                                       PrimaryFormField(
@@ -254,7 +260,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Message",
                                         hintTxt: "Enter SMS message",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.smsMessage = p0;
+                                          qgc.smsMessageController.text = p0;
                                         },
                                         validator: Validators.checkFieldEmpty,
                                       ),
@@ -267,8 +273,10 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         hintTxt: "Enter phone number",
                                         validator: Validators.checkPhoneNumberField,
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.phoneNumber = p0.completeNumber;
+                                          qgc.phoneNumberController.text = p0.number;
+                                          qgc.completePhoneNumber = p0.completeNumber;
                                         },
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                       ),
                                     ]
                                     // 📍 Geo
@@ -284,7 +292,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           ),
                                         ],
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.latitude = double.tryParse(p0);
+                                          qgc.latitudeController.text = p0;
                                         },
                                         validator: Validators.checkFieldEmpty,
                                       ),
@@ -300,7 +308,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           ),
                                         ],
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.longitude = double.tryParse(p0);
+                                          qgc.longitudeController.text = p0;
                                         },
                                         validator: Validators.checkFieldEmpty,
                                       ),
@@ -312,7 +320,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Event Title",
                                         hintTxt: "Enter event title",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.eventTitle = p0;
+                                          qgc.eventTitleController.text = p0;
                                         },
                                         validator: Validators.checkFieldEmpty,
                                       ),
@@ -323,7 +331,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Location",
                                         hintTxt: "Enter event location",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.eventLocation = p0;
+                                          qgc.eventLocationController.text = p0;
                                         },
                                       ),
                                       config.verticalSpaceSmall(),
@@ -410,7 +418,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         title: "Description",
                                         hintTxt: "Enter event description",
                                         onSaved: (p0) {
-                                          qgc.qrGenerateParams?.eventDescription = p0;
+                                          qgc.eventDescriptionController.text = p0;
                                         },
                                         keyboardType: TextInputType.multiline,
                                       ),
@@ -421,6 +429,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                       onPressed: () {
                                         if (qgc.formKey.currentState!.validate()) {
                                           qgc.formKey.currentState!.save();
+                                          qgc.setValueinModel();
                                           qgc.generateQr(qgc.qrGenerateParams!);
                                         }
                                       },
