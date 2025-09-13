@@ -232,7 +232,7 @@ class _BarcodeScanScreenState extends State<BarcodeScanScreen> {
                               'Please Scan Barcode To Continue',
                               textAlign: TextAlign.center,
                               style: customTextStyle(
-                                fontSize: 14,
+                                fontSize: config.appHeight(2),
                                 fontWeight: FontWeight.bold,
                                 color: whiteColor,
                                 overflow: TextOverflow.visible,

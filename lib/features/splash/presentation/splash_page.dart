@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         text: 'Ready to Scan?\nHold on!\nWe are preparing everything for you.',
                         textStyle: customTextStyle(
                           color: primaryColor,
-                          fontSize: 16,
+                          fontSize: config.appHeight(2),
                           fontWeight: FontWeight.bold,
                           overflow: TextOverflow.visible,
                         ),

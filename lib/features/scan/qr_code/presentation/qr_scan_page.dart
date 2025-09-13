@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -350,7 +349,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                               'Please Scan QR to get credentials',
                               textAlign: TextAlign.center,
                               style: customTextStyle(
-                                fontSize: 14,
+                                fontSize: config.appHeight(1.8),
                                 fontWeight: FontWeight.bold,
                                 color: whiteColor,
                                 overflow: TextOverflow.visible,
@@ -682,14 +681,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
                 ),
 
                 config.verticalSpaceSmall(),
-                Text(
-                  'Message: ${qrData.sms!.message}',
-                  style: customTextStyle(
-                    color: blackColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                ExpandableTextWidget(text: 'Message: ${qrData.sms!.message}', trimLength: 100),
               ],
           actionBuilder: (type, assign) {
             SmsModel smsData = qrData.sms!;

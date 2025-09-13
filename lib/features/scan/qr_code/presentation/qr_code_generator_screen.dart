@@ -72,7 +72,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           label: Text(
                                             e.label.capitalizeFirst!,
                                             style: customTextStyle(
-                                              fontSize: 14,
+                                              fontSize: config.appHeight(1.8),
                                               fontWeight: FontWeight.normal,
                                               color:
                                                   qgc.isSelected == e.name

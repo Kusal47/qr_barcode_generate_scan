@@ -17,6 +17,8 @@ class HomeController extends GetxController {
   final SecureStorageService secureStorageService = SecureStorageService();
   final RefreshController refreshController = RefreshController();
   List<ScannedCodeResultModel> historyList = [];
+  List<ScannedCodeResultModel> searchedList = [];
+  final searchController = TextEditingController();
   @override
   @override
   void onInit() {
@@ -27,6 +29,19 @@ class HomeController extends GetxController {
 
   Future<void> loadHistory() async {
     await fetchAllHistory();
+    if (searchController.text.isNotEmpty) filterHistory(searchController.text);
+    update();
+  }
+
+  filterHistory(String query) {
+    searchedList = historyList.where((element) => element.displayValue!.contains(query)).toList();
+    update();
+  }
+
+  searchActionMethod() {
+    searchController.clear();
+    searchedList.clear();
+    update();
   }
 
   Future<void> getDeviceInfo() async {
@@ -56,7 +71,7 @@ class HomeController extends GetxController {
   fetchAllHistory() async {
     try {
       final wifiData = await secureStorageService.getScannedValue();
-      qrHistory = wifiData.reversed.toList() ?? [];
+      qrHistory = wifiData.reversed.toList();
       historyList = qrHistory;
 
       historyList.sort((a, b) {

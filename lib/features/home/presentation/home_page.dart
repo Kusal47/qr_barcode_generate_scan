@@ -30,1299 +30,1225 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseWidget(
-      builder:
-          (context, config, theme) => GetBuilder<HomeController>(
-            builder: (hc) {
-              return SafeArea(
-                child: Scaffold(
-                  appBar: buildAppBar(
-                    context,
-                    'Welcome, ${hc.platformVersion}!',
-                    automaticallyImplyLeading: true,
-                    needToBack: false,
-                    action: [
-                      hc.historyList.isNotEmpty
-                          ? IconButton(
-                            onPressed:
-                                () => showDialog(
-                                  context: context,
-                                  builder:
-                                      (context) => CustomAlertDialog(
-                                        tilte: 'Delete',
-                                        content: 'Are you sure you want to delete all history?',
-                                        onYesPressed: () {
-                                          hc.deleteQRData(all: true);
-                                          Get.back();
-                                        },
-                                      ),
-                                ),
-                            icon: Icon(
-                              CupertinoIcons.delete_solid,
-                              color: redColor,
-                              size: config.appHeight(3),
-                            ),
-                          )
-                          : Container(),
-                      //  IconButton(
-                      //   onPressed: () {
-                      //     hc.fetchAllHistory();
-                      //   },
-
-                      //   icon: Icon(
-                      //     CupertinoIcons.refresh_circled,
-                      //     color: redColor,
-                      //     size: config.appHeight(3),
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                  drawer: Drawer(
-                    backgroundColor:
-                        Theme.of(context).brightness == Brightness.dark ? darkBgColor : greyColor,
-                    child: ListView(
-                      padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
-                      children: [
-                        DrawerHeader(
-                          padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
-                          curve: Curves.easeInSine,
-                          child: Container(
-                            padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(10)),
-                              color: primaryColor,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                  radius: 30,
-                                  backgroundImage: const AssetImage(UiAssets.user),
-                                ),
-                                config.verticalSpaceMedium(),
-                                Text(
-                                  'Welcome to ScanQR',
-                                  style: customTextStyle(
-                                    color: whiteColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                config.verticalSpaceSmall(),
-
-                                Text(
-                                  hc.platformVersion,
-                                  maxLines: 2,
-                                  style: customTextStyle(
-                                    color: whiteColor,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        customExpansionTileWidget(
-                          context,
-                          'QR Code',
-                          leadingIcon: HeroIcons.qr_code,
-                          childrens: [
-                            buildSettingItem(
-                              context,
-                              Icons.qr_code_scanner,
-                              'Scan QR',
-                              onTap: () {
-                                Get.back();
-                                Get.toNamed(Routes.qrscanScreen);
-                              },
-                            ),
-                            config.verticalSpaceSmall(),
-                            buildSettingItem(
-                              context,
-                              Bootstrap.qr_code,
-                              'Generate QR',
-                              onTap: () {
-                                Get.back();
-                                Get.toNamed(Routes.generateQr);
-                              },
-                            ),
-                          ],
-                        ),
-
-                        customExpansionTileWidget(
-                          context,
-                          'Barcode',
-                          leadingIcon: AntDesign.barcode_outline,
-                          childrens: [
-                            buildSettingItem(
-                              context,
-                              Bootstrap.upc_scan,
-                              'Scan Barcode',
-                              onTap: () {
-                                Get.back();
-                                Get.toNamed(Routes.barcodescanScreen);
-                              },
-                            ),
-                            config.verticalSpaceSmall(),
-                            buildSettingItem(
-                              context,
-                              FontAwesome.barcode_solid,
-                              'Generate Barcode',
-                              onTap: () {
-                                Get.back();
-                                Get.toNamed(Routes.generateBarcode);
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
+    return WillPopScope(
+      onWillPop: () => showExitPopup(context),
+      child: BaseWidget(
+        builder:
+            (context, config, theme) => GetBuilder<HomeController>(
+              builder: (hc) {
+                return SafeArea(
+                  child: Scaffold(
+                    resizeToAvoidBottomInset: false,
+                    appBar: buildAppBar(
+                      context,
+                      'Welcome, ${hc.platformVersion}!',
+                      automaticallyImplyLeading: true,
+                      needToBack: false,
                     ),
-                  ),
+                    drawer: CustomDrawerWidget(),
 
-                  floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-                  floatingActionButton: Padding(
-                    padding: EdgeInsets.all(config.appHorizontalPaddingLarge()),
+                    floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+                    floatingActionButton: Padding(
+                      padding: EdgeInsets.all(config.appHorizontalPaddingLarge()),
 
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Flexible(
-                          child: PrimaryIconButton(
-                            iconAlignment: IconAlignment.start,
-                            icon: Icon(HeroIcons.qr_code, size: config.appHeight(5)),
-                            label: 'QR',
-                            onPressed: () => Get.toNamed(Routes.qrscanScreen),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Flexible(
+                            child: PrimaryIconButton(
+                              iconAlignment: IconAlignment.start,
+                              icon: Icon(HeroIcons.qr_code, size: config.appHeight(5)),
+                              label: 'QR',
+                              onPressed: () => Get.toNamed(Routes.qrscanScreen),
+                            ),
                           ),
-                        ),
-                        config.horizontalSpaceSmall(),
-                        Flexible(
-                          child: PrimaryIconButton(
-                            iconAlignment: IconAlignment.start,
-                            icon: Icon(AntDesign.barcode_outline, size: config.appHeight(5)),
-                            label: 'Barcode',
-                            onPressed: () => Get.toNamed(Routes.barcodescanScreen),
+                          config.horizontalSpaceSmall(),
+                          Flexible(
+                            child: PrimaryIconButton(
+                              iconAlignment: IconAlignment.start,
+                              icon: Icon(AntDesign.barcode_outline, size: config.appHeight(5)),
+                              label: 'Barcode',
+                              onPressed: () => Get.toNamed(Routes.barcodescanScreen),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  body: CustomSmartRefresher(
-                    controller: hc.refreshController,
-                    enablePullDown: true,
-                    header: WaterDropHeader(waterDropColor: primaryColor),
-                    onRefreshing: () async {
-                      await hc.loadHistory();
+                    body: CustomSmartRefresher(
+                      controller: hc.refreshController,
+                      enablePullDown: true,
+                      header: WaterDropHeader(waterDropColor: primaryColor),
+                      onRefreshing: () async {
+                        await hc.loadHistory();
 
-                      hc.refreshController.refreshCompleted();
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
-                      child:
-                          hc.historyList.isEmpty
-                              ? SizedBox(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(UiAssets.qrSearch, height: config.appHeight(30)),
-                                    customTextMessages('No history found!', context),
-                                  ],
-                                ),
-                              )
-                              : SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemCount: hc.historyList.length,
-                                      itemBuilder: (_, index) {
-                                        bool isVisible = hc.visibleIndex == index;
-                                        final dataList = hc.historyList[index];
-                                        if (dataList.wifi != null) {
-                                          return Padding(
+                        hc.refreshController.refreshCompleted();
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
+                        child:
+                            hc.historyList.isEmpty
+                                ? SizedBox(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(UiAssets.qrSearch, height: config.appHeight(30)),
+                                      customTextMessages('No history found!', context),
+                                    ],
+                                  ),
+                                )
+                                : SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
+                                        child: PrimaryFormField(
+                                          controller: hc.searchController,
+                                          onSaved: (val) {
+                                            hc.filterHistory(val);
+                                            hc.searchController.text = val;
+                                          },
+                                          onChanged: (p0) {
+                                            hc.filterHistory(p0);
+                                          },
+                                          hintTxt: 'Enter search text here',
+                                          borderRadius: BorderRadius.circular(config.appHeight(10)),
+                                          suffixIcon: Padding(
                                             padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
+                                              config.appHorizontalPaddingSmall(),
                                             ),
-                                            child: customListTileWidget(
-                                              context,
-                                              'Wifi Name: ${dataList.wifi!.ssid}',
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: Icon(
-                                                Icons.wifi_password_outlined,
-                                                color: theme.primaryColor,
-                                              ),
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(
-                                                  Icons.more_vert_rounded,
-                                                  color: blackColor,
-                                                ),
-                                                onSelected: (value) {
-                                                  if (value == 'view_qr') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      "SSID: ${dataList.wifi!.ssid}\nPassword: ${dataList.wifi!.password}\nWifi Type: ${dataList.wifi!.wifiType}",
-                                                      scannedData: dataList,
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this wifi?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(
-                                                                ssid: dataList.wifi!.ssid!,
-                                                              );
-                                                              Get.back();
-                                                            },
-                                                          ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_qr',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              HeroIcons.qr_code,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View QR',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                              ),
 
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    children: [
-                                                      Expanded(
-                                                        child: AnimatedTextAnimation(
-                                                          text: dataList.wifi!.password ?? '',
-                                                          isVisible: isVisible,
-                                                          textStyle: customTextStyle(
+                                            child: prefixCircleAvatarMethodCustom(
+                                              config,
+                                              null,
+                                              radius: config.appHeight(1.1),
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  hc.searchActionMethod();
+                                                },
+                                                icon: Icon(
+                                                  hc.searchController.text.isNotEmpty
+                                                      ? Icons.close
+                                                      : AntDesign.search_outline,
+                                                  color: whiteColor,
+                                                  size: config.appHeight(2.5),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      config.verticalSpaceVerySmall(),
+                                      if (hc.searchController.text.isNotEmpty &&
+                                          hc.searchedList.isEmpty) ...{
+                                        config.verticalSpaceLarge(),
+                                        customTextMessages('No search result found!', context),
+                                        config.verticalSpaceLarge(),
+                                      },
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount:
+                                            hc.searchedList.isNotEmpty
+                                                ? hc.searchedList.length
+                                                : hc.historyList.length,
+                                        itemBuilder: (_, index) {
+                                          bool isVisible = hc.visibleIndex == index;
+                                          final dataList =
+                                              hc.searchedList.isNotEmpty
+                                                  ? hc.searchedList[index]
+                                                  : hc.historyList[index];
+                                          if (dataList.wifi != null) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingMedium(),
+                                              ),
+                                              child: customListTileWidget(
+                                                context,
+                                                'Wifi Name: ${dataList.wifi!.ssid}',
+                                                containerColor: greyColor.withOpacity(0.3),
+                                                leadingWidget: Icon(
+                                                  Icons.wifi_password_outlined,
+                                                  color: theme.primaryColor,
+                                                ),
+                                                trailing: PopupMenuButton<String>(
+                                                  // popUpAnimationStyle: AnimationStyle(
+                                                  //   curve: Curves.bounceIn,
+                                                  //   reverseCurve: Curves.bounceOut,
+                                                  //   duration: Duration(milliseconds: 600),
+                                                  // ),
+                                                  icon: Icon(
+                                                    Icons.more_vert_rounded,
+                                                    color: blackColor,
+                                                  ),
+                                                  onSelected: (value) {
+                                                    if (value == 'view_qr') {
+                                                      viewQrDialog(
+                                                        context,
+                                                        config,
+                                                        "SSID: ${dataList.wifi!.ssid}\nPassword: ${dataList.wifi!.password}\nWifi Type: ${dataList.wifi!.wifiType}",
+                                                        scannedData: dataList,
+                                                      );
+                                                    } else if (value == 'delete') {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            (context) => CustomAlertDialog(
+                                                              tilte: 'Delete',
+                                                              content:
+                                                                  'Are you sure you want to delete this wifi?',
+                                                              onYesPressed: () {
+                                                                hc.deleteQRData(
+                                                                  ssid: dataList.wifi!.ssid!,
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                      );
+                                                    }
+                                                  },
+                                                  itemBuilder:
+                                                      (context) => [
+                                                        PopupMenuItem(
+                                                          value: 'view_qr',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                HeroIcons.qr_code,
+                                                                color: blackColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'View QR',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.delete,
+                                                                color: redColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'Delete',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                ),
+
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                        Expanded(
+                                                          child: AnimatedTextAnimation(
+                                                            text: dataList.wifi!.password ?? '',
+                                                            isVisible: isVisible,
+                                                            textStyle: customTextStyle(
+                                                              color:
+                                                                  isVisible
+                                                                      ? primaryColor
+                                                                      : darkGreyColor,
+                                                            ),
+                                                            charInterval: 0.1,
+                                                          ),
+                                                        ),
+                                                        config.horizontalSpaceSmall(),
+                                                        InkWell(
+                                                          onTap: () => hc.changeVisibility(index),
+                                                          child: Icon(
+                                                            isVisible
+                                                                ? Icons.visibility_off
+                                                                : Icons.visibility,
                                                             color:
                                                                 isVisible
                                                                     ? primaryColor
                                                                     : darkGreyColor,
+                                                            size: config.appHeight(3),
                                                           ),
-                                                          charInterval: 0.1,
                                                         ),
+                                                        config.horizontalSpaceSmall(),
+                                                      ],
+                                                    ),
+                                                    Text(
+                                                      'Wifi Type: ${dataList.wifi!.wifiType}',
+                                                      style: customTextStyle(color: darkGreyColor),
+                                                    ),
+                                                    config.verticalSpaceSmall(),
+                                                    Text(
+                                                      formatDateTime(
+                                                        dataList.timestamp!,
+                                                        dateTimeOnly: true,
                                                       ),
-                                                      config.horizontalSpaceSmall(),
-                                                      InkWell(
-                                                        onTap: () => hc.changeVisibility(index),
-                                                        child: Icon(
-                                                          isVisible
-                                                              ? Icons.visibility_off
-                                                              : Icons.visibility,
-                                                          color:
-                                                              isVisible
-                                                                  ? primaryColor
-                                                                  : darkGreyColor,
-                                                          size: config.appHeight(3),
-                                                        ),
-                                                      ),
-                                                      config.horizontalSpaceSmall(),
-                                                    ],
-                                                  ),
-                                                  Text(
-                                                    'Wifi Type: ${dataList.wifi!.wifiType}',
-                                                    style: customTextStyle(color: darkGreyColor),
-                                                  ),
-                                                  config.verticalSpaceSmall(),
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.timestamp!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        } else if (dataList.url != null) {
-                                          return Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
-                                            ),
-                                            child: customListTileWidget(
-                                              context,
-                                              'Title: ${dataList.url != null && dataList.url!.url != null ? Uri.tryParse(dataList.url!.url!)?.host ?? dataList.url!.url : 'N/A'}',
-
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Url: ${dataList.url!.url ?? 'N/A'}',
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor,
-                                                      overflow: TextOverflow.visible,
-                                                    ),
-                                                  ),
-                                                  config.verticalSpaceSmall(),
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.timestamp!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: Icon(
-                                                Icons.link,
-                                                color: theme.primaryColor,
-                                              ),
-
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
-                                                onSelected: (value) {
-                                                  if (value == 'view_qr') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      scannedData: dataList,
-
-                                                      "${dataList.url!.url}",
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this URL?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(
-                                                                url: dataList.url!.url!,
-                                                              );
-                                                              Get.back();
-                                                            },
-                                                          ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_qr',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              HeroIcons.qr_code,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View QR',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                              ),
-                                            ),
-                                          );
-                                        } else if (dataList.contactInfo != null) {
-                                          return Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
-                                            ),
-                                            child: customListTileWidget(
-                                              context,
-                                              'Name: ${dataList.contactInfo!.contactName != null && dataList.contactInfo!.contactName!.isNotEmpty ? dataList.contactInfo!.contactName : 'N/A'}',
-
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Phone: ${dataList.contactInfo!.contactNumber}',
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor,
-                                                      overflow: TextOverflow.visible,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'Email: ${dataList.contactInfo!.contactEmail}',
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor,
-                                                      overflow: TextOverflow.visible,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    'Address: ${dataList.contactInfo!.contactAddress}',
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor,
-                                                      overflow: TextOverflow.visible,
-                                                    ),
-                                                  ),
-                                                  config.verticalSpaceSmall(),
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.timestamp!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: circleAvatarMethodCustom(
-                                                config,
-                                                AssetImage(UiAssets.user),
-                                                radius: config.appHeight(3),
-                                              ),
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
-                                                onSelected: (value) {
-                                                  if (value == 'view_qr') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      scannedData: dataList,
-                                                      'Name: ${dataList.contactInfo!.contactName}, Phone: ${dataList.contactInfo!.contactNumber}, E-mail: ${dataList.contactInfo!.contactEmail} Address: ${dataList.contactInfo!.contactAddress}',
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this contact info?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(
-                                                                contactNumber:
-                                                                    dataList
-                                                                        .contactInfo!
-                                                                        .contactNumber,
-                                                              );
-                                                              Get.back();
-                                                            },
-                                                          ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_qr',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              HeroIcons.qr_code,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View QR',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                              ),
-                                            ),
-                                          );
-                                        } else if (dataList.email != null) {
-                                          return Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
-                                            ),
-                                            child: customListTileWidget(
-                                              context,
-                                              'Email: ${dataList.email!.address ?? 'N/A'}',
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  config.verticalSpaceSmall(),
-                                                  RichText(
-                                                    text: TextSpan(
-                                                      text: 'Subject: ',
                                                       style: customTextStyle(
-                                                        fontSize: 12,
-                                                        color: blackColor,
-                                                        fontWeight: FontWeight.w400,
+                                                        color: darkGreyColor.withOpacity(0.5),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          } else if (dataList.url != null) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingMedium(),
+                                              ),
+                                              child: customListTileWidget(
+                                                context,
+                                                'Title: ${dataList.url != null && dataList.url!.url != null ? Uri.tryParse(dataList.url!.url!)?.host ?? dataList.url!.url : 'N/A'}',
+
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Url: ${dataList.url!.url ?? 'N/A'}',
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor,
                                                         overflow: TextOverflow.visible,
                                                       ),
-                                                      children: <TextSpan>[
-                                                        TextSpan(
-                                                          text: dataList.email!.subject ?? 'N/A',
-                                                          style: customTextStyle(
-                                                            fontSize: 12,
-                                                            fontWeight: FontWeight.normal,
-                                                            overflow: TextOverflow.visible,
+                                                    ),
+                                                    config.verticalSpaceSmall(),
+                                                    Text(
+                                                      formatDateTime(
+                                                        dataList.timestamp!,
+                                                        dateTimeOnly: true,
+                                                      ),
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor.withOpacity(0.5),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                containerColor: greyColor.withOpacity(0.3),
+                                                leadingWidget: Icon(
+                                                  Icons.link,
+                                                  color: theme.primaryColor,
+                                                ),
+
+                                                trailing: PopupMenuButton<String>(
+                                                  icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                                  onSelected: (value) {
+                                                    if (value == 'view_qr') {
+                                                      viewQrDialog(
+                                                        context,
+                                                        config,
+                                                        scannedData: dataList,
+
+                                                        "${dataList.url!.url}",
+                                                      );
+                                                    } else if (value == 'delete') {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            (context) => CustomAlertDialog(
+                                                              tilte: 'Delete',
+                                                              content:
+                                                                  'Are you sure you want to delete this URL?',
+                                                              onYesPressed: () {
+                                                                hc.deleteQRData(
+                                                                  url: dataList.url!.url!,
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                      );
+                                                    }
+                                                  },
+                                                  itemBuilder:
+                                                      (context) => [
+                                                        PopupMenuItem(
+                                                          value: 'view_qr',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                HeroIcons.qr_code,
+                                                                color: blackColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'View QR',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.delete,
+                                                                color: redColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'Delete',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
                                                       ],
-                                                    ),
-                                                  ),
-                                                  config.verticalSpaceSmall(),
-                                                  ExpandableTextWidget(
-                                                    text: dataList.email!.body ?? 'N/A',
-                                                    trimLength: 100,
-                                                  ),
-                                                  config.verticalSpaceSmall(),
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.timestamp!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
+                                                ),
                                               ),
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: Icon(
-                                                Icons.email_outlined,
-                                                color: theme.primaryColor,
+                                            );
+                                          } else if (dataList.contactInfo != null) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingMedium(),
                                               ),
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
-                                                onSelected: (value) {
-                                                  if (value == 'view_qr') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      scannedData: dataList,
-                                                      'Email: ${dataList.email!.address}, Subject: ${dataList.email!.subject}, Body: ${dataList.email!.body}',
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this email?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(
-                                                                email: dataList.email!.address,
-                                                              );
-                                                              Get.back();
-                                                            },
+                                              child: customListTileWidget(
+                                                context,
+                                                'Name: ${dataList.contactInfo!.contactName != null && dataList.contactInfo!.contactName!.isNotEmpty ? dataList.contactInfo!.contactName : 'N/A'}',
+
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Phone: ${dataList.contactInfo!.contactNumber}',
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor,
+                                                        overflow: TextOverflow.visible,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'Email: ${dataList.contactInfo!.contactEmail}',
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor,
+                                                        overflow: TextOverflow.visible,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'Address: ${dataList.contactInfo!.contactAddress}',
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor,
+                                                        overflow: TextOverflow.visible,
+                                                      ),
+                                                    ),
+                                                    config.verticalSpaceSmall(),
+                                                    Text(
+                                                      formatDateTime(
+                                                        dataList.timestamp!,
+                                                        dateTimeOnly: true,
+                                                      ),
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor.withOpacity(0.5),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                containerColor: greyColor.withOpacity(0.3),
+                                                leadingWidget: circleAvatarMethodCustom(
+                                                  config,
+                                                  AssetImage(UiAssets.user),
+                                                  radius: config.appHeight(3),
+                                                ),
+                                                trailing: PopupMenuButton<String>(
+                                                  icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                                  onSelected: (value) {
+                                                    if (value == 'view_qr') {
+                                                      viewQrDialog(
+                                                        context,
+                                                        config,
+                                                        scannedData: dataList,
+                                                        'Name: ${dataList.contactInfo!.contactName}, Phone: ${dataList.contactInfo!.contactNumber}, E-mail: ${dataList.contactInfo!.contactEmail} Address: ${dataList.contactInfo!.contactAddress}',
+                                                      );
+                                                    } else if (value == 'delete') {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            (context) => CustomAlertDialog(
+                                                              tilte: 'Delete',
+                                                              content:
+                                                                  'Are you sure you want to delete this contact info?',
+                                                              onYesPressed: () {
+                                                                hc.deleteQRData(
+                                                                  contactNumber:
+                                                                      dataList
+                                                                          .contactInfo!
+                                                                          .contactNumber,
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                      );
+                                                    }
+                                                  },
+                                                  itemBuilder:
+                                                      (context) => [
+                                                        PopupMenuItem(
+                                                          value: 'view_qr',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                HeroIcons.qr_code,
+                                                                color: blackColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'View QR',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_qr',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              HeroIcons.qr_code,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View QR',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
                                                         ),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
+                                                        PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.delete,
+                                                                color: redColor,
+                                                                size: config.appHeight(4),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                              ),
-                                            ),
-                                          );
-                                        } else if (dataList.sms != null) {
-                                          return Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
-                                            ),
-                                            child: customListTileWidget(
-                                              context,
-                                              'To: ${dataList.sms!.number ?? 'N/A'}',
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  ExpandableTextWidget(
-                                                    text:
-                                                        'Message: ${dataList.sms!.message ?? 'N/A'}',
-                                                    trimLength: 100,
-                                                  ),
-
-                                                  config.verticalSpaceSmall(),
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.timestamp!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: Icon(
-                                                Icons.sms_outlined,
-                                                color: theme.primaryColor,
-                                              ),
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
-                                                onSelected: (value) {
-                                                  if (value == 'view_qr') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      scannedData: dataList,
-                                                      'To: ${dataList.sms!.number}, Message: ${dataList.sms!.message}',
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this SMS?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(
-                                                                sms: dataList.sms!.number,
-                                                              );
-                                                              Get.back();
-                                                            },
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'Delete',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_qr',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              HeroIcons.qr_code,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View QR',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
                                                         ),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
+                                                      ],
+                                                ),
+                                              ),
+                                            );
+                                          } else if (dataList.email != null) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingMedium(),
+                                              ),
+                                              child: customListTileWidget(
+                                                context,
+                                                'Email: ${dataList.email!.address ?? 'N/A'}',
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    config.verticalSpaceSmall(),
+                                                    RichText(
+                                                      text: TextSpan(
+                                                        text: 'Subject: ',
+                                                        style: customTextStyle(
+                                                          fontSize: config.appHeight(1.8),
+                                                          color: blackColor,
+                                                          fontWeight: FontWeight.w400,
+                                                          overflow: TextOverflow.visible,
                                                         ),
-                                                      ),
-                                                    ],
-                                              ),
-                                            ),
-                                          );
-                                        } else if (dataList.phone != null) {
-                                          return Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
-                                            ),
-                                            child: customListTileWidget(
-                                              context,
-                                              'Phone: ${dataList.phone!.number ?? 'N/A'}',
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: Icon(
-                                                Icons.phone_outlined,
-                                                color: theme.primaryColor,
-                                              ),
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  config.verticalSpaceSmall(),
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.timestamp!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
-                                                onSelected: (value) {
-                                                  if (value == 'view_qr') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      scannedData: dataList,
-                                                      'Phone: ${dataList.phone!.number}',
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this phone number?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(
-                                                                phone: dataList.phone!.number,
-                                                              );
-                                                              Get.back();
-                                                            },
+                                                        children: <TextSpan>[
+                                                          TextSpan(
+                                                            text: dataList.email!.subject ?? 'N/A',
+                                                            style: customTextStyle(
+                                                              fontSize: config.appHeight(1.8),
+                                                              fontWeight: FontWeight.normal,
+                                                              overflow: TextOverflow.visible,
+                                                            ),
                                                           ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_qr',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              HeroIcons.qr_code,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View QR',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                        ],
                                                       ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                    ),
+                                                    config.verticalSpaceSmall(),
+                                                    ExpandableTextWidget(
+                                                      text: dataList.email!.body ?? 'N/A',
+                                                      trimLength: 100,
+                                                    ),
+                                                    config.verticalSpaceSmall(),
+                                                    Text(
+                                                      formatDateTime(
+                                                        dataList.timestamp!,
+                                                        dateTimeOnly: true,
                                                       ),
-                                                    ],
-                                              ),
-                                            ),
-                                          );
-                                        } else if (dataList.geo != null) {
-                                          return Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
-                                            ),
-                                            child: customListTileWidget(
-                                              context,
-                                              'Geo Location',
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Latitude: ${dataList.geo!.latitude}°',
-                                                    style: customTextStyle(
-                                                      fontWeight: FontWeight.normal,
-                                                      fontSize: config.appHeight(2),
-                                                      overflow: TextOverflow.visible,
-                                                      color: darkGreyColor,
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor.withOpacity(0.5),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  Text(
-                                                    'Longitude: ${dataList.geo!.longitude}°',
-                                                    style: customTextStyle(
-                                                      fontWeight: FontWeight.normal,
-                                                      fontSize: config.appHeight(2),
-                                                      color: darkGreyColor,
-                                                      overflow: TextOverflow.visible,
-                                                    ),
-                                                  ),
-                                                  config.verticalSpaceSmall(),
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.timestamp!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: Icon(
-                                                Icons.location_on_outlined,
-                                                color: theme.primaryColor,
-                                              ),
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
-                                                onSelected: (value) {
-                                                  if (value == 'view_qr') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      scannedData: dataList,
-                                                      'Latitude: ${dataList.geo!.latitude}, Longitude: ${dataList.geo!.longitude}',
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this geo location?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(
-                                                                geo: dataList.geo!.latitude,
-                                                              );
-                                                              Get.back();
-                                                            },
+                                                  ],
+                                                ),
+                                                containerColor: greyColor.withOpacity(0.3),
+                                                leadingWidget: Icon(
+                                                  Icons.email_outlined,
+                                                  color: theme.primaryColor,
+                                                ),
+                                                trailing: PopupMenuButton<String>(
+                                                  icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                                  onSelected: (value) {
+                                                    if (value == 'view_qr') {
+                                                      viewQrDialog(
+                                                        context,
+                                                        config,
+                                                        scannedData: dataList,
+                                                        'Email: ${dataList.email!.address}, Subject: ${dataList.email!.subject}, Body: ${dataList.email!.body}',
+                                                      );
+                                                    } else if (value == 'delete') {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            (context) => CustomAlertDialog(
+                                                              tilte: 'Delete',
+                                                              content:
+                                                                  'Are you sure you want to delete this email?',
+                                                              onYesPressed: () {
+                                                                hc.deleteQRData(
+                                                                  email: dataList.email!.address,
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                      );
+                                                    }
+                                                  },
+                                                  itemBuilder:
+                                                      (context) => [
+                                                        PopupMenuItem(
+                                                          value: 'view_qr',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                HeroIcons.qr_code,
+                                                                color: blackColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'View QR',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_qr',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              HeroIcons.qr_code,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View QR',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
                                                         ),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
+                                                        PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.delete,
+                                                                color: redColor,
+                                                                size: config.appHeight(4),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                              ),
-                                            ),
-                                          );
-                                        } else if (dataList.calendarEvent != null) {
-                                          return Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
-                                            ),
-                                            child: customListTileWidget(
-                                              context,
-                                              'Event: ${dataList.calendarEvent!.summary ?? 'N/A'}',
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  config.verticalSpaceVerySmall(),
-
-                                                  Text(
-                                                    'Location: ${dataList.calendarEvent!.location ?? 'N/A'}',
-                                                    style: customTextStyle(color: darkGreyColor),
-                                                  ),
-                                                  config.verticalSpaceVerySmall(),
-
-                                                  Text(
-                                                    'Start: ${formatDateTime(dataList.calendarEvent!.start!)}',
-                                                    style: customTextStyle(color: darkGreyColor),
-                                                  ),
-                                                  config.verticalSpaceVerySmall(),
-
-                                                  Text(
-                                                    'End: ${formatDateTime(dataList.calendarEvent!.end!)}',
-                                                    style: customTextStyle(color: darkGreyColor),
-                                                  ),
-                                                  config.verticalSpaceVerySmall(),
-
-                                                  ExpandableTextWidget(
-                                                    text:
-                                                        dataList.calendarEvent!.description ??
-                                                        'N/A',
-                                                    trimLength: 50,
-                                                  ),
-                                                  config.verticalSpaceSmall(),
-
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.timestamp!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: Icon(
-                                                Icons.event,
-                                                color: theme.primaryColor,
-                                              ),
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
-                                                onSelected: (value) {
-                                                  if (value == 'view_qr') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      scannedData: dataList,
-                                                      'Event: ${dataList.calendarEvent!.summary}, Location: ${dataList.calendarEvent!.location}, Start: ${formatDateTime(dataList.calendarEvent!.start!)}, End: ${formatDateTime(dataList.calendarEvent!.end!)}',
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this calendar event?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(
-                                                                calendarEvent:
-                                                                    dataList.calendarEvent!.summary,
-                                                              );
-                                                              Get.back();
-                                                            },
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'Delete',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_qr',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              HeroIcons.qr_code,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View QR',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
                                                         ),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                ),
                                               ),
-                                            ),
-                                          );
-                                        } else if (dataList.isBarcode == true) {
-                                          return Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingMedium(),
-                                            ),
-                                            child: customListTileWidget(
-                                              context,
-                                              dataList.format
-                                                  .toString()
-                                                  .split('.')
-                                                  .last
-                                                  .toUpperCase(),
+                                            );
+                                          } else if (dataList.sms != null) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingMedium(),
+                                              ),
+                                              child: customListTileWidget(
+                                                context,
+                                                'To: ${dataList.sms!.number ?? 'N/A'}',
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    ExpandableTextWidget(
+                                                      text:
+                                                          'Message: ${dataList.sms!.message ?? 'N/A'}',
+                                                      trimLength: 100,
+                                                    ),
 
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    '${dataList.displayValue}',
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor,
-                                                      overflow: TextOverflow.visible,
+                                                    config.verticalSpaceSmall(),
+                                                    Text(
+                                                      formatDateTime(
+                                                        dataList.timestamp!,
+                                                        dateTimeOnly: true,
+                                                      ),
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor.withOpacity(0.5),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  config.verticalSpaceSmall(),
-                                                  Text(
-                                                    formatDateTime(
-                                                      dataList.timestamp!,
-                                                      dateTimeOnly: true,
-                                                    ),
-                                                    style: customTextStyle(
-                                                      color: darkGreyColor.withOpacity(0.5),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              containerColor: greyColor.withOpacity(0.3),
-                                              leadingWidget: Icon(
-                                                FontAwesome.barcode_solid,
-                                                color: theme.primaryColor,
-                                              ),
-                                              trailing: PopupMenuButton<String>(
-                                                icon: Icon(Icons.more_vert, color: darkGreyColor),
-                                                onSelected: (value) {
-                                                  if (value == 'view_barcode') {
-                                                    viewQrDialog(
-                                                      context,
-                                                      config,
-                                                      scannedData: dataList,
-                                                      "${dataList.displayValue}",
-                                                    );
-                                                  } else if (value == 'delete') {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder:
-                                                          (context) => CustomAlertDialog(
-                                                            tilte: 'Delete',
-                                                            content:
-                                                                'Are you sure you want to delete this URL?',
-                                                            onYesPressed: () {
-                                                              hc.deleteQRData(
-                                                                barcode: dataList.displayValue,
-                                                              );
-                                                              Get.back();
-                                                            },
+                                                  ],
+                                                ),
+                                                containerColor: greyColor.withOpacity(0.3),
+                                                leadingWidget: Icon(
+                                                  Icons.sms_outlined,
+                                                  color: theme.primaryColor,
+                                                ),
+                                                trailing: PopupMenuButton<String>(
+                                                  icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                                  onSelected: (value) {
+                                                    if (value == 'view_qr') {
+                                                      viewQrDialog(
+                                                        context,
+                                                        config,
+                                                        scannedData: dataList,
+                                                        'To: ${dataList.sms!.number}, Message: ${dataList.sms!.message}',
+                                                      );
+                                                    } else if (value == 'delete') {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            (context) => CustomAlertDialog(
+                                                              tilte: 'Delete',
+                                                              content:
+                                                                  'Are you sure you want to delete this SMS?',
+                                                              onYesPressed: () {
+                                                                hc.deleteQRData(
+                                                                  sms: dataList.sms!.number,
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                      );
+                                                    }
+                                                  },
+                                                  itemBuilder:
+                                                      (context) => [
+                                                        PopupMenuItem(
+                                                          value: 'view_qr',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                HeroIcons.qr_code,
+                                                                color: blackColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'View QR',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                    );
-                                                  }
-                                                },
-                                                itemBuilder:
-                                                    (context) => [
-                                                      PopupMenuItem(
-                                                        value: 'view_barcode',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              FontAwesome.barcode_solid,
-                                                              color: blackColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'View Barcode',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
-                                                              ),
-                                                            ),
-                                                          ],
                                                         ),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 'delete',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.delete,
-                                                              color: redColor,
-                                                              size: config.appHeight(4),
-                                                            ),
-                                                            config.horizontalSpaceSmall(),
-                                                            Text(
-                                                              'Delete',
-                                                              style: customTextStyle(
-                                                                fontSize: config.appHeight(2.2),
+                                                        PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.delete,
+                                                                color: redColor,
+                                                                size: config.appHeight(4),
                                                               ),
-                                                            ),
-                                                          ],
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'Delete',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                ),
                                               ),
-                                            ),
-                                          );
-                                        } else {
-                                          return SizedBox.shrink();
-                                        }
-                                      },
-                                    ),
-                                    config.verticalSpaceCustom(0.3),
-                                  ],
+                                            );
+                                          } else if (dataList.phone != null) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingMedium(),
+                                              ),
+                                              child: customListTileWidget(
+                                                context,
+                                                'Phone: ${dataList.phone!.number ?? 'N/A'}',
+                                                containerColor: greyColor.withOpacity(0.3),
+                                                leadingWidget: Icon(
+                                                  Icons.phone_outlined,
+                                                  color: theme.primaryColor,
+                                                ),
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    config.verticalSpaceSmall(),
+                                                    Text(
+                                                      formatDateTime(
+                                                        dataList.timestamp!,
+                                                        dateTimeOnly: true,
+                                                      ),
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor.withOpacity(0.5),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                trailing: PopupMenuButton<String>(
+                                                  icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                                  onSelected: (value) {
+                                                    if (value == 'view_qr') {
+                                                      viewQrDialog(
+                                                        context,
+                                                        config,
+                                                        scannedData: dataList,
+                                                        'Phone: ${dataList.phone!.number}',
+                                                      );
+                                                    } else if (value == 'delete') {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            (context) => CustomAlertDialog(
+                                                              tilte: 'Delete',
+                                                              content:
+                                                                  'Are you sure you want to delete this phone number?',
+                                                              onYesPressed: () {
+                                                                hc.deleteQRData(
+                                                                  phone: dataList.phone!.number,
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                      );
+                                                    }
+                                                  },
+                                                  itemBuilder:
+                                                      (context) => [
+                                                        PopupMenuItem(
+                                                          value: 'view_qr',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                HeroIcons.qr_code,
+                                                                color: blackColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'View QR',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.delete,
+                                                                color: redColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'Delete',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                ),
+                                              ),
+                                            );
+                                          } else if (dataList.geo != null) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingMedium(),
+                                              ),
+                                              child: customListTileWidget(
+                                                context,
+                                                'Geo Location',
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Latitude: ${dataList.geo!.latitude}°',
+                                                      style: customTextStyle(
+                                                        fontWeight: FontWeight.normal,
+                                                        fontSize: config.appHeight(2),
+                                                        overflow: TextOverflow.visible,
+                                                        color: darkGreyColor,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'Longitude: ${dataList.geo!.longitude}°',
+                                                      style: customTextStyle(
+                                                        fontWeight: FontWeight.normal,
+                                                        fontSize: config.appHeight(2),
+                                                        color: darkGreyColor,
+                                                        overflow: TextOverflow.visible,
+                                                      ),
+                                                    ),
+                                                    config.verticalSpaceSmall(),
+                                                    Text(
+                                                      formatDateTime(
+                                                        dataList.timestamp!,
+                                                        dateTimeOnly: true,
+                                                      ),
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor.withOpacity(0.5),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                containerColor: greyColor.withOpacity(0.3),
+                                                leadingWidget: Icon(
+                                                  Icons.location_on_outlined,
+                                                  color: theme.primaryColor,
+                                                ),
+                                                trailing: PopupMenuButton<String>(
+                                                  icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                                  onSelected: (value) {
+                                                    if (value == 'view_qr') {
+                                                      viewQrDialog(
+                                                        context,
+                                                        config,
+                                                        scannedData: dataList,
+                                                        'Latitude: ${dataList.geo!.latitude}, Longitude: ${dataList.geo!.longitude}',
+                                                      );
+                                                    } else if (value == 'delete') {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            (context) => CustomAlertDialog(
+                                                              tilte: 'Delete',
+                                                              content:
+                                                                  'Are you sure you want to delete this geo location?',
+                                                              onYesPressed: () {
+                                                                hc.deleteQRData(
+                                                                  geo: dataList.geo!.latitude,
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                      );
+                                                    }
+                                                  },
+                                                  itemBuilder:
+                                                      (context) => [
+                                                        PopupMenuItem(
+                                                          value: 'view_qr',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                HeroIcons.qr_code,
+                                                                color: blackColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'View QR',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.delete,
+                                                                color: redColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'Delete',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                ),
+                                              ),
+                                            );
+                                          } else if (dataList.calendarEvent != null) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingMedium(),
+                                              ),
+                                              child: customListTileWidget(
+                                                context,
+                                                'Event: ${dataList.calendarEvent!.summary ?? 'N/A'}',
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    config.verticalSpaceVerySmall(),
+
+                                                    Text(
+                                                      'Location: ${dataList.calendarEvent!.location ?? 'N/A'}',
+                                                      style: customTextStyle(color: darkGreyColor),
+                                                    ),
+                                                    config.verticalSpaceVerySmall(),
+
+                                                    Text(
+                                                      'Start: ${formatDateTime(dataList.calendarEvent!.start!)}',
+                                                      style: customTextStyle(color: darkGreyColor),
+                                                    ),
+                                                    config.verticalSpaceVerySmall(),
+
+                                                    Text(
+                                                      'End: ${formatDateTime(dataList.calendarEvent!.end!)}',
+                                                      style: customTextStyle(color: darkGreyColor),
+                                                    ),
+                                                    config.verticalSpaceVerySmall(),
+
+                                                    ExpandableTextWidget(
+                                                      text:
+                                                          dataList.calendarEvent!.description ??
+                                                          'N/A',
+                                                      trimLength: 50,
+                                                    ),
+                                                    config.verticalSpaceSmall(),
+
+                                                    Text(
+                                                      formatDateTime(
+                                                        dataList.timestamp!,
+                                                        dateTimeOnly: true,
+                                                      ),
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor.withOpacity(0.5),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                containerColor: greyColor.withOpacity(0.3),
+                                                leadingWidget: Icon(
+                                                  Icons.event,
+                                                  color: theme.primaryColor,
+                                                ),
+                                                trailing: PopupMenuButton<String>(
+                                                  icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                                  onSelected: (value) {
+                                                    if (value == 'view_qr') {
+                                                      viewQrDialog(
+                                                        context,
+                                                        config,
+                                                        scannedData: dataList,
+                                                        'Event: ${dataList.calendarEvent!.summary}, Location: ${dataList.calendarEvent!.location}, Start: ${formatDateTime(dataList.calendarEvent!.start!)}, End: ${formatDateTime(dataList.calendarEvent!.end!)}',
+                                                      );
+                                                    } else if (value == 'delete') {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            (context) => CustomAlertDialog(
+                                                              tilte: 'Delete',
+                                                              content:
+                                                                  'Are you sure you want to delete this calendar event?',
+                                                              onYesPressed: () {
+                                                                hc.deleteQRData(
+                                                                  calendarEvent:
+                                                                      dataList
+                                                                          .calendarEvent!
+                                                                          .summary,
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                      );
+                                                    }
+                                                  },
+                                                  itemBuilder:
+                                                      (context) => [
+                                                        PopupMenuItem(
+                                                          value: 'view_qr',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                HeroIcons.qr_code,
+                                                                color: blackColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'View QR',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.delete,
+                                                                color: redColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'Delete',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                ),
+                                              ),
+                                            );
+                                          } else if (dataList.isBarcode == true) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingMedium(),
+                                              ),
+                                              child: customListTileWidget(
+                                                context,
+                                                dataList.format
+                                                    .toString()
+                                                    .split('.')
+                                                    .last
+                                                    .toUpperCase(),
+
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '${dataList.displayValue}',
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor,
+                                                        overflow: TextOverflow.visible,
+                                                      ),
+                                                    ),
+                                                    config.verticalSpaceSmall(),
+                                                    Text(
+                                                      formatDateTime(
+                                                        dataList.timestamp!,
+                                                        dateTimeOnly: true,
+                                                      ),
+                                                      style: customTextStyle(
+                                                        color: darkGreyColor.withOpacity(0.5),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                containerColor: greyColor.withOpacity(0.3),
+                                                leadingWidget: Icon(
+                                                  FontAwesome.barcode_solid,
+                                                  color: theme.primaryColor,
+                                                ),
+                                                trailing: PopupMenuButton<String>(
+                                                  icon: Icon(Icons.more_vert, color: darkGreyColor),
+                                                  onSelected: (value) {
+                                                    if (value == 'view_barcode') {
+                                                      viewQrDialog(
+                                                        context,
+                                                        config,
+                                                        scannedData: dataList,
+                                                        "${dataList.displayValue}",
+                                                      );
+                                                    } else if (value == 'delete') {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            (context) => CustomAlertDialog(
+                                                              tilte: 'Delete',
+                                                              content:
+                                                                  'Are you sure you want to delete this URL?',
+                                                              onYesPressed: () {
+                                                                hc.deleteQRData(
+                                                                  barcode: dataList.displayValue,
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                      );
+                                                    }
+                                                  },
+                                                  itemBuilder:
+                                                      (context) => [
+                                                        PopupMenuItem(
+                                                          value: 'view_barcode',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                FontAwesome.barcode_solid,
+                                                                color: blackColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'View Barcode',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.delete,
+                                                                color: redColor,
+                                                                size: config.appHeight(4),
+                                                              ),
+                                                              config.horizontalSpaceSmall(),
+                                                              Text(
+                                                                'Delete',
+                                                                style: customTextStyle(
+                                                                  fontSize: config.appHeight(2.2),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            return SizedBox.shrink();
+                                          }
+                                        },
+                                      ),
+                                      config.verticalSpaceCustom(0.3),
+                                    ],
+                                  ),
                                 ),
-                              ),
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-          ),
+                );
+              },
+            ),
+      ),
     );
   }
 
@@ -1894,6 +1820,175 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
+    );
+  }
+}
+
+class CustomDrawerWidget extends StatelessWidget {
+  const CustomDrawerWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final HomeController hc = Get.find();
+    return BaseWidget(
+      builder: (context, config, theme) {
+        return Drawer(
+          backgroundColor:
+              Theme.of(context).brightness == Brightness.dark ? darkBgColor : greyColor,
+          child: ListView(
+            padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
+            children: [
+              DrawerHeader(
+                padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
+                curve: Curves.easeInSine,
+                child: Container(
+                  padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(config.appHeight(2))),
+                    color: primaryColor,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      CircleAvatar(
+                        radius: config.appHeight(3),
+                        backgroundImage: const AssetImage(UiAssets.user),
+                      ),
+                      config.verticalSpaceMedium(),
+                      Text(
+                        'Welcome to ScanQR',
+                        style: customTextStyle(
+                          color: whiteColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: config.appHeight(2),
+                        ),
+                      ),
+                      config.verticalSpaceSmall(),
+
+                      Text(
+                        hc.platformVersion,
+                        maxLines: 2,
+                        style: customTextStyle(
+                          color: whiteColor,
+                          fontWeight: FontWeight.normal,
+                          fontSize: config.appHeight(2),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              customExpansionTileWidget(
+                context,
+                'QR Code',
+                leadingIcon: HeroIcons.qr_code,
+                childrens: [
+                  buildSettingItem(
+                    context,
+                    Icons.qr_code_scanner,
+                    'Scan QR',
+                    onTap: () {
+                      Get.back();
+                      Get.toNamed(Routes.qrscanScreen);
+                    },
+                  ),
+                  config.verticalSpaceSmall(),
+                  buildSettingItem(
+                    context,
+                    Bootstrap.qr_code,
+                    'Generate QR',
+                    onTap: () {
+                      Get.back();
+                      Get.toNamed(Routes.generateQr);
+                    },
+                  ),
+                ],
+              ),
+
+              customExpansionTileWidget(
+                context,
+                'Barcode',
+                leadingIcon: AntDesign.barcode_outline,
+                childrens: [
+                  buildSettingItem(
+                    context,
+                    Bootstrap.upc_scan,
+                    'Scan Barcode',
+                    onTap: () {
+                      Get.back();
+                      Get.toNamed(Routes.barcodescanScreen);
+                    },
+                  ),
+                  config.verticalSpaceSmall(),
+                  buildSettingItem(
+                    context,
+                    FontAwesome.barcode_solid,
+                    'Generate Barcode',
+                    onTap: () {
+                      Get.back();
+                      Get.toNamed(Routes.generateBarcode);
+                    },
+                  ),
+                ],
+              ),
+
+              hc.historyList.isNotEmpty
+                  ? customExpansionTileWidget(
+                    context,
+                    'Delete History',
+                    leadingIcon: AntDesign.delete_fill,
+                    iconColor: redColor,
+                    childrens: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: PrimaryIconButton(
+                              height: config.appHeight(5),
+                              radius: config.appHeight(0.5),
+                              label: 'Clear All',
+                              labelColor: whiteColor,
+                              backgroundColor: greenColor,
+                              onPressed:
+                                  () => showDialog(
+                                    context: context,
+                                    builder:
+                                        (context) => CustomAlertDialog(
+                                          tilte: 'Delete',
+                                          content: 'Are you sure you want to delete all history?',
+                                          onYesPressed: () {
+                                            hc.deleteQRData(all: true);
+                                            Get.back();
+                                          },
+                                        ),
+                                  ),
+                              icon: Icon(
+                                AntDesign.delete_fill,
+                                color: whiteColor,
+                                size: config.appHeight(3),
+                              ),
+                            ),
+                          ),
+                          config.horizontalSpaceSmall(),
+                          Expanded(
+                            child: PrimaryIconButton(
+                              height: config.appHeight(5),
+                              radius: config.appHeight(0.5),
+                              label: 'Cancel',
+                              labelColor: whiteColor,
+                              backgroundColor: redColor,
+                              onPressed: () => Get.back(),
+                              icon: Icon(Icons.close, color: whiteColor, size: config.appHeight(3)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                  : Container(),
+            ],
+          ),
+        );
+      },
     );
   }
 }
