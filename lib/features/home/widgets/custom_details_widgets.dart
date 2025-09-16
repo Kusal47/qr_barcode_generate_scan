@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/get_utils.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 import '../../../core/resources/export_resources.dart';
@@ -442,7 +443,10 @@ class SmsDetailsWidget extends StatelessWidget {
               ],
             ),
             containerColor: greyColor.withOpacity(0.3),
-            leadingWidget: Icon(Icons.sms_outlined, color: theme.primaryColor),
+            leadingWidget: Icon(
+              HeroIcons.chat_bubble_bottom_center_text,
+              color: theme.primaryColor,
+            ),
             trailing: PopupMenuButton<String>(
               icon: Icon(Icons.more_vert, color: darkGreyColor),
               onSelected: (value) {
@@ -711,7 +715,7 @@ class UrlDetailsWidget extends StatelessWidget {
           padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
           child: customListTileWidget(
             context,
-            'Title: ${dataList.url != null && dataList.url!.url != null ? Uri.tryParse(dataList.url!.url!)?.host ?? dataList.url!.url : 'N/A'}',
+            'Title: ${getUrlHost(dataList.url!.url).toString().capitalize!}',
 
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -781,6 +785,21 @@ class UrlDetailsWidget extends StatelessWidget {
         );
       },
     );
+  }
+
+  String getUrlHost(String? url) {
+    if (url == null || url.isEmpty) return 'N/A';
+    final formattedUrl = url.startsWith(RegExp(r'https?://')) ? url : 'https://$url';
+    final host = Uri.tryParse(formattedUrl)?.host;
+    if (host == null) return url;
+    final regex = RegExp(r'^(?:www\.)?([^\.]+)\.com$', caseSensitive: false);
+    final match = regex.firstMatch(host);
+
+    if (match != null) {
+      return match.group(1)!;
+    }
+
+    return host;
   }
 }
 

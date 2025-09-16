@@ -132,7 +132,7 @@ class _BarcodeGenerateScreenState extends State<BarcodeGenerateScreen> {
                         ),
                       ),
 
-                      config.verticalSpaceMedium(),
+                      config.verticalSpaceLarge(),
 
                       // Show QR
                       if (barcodeGC.barcodeData.isNotEmpty) ...[
@@ -144,32 +144,36 @@ class _BarcodeGenerateScreenState extends State<BarcodeGenerateScreen> {
                           ),
                         ),
 
-                        config.verticalSpaceMedium(),
+                        config.verticalSpaceLarge(),
+
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            PrimaryIconButton(
-                              width: config.appWidth(30),
-                              onPressed: () async {
-                                await barcodeGC.shareQr(
-                                  barcodeGC.qrKey,
-                                  text: barcodeGC.barcodeData,
-                                );
-                              },
-                              icon: Icon(LineAwesome.share_alt_solid, size: config.appHeight(3)),
-                              label: "Share",
+                            Expanded(
+                              child: PrimaryIconButton(
+                                onPressed: () async {
+                                  await barcodeGC.shareQr(
+                                    barcodeGC.qrKey,
+                                    text: barcodeGC.barcodeData,
+                                  );
+                                },
+                                icon: Icon(LineAwesome.share_alt_solid, size: config.appHeight(3)),
+                                label: "Share",
+                              ),
                             ),
                             config.horizontalSpaceSmall(),
-                            PrimaryIconButton(
-                              width: config.appWidth(30),
-                              onPressed: () async {
-                                await barcodeGC.downLoadQr();
-                              },
-                              icon: Icon(LineAwesome.download_solid, size: config.appHeight(3)),
-                              label: "Download",
+                            Expanded(
+                              child: PrimaryIconButton(
+                                onPressed: () async {
+                                  await barcodeGC.downLoadQr();
+                                },
+                                icon: Icon(LineAwesome.download_solid, size: config.appHeight(3)),
+                                label: "Download",
+                              ),
                             ),
                           ],
                         ),
+                        config.verticalSpaceLarge(),
                       ],
                     ],
                   ),

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:scan_qr/features/home/controller/home_controller.dart';
 
 import '../../scan/model/scan_code_result_model.dart';
@@ -11,6 +12,7 @@ class SearchHistroyController extends GetxController {
   final searchController = TextEditingController();
   final searchFocusNode = FocusNode();
   HomeController hc = HomeController();
+  final refreshController = RefreshController();
 
   @override
   onInit() {
