@@ -120,6 +120,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           qgc.urlcontroller.text = p0;
                                         },
                                         validator: Validators.checkUrlField,
+                                        keyboardType: TextInputType.url,
                                       ),
                                     ]
                                     // 🛜 WiFi
@@ -173,6 +174,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           qgc.contactNamecontroller.text = p0;
                                         },
                                         validator: Validators.checkFieldEmpty,
+                                        keyboardType: TextInputType.name,
                                       ),
                                       config.verticalSpaceSmall(),
                                       PrimaryPhoneFormField(
@@ -185,6 +187,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         },
                                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                         validator: Validators.checkPhoneNumberField,
+                                        keyboardType: TextInputType.phone,
                                       ),
                                       config.verticalSpaceSmall(),
                                       PrimaryFormField(
@@ -195,6 +198,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         onSaved: (p0) {
                                           qgc.contactEmailcontroller.text = p0;
                                         },
+                                        keyboardType: TextInputType.emailAddress,
                                       ),
                                       config.verticalSpaceSmall(),
                                       PrimaryFormField(
@@ -205,6 +209,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           qgc.contactAddresscontroller.text = p0;
                                         },
                                         validator: Validators.checkFieldEmpty,
+                                        keyboardType: TextInputType.streetAddress,
                                       ),
                                     ]
                                     // 📧 Email
@@ -217,6 +222,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         onSaved: (p0) {
                                           qgc.emailAddressController.text = p0;
                                         },
+                                        keyboardType: TextInputType.emailAddress,
                                       ),
                                       config.verticalSpaceSmall(),
                                       PrimaryFormField(
@@ -253,6 +259,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           qgc.completeSmsNumber = p0.completeNumber;
                                         },
                                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                        keyboardType: TextInputType.phone,
                                       ),
                                       config.verticalSpaceSmall(),
                                       PrimaryFormField(
@@ -277,6 +284,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                           qgc.completePhoneNumber = p0.completeNumber;
                                         },
                                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                        keyboardType: TextInputType.phone,
                                       ),
                                     ]
                                     // 📍 Geo
@@ -333,6 +341,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                                         onSaved: (p0) {
                                           qgc.eventLocationController.text = p0;
                                         },
+                                        keyboardType: TextInputType.streetAddress,
                                       ),
                                       config.verticalSpaceSmall(),
                                       // start time
@@ -443,7 +452,7 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                         ),
                       ),
 
-                      config.verticalSpaceMedium(),
+                      config.verticalSpaceLarge(),
 
                       // Show QR
                       if (qgc.qrData.isNotEmpty)
@@ -461,31 +470,34 @@ class _QrGeneratorPageState extends State<QrGeneratorPage> {
                           ),
                         ),
 
-                      config.verticalSpaceMedium(),
+                      config.verticalSpaceLarge(),
 
                       if (qgc.qrData.isNotEmpty)
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            PrimaryIconButton(
-                              width: config.appWidth(30),
-                              onPressed: () async {
-                                await qgc.shareQr(qgc.qrKey, text: qgc.qrData);
-                              },
-                              icon: Icon(LineAwesome.share_alt_solid, size: config.appHeight(3)),
-                              label: "Share",
+                            Expanded(
+                              child: PrimaryIconButton(
+                                onPressed: () async {
+                                  await qgc.shareQr(qgc.qrKey, text: qgc.qrData);
+                                },
+                                icon: Icon(LineAwesome.share_alt_solid, size: config.appHeight(3)),
+                                label: "Share",
+                              ),
                             ),
                             config.horizontalSpaceSmall(),
-                            PrimaryIconButton(
-                              width: config.appWidth(30),
-                              onPressed: () async {
-                                await qgc.downLoadQr();
-                              },
-                              icon: Icon(LineAwesome.download_solid, size: config.appHeight(3)),
-                              label: "Download",
+                            Expanded(
+                              child: PrimaryIconButton(
+                                onPressed: () async {
+                                  await qgc.downLoadQr();
+                                },
+                                icon: Icon(LineAwesome.download_solid, size: config.appHeight(3)),
+                                label: "Download",
+                              ),
                             ),
                           ],
                         ),
+                      config.verticalSpaceLarge(),
                     ],
                   ),
                 ),
