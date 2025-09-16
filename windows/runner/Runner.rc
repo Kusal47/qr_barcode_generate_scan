@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "scan_qr" "\0"
+            VALUE "FileDescription", "codova_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "scan_qr" "\0"
+            VALUE "InternalName", "codova_app" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "scan_qr.exe" "\0"
-            VALUE "ProductName", "scan_qr" "\0"
+            VALUE "OriginalFilename", "codova_app.exe" "\0"
+            VALUE "ProductName", "codova_app" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -6,18 +6,18 @@
     "configurations": [
         
         {
-            "name": "ScanQR",
+            "name": "Codova",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "ScanQR (profile mode)",
+            "name": "Codova (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "ScanQR (release mode)",
+            "name": "Codova (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

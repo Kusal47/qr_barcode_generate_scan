@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:scan_qr/features/scan/model/scan_code_result_model.dart';
+import 'package:codova_app/features/scan/model/scan_code_result_model.dart';
 import '../constants/storage_constants.dart';
 
 class SecureStorageService {

@@ -8,12 +8,12 @@ import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
-import 'package:scan_qr/core/resources/export_resources.dart';
+import 'package:codova_app/core/resources/export_resources.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:scan_qr/features/scan/barcode/model/barcode_generate_params.dart';
-import 'package:scan_qr/features/scan/model/scan_code_result_model.dart';
+import 'package:codova_app/features/scan/barcode/model/barcode_generate_params.dart';
+import 'package:codova_app/features/scan/model/scan_code_result_model.dart';
 
 import '../../../features/scan/barcode/controller/barcode_generation_controller.dart';
 import '../export_custom_widget.dart';
@@ -59,7 +59,7 @@ Future<String> saveImageToGallery(Uint8List imageBytes) async {
   final byteData = await finalImage.toByteData(format: ui.ImageByteFormat.png);
   final newBytes = byteData!.buffer.asUint8List();
   final dir = await getTemporaryDirectory();
-  final filePath = '${dir.path}/scan_qr.png';
+  final filePath = '${dir.path}/codova_app.png';
   final file = File(filePath);
   await file.writeAsBytes(newBytes);
 
@@ -128,7 +128,7 @@ Future<Uint8List> generatePdfFromImage(Uint8List imageBytes) async {
   pdf.addPage(pw.Page(build: (context) => pw.Center(child: pw.Image(image))));
 
   final dir = await getTemporaryDirectory();
-  final pdfPath = '${dir.path}/qr_${DateTime.now().millisecondsSinceEpoch}.pdf';
+  final pdfPath = '${dir.path}/codova_${DateTime.now().millisecondsSinceEpoch}.pdf';
   final file = File(pdfPath);
   await file.writeAsBytes(await pdf.save());
   return file.readAsBytes();

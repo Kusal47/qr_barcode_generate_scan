@@ -1,4 +1,4 @@
-# ScanQR
+# Codova
 
 A new Flutter project.
 

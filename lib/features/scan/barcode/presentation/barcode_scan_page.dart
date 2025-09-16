@@ -55,7 +55,7 @@ class _BarcodeScanScreenState extends State<BarcodeScanScreen> {
         ScaffoldMessenger.of(context)
             .showSnackBar(
               const SnackBar(
-                content: Text('Invalid QR data!', style: TextStyle(color: whiteColor)),
+                content: Text('Invalid Barcode data!', style: TextStyle(color: whiteColor)),
                 backgroundColor: redColor,
               ),
             )
@@ -209,7 +209,7 @@ class _BarcodeScanScreenState extends State<BarcodeScanScreen> {
                                 if (barcodes != null) {
                                   _handleBarcode(barcodes);
                                 } else {
-                                  showErrorToast('Invalid QR code');
+                                  showErrorToast('Invalid Barcode');
                                 }
                                 setState(() {});
                               },

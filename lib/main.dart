@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:scan_qr/core/api/core_bindings.dart';
-import 'package:scan_qr/core/routes/app_pages.dart';
+import 'package:codova_app/core/api/core_bindings.dart';
+import 'package:codova_app/core/routes/app_pages.dart';
 
 import 'core/resources/export_resources.dart';
 

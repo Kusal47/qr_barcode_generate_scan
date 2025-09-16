@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:scan_qr/features/scan/qr_code/controller/qr_scan_controller.dart';
-import 'package:scan_qr/features/scan/model/scan_code_result_model.dart';
+import 'package:codova_app/features/scan/qr_code/controller/qr_scan_controller.dart';
+import 'package:codova_app/features/scan/model/scan_code_result_model.dart';
 
 import '../../../../core/resources/export_resources.dart';
 import '../../../../core/widgets/export_common_widget.dart';

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:scan_qr/core/routes/app_pages.dart';
-import 'package:scan_qr/core/widgets/export_custom_widget.dart';
+import 'package:codova_app/core/routes/app_pages.dart';
+import 'package:codova_app/core/widgets/export_custom_widget.dart';
 import '../../../core/resources/export_resources.dart';
 import '../../../core/widgets/export_common_widget.dart';
 import '../controller/home_controller.dart';
@@ -267,7 +267,7 @@ class CustomDrawerWidget extends StatelessWidget {
                       ),
                       config.verticalSpaceMedium(),
                       Text(
-                        'Welcome to ScanQR',
+                        'Welcome to Codova',
                         style: customTextStyle(
                           color: whiteColor,
                           fontWeight: FontWeight.bold,
