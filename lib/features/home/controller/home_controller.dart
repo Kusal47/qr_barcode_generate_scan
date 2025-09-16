@@ -10,6 +10,7 @@ import 'package:scan_qr/features/scan/model/scan_code_result_model.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/widgets/export_custom_widget.dart';
+import '../../search/controller/search_history_controller.dart';
 
 class HomeController extends GetxController {
   String platformVersion = 'Unknown';
@@ -28,20 +29,9 @@ class HomeController extends GetxController {
     loadHistory();
   }
 
-  Future<void> loadHistory() async {
+  Future<void> loadHistory({String? query}) async {
     await fetchAllHistory();
-    if (searchController.text.isNotEmpty) filterHistory(searchController.text);
-    update();
-  }
-
-  filterHistory(String query) {
-    searchedList = historyList.where((element) => element.displayValue!.contains(query)).toList();
-    update();
-  }
-
-  searchActionMethod() {
-    searchController.clear();
-    searchedList.clear();
+    if (query != null && query.isNotEmpty) Get.find<SearchHistroyController>().filterHistory(query);
     update();
   }
 
@@ -99,6 +89,7 @@ class HomeController extends GetxController {
     double? geo,
     String? calendarEvent,
     String? barcode,
+    String? query,
   }) async {
     if (all) {
       await secureStorageService.deleteQrData();
@@ -108,7 +99,7 @@ class HomeController extends GetxController {
             .toString(),
       );
     }
-    await loadHistory();
+    await loadHistory(query: query);
 
     update();
   }
