@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:scan_qr/core/resources/secure_storage_functions.dart';
+import 'package:codova_app/core/resources/secure_storage_functions.dart';
 
 import '../../../core/constants/storage_constants.dart';
 import '../../../core/routes/app_pages.dart';

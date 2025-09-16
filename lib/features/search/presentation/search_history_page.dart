@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:scan_qr/core/widgets/export_common_widget.dart';
-import 'package:scan_qr/core/widgets/export_custom_widget.dart';
+import 'package:codova_app/core/widgets/export_common_widget.dart';
+import 'package:codova_app/core/widgets/export_custom_widget.dart';
 
 import '../../../core/resources/export_resources.dart';
 import '../../../core/widgets/custom/custom_widget.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:scan_qr/core/resources/export_resources.dart';
-import 'package:scan_qr/core/widgets/export_custom_widget.dart';
+import 'package:codova_app/core/resources/export_resources.dart';
+import 'package:codova_app/core/widgets/export_custom_widget.dart';
 import '../../../core/widgets/common/base_widget.dart';
 import '../../home/presentation/animated_text.dart';
 import '../controller/splash_controller.dart';
@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         ),
                       ),
                       AnimatedTextAnimation(
-                        text: 'Ready to Scan?\nHold on!\nWe are preparing everything for you.',
+                        text: 'Ready to Dive in?\nPreparing resources...',
                         textStyle: customTextStyle(
                           color: primaryColor,
                           fontSize: config.appHeight(2),

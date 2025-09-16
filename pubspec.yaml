@@ -1,5 +1,5 @@
-name: scan_qr
-description: "A new Flutter project."
+name: codova_app
+description: "Codova App is a QR Code and Bar Code Scanner and Generator App."
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 

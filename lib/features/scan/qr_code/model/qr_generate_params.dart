@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:scan_qr/features/scan/model/scan_code_result_model.dart';
+import 'package:codova_app/features/scan/model/scan_code_result_model.dart';
 
 class QRGenerateParams {
   WifiModel? wifi;

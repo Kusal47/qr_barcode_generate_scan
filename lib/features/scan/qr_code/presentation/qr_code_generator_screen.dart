@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
-import 'package:scan_qr/core/constants/validators.dart';
-import 'package:scan_qr/core/resources/colors.dart';
-import 'package:scan_qr/core/widgets/export_common_widget.dart';
-import 'package:scan_qr/core/widgets/export_custom_widget.dart';
-import 'package:scan_qr/features/scan/qr_code/model/qr_generate_params.dart';
+import 'package:codova_app/core/constants/validators.dart';
+import 'package:codova_app/core/resources/colors.dart';
+import 'package:codova_app/core/widgets/export_common_widget.dart';
+import 'package:codova_app/core/widgets/export_custom_widget.dart';
+import 'package:codova_app/features/scan/qr_code/model/qr_generate_params.dart';
 
 import '../controller/qr_code_generation_controller.dart';
 
