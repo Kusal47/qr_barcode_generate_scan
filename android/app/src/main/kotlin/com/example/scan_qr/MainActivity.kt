@@ -1,4 +1,4 @@
-package com.qr_scan.ak
+package com.codova_app.ak
 
 import io.flutter.embedding.android.FlutterActivity
 
