@@ -9,6 +9,7 @@ class UiAssets {
 
   //logo
   static const String logo = "${logoDir}logo.png";
+  static const String logoWithNoBg = "${logoDir}logo_with_no_bg.png";
 
   //loading shimmer effect
   static const String shimmerLoading = "${gifDir}loading.gif";
