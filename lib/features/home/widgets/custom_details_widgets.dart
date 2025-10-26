@@ -34,7 +34,6 @@ class WifiDetailsWidget extends StatelessWidget {
             containerColor: greyColor.withOpacity(0.3),
             leadingWidget: Icon(Icons.wifi_password_outlined, color: theme.primaryColor),
             trailing: PopupMenuButton<String>(
-              
               // popUpAnimationStyle: AnimationStyle(
               //   curve: Curves.bounceIn,
               //   reverseCurve: Curves.bounceOut,
@@ -874,6 +873,98 @@ class BarcodeDetailsWidget extends StatelessWidget {
                             'View Barcode',
                             style: customTextStyle(fontSize: config.appHeight(2.2)),
                           ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, color: redColor, size: config.appHeight(4)),
+                          config.horizontalSpaceSmall(),
+                          Text('Delete', style: customTextStyle(fontSize: config.appHeight(2.2))),
+                        ],
+                      ),
+                    ),
+                  ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class DefaultDetailsWidget extends StatelessWidget {
+  const DefaultDetailsWidget({super.key, required this.dataList, required this.onYesPressed});
+
+  final ScannedCodeResultModel dataList;
+  final Function() onYesPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseWidget(
+      builder: (context, config, theme) {
+        return Padding(
+          padding: EdgeInsets.all(config.appHorizontalPaddingMedium()),
+          child: customListTileWidget(
+            context,
+            dataList.format.toString().split('.').last.toUpperCase(),
+
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  dataList.displayValue ?? 'N/A',
+                  maxLines: 2,
+                  style: customTextStyle(
+                    color: darkGreyColor,
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: config.appHeight(1.8),
+                  ),
+                ),
+                config.verticalSpaceSmall(),
+                Text(
+                  formatDateTime(dataList.timestamp!, dateTimeOnly: true),
+                  style: customTextStyle(color: darkGreyColor.withOpacity(0.5)),
+                ),
+              ],
+            ),
+            containerColor: greyColor.withOpacity(0.3),
+            leadingWidget: Icon(Icons.link, color: theme.primaryColor),
+
+            trailing: PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert, color: blackColor),
+              onSelected: (value) {
+                if (value == 'view_qr') {
+                  viewQrBarcodeDialog(
+                    context,
+                    config,
+                    scannedData: dataList,
+
+                    "${dataList.displayValue}",
+                  );
+                } else if (value == 'delete') {
+                  showDialog(
+                    context: context,
+                    builder:
+                        (context) => CustomAlertDialog(
+                          tilte: 'Delete',
+                          content: 'Are you sure you want to delete this URL?',
+                          onYesPressed: onYesPressed,
+                        ),
+                  );
+                }
+              },
+              itemBuilder:
+                  (context) => [
+                    PopupMenuItem(
+                      value: 'view_qr',
+                      child: Row(
+                        children: [
+                          Icon(HeroIcons.qr_code, color: blackColor, size: config.appHeight(4)),
+                          config.horizontalSpaceSmall(),
+                          Text('View QR', style: customTextStyle(fontSize: config.appHeight(2.2))),
                         ],
                       ),
                     ),
