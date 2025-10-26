@@ -142,7 +142,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
               barrierColor: transparent,
               enableDrag: false,
               builder: (_) {
-                return urlDetailsBottomSheet(qrController.qrScannedData!);
+                return defaultDetailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
               qrController.resetDialogAndScanner();
@@ -207,6 +207,29 @@ class _QRScanScreenState extends State<QRScanScreen> {
                         fit: BoxFit.cover,
                         onDetect: _handleBarcode,
                       ),
+
+                      // CustomPaint(
+                      //   painter: FadePainter(),
+                      //   child: Center(
+                      //     child:
+                      //         qc.qrScannedData != null
+                      //             ? Container(
+                      //               width: config.appWidth(60),
+                      //               child: RepaintBoundary(
+                      //                 key: qc.qrKey,
+                      //                 child: drawQrImage(qc.qrScannedData!.displayValue!),
+                      //               ),
+                      //             )
+                      //             : Container(
+                      //               decoration: BoxDecoration(
+                      //                 borderRadius: BorderRadius.circular(20),
+                      //                 border: Border.all(color: orangeColor, width: 3),
+                      //               ),
+                      //               height: size.height * 0.235,
+                      //               width: size.height * 0.235,
+                      //             ),
+                      //   ),
+                      // ),
                       Center(
                         child: Container(
                           height: config.appHeight(40),
@@ -233,7 +256,6 @@ class _QRScanScreenState extends State<QRScanScreen> {
                                   : null,
                         ),
                       ),
-
                       Positioned(
                         top: size.height * 0.01,
                         left: size.width * 0.04,
@@ -935,6 +957,50 @@ class _QRScanScreenState extends State<QRScanScreen> {
             }
           },
         );
+      },
+    );
+  }
+
+  defaultDetailsBottomSheet(ScannedCodeResultModel qrData) {
+    return scanDetailsBottomSheet<ScannedCodeResultModel, UrlActionType>(
+      model: qrData,
+      title: "Scanned QR Details",
+      actions: UrlActionType.values,
+      contentBuilder:
+          (url) => [
+            if (url.displayValue != null && url.displayValue!.isNotEmpty)
+              Text(
+                "URL: ${url.displayValue}",
+                style: customTextStyle(
+                  color: blackColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  overflow: TextOverflow.visible,
+                ),
+              ),
+          ],
+      actionBuilder: (type, assign) {
+        switch (type) {
+          case UrlActionType.open:
+            assign(HeroIcons.globe_alt, blueColor, () => urlLaunchMethod(qrData.displayValue!));
+            break;
+          case UrlActionType.copy:
+            assign(HeroIcons.clipboard_document_list, greenishColor, () {
+              copyToClipboard(context, qrData.displayValue!);
+            });
+            break;
+          case UrlActionType.share:
+            assign(HeroIcons.share, blueColor, () {
+              qrController.shareQr(qrController.qrKey, url: qrData.displayValue!);
+            });
+            break;
+          case UrlActionType.close:
+            assign(Icons.close, redColor, () {
+              Get.back();
+              qrController.resetScanner();
+            });
+            break;
+        }
       },
     );
   }
