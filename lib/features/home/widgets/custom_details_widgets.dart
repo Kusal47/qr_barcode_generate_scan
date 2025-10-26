@@ -34,6 +34,7 @@ class WifiDetailsWidget extends StatelessWidget {
             containerColor: greyColor.withOpacity(0.3),
             leadingWidget: Icon(Icons.wifi_password_outlined, color: theme.primaryColor),
             trailing: PopupMenuButton<String>(
+              
               // popUpAnimationStyle: AnimationStyle(
               //   curve: Curves.bounceIn,
               //   reverseCurve: Curves.bounceOut,
@@ -182,7 +183,7 @@ class CalenderEventDetailsWidget extends StatelessWidget {
             containerColor: greyColor.withOpacity(0.3),
             leadingWidget: Icon(Icons.event, color: theme.primaryColor),
             trailing: PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: darkGreyColor),
+              icon: Icon(Icons.more_vert, color: blackColor),
               onSelected: (value) {
                 if (value == 'view_qr') {
                   viewQrBarcodeDialog(
@@ -280,7 +281,7 @@ class GeoDetailsWidget extends StatelessWidget {
             containerColor: greyColor.withOpacity(0.3),
             leadingWidget: Icon(Icons.location_on_outlined, color: theme.primaryColor),
             trailing: PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: darkGreyColor),
+              icon: Icon(Icons.more_vert, color: blackColor),
               onSelected: (value) {
                 if (value == 'view_qr') {
                   viewQrBarcodeDialog(
@@ -360,7 +361,7 @@ class PhoneDetailsWidget extends StatelessWidget {
               ],
             ),
             trailing: PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: darkGreyColor),
+              icon: Icon(Icons.more_vert, color: blackColor),
               onSelected: (value) {
                 if (value == 'view_qr') {
                   viewQrBarcodeDialog(
@@ -448,7 +449,7 @@ class SmsDetailsWidget extends StatelessWidget {
               color: theme.primaryColor,
             ),
             trailing: PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: darkGreyColor),
+              icon: Icon(Icons.more_vert, color: blackColor),
               onSelected: (value) {
                 if (value == 'view_qr') {
                   viewQrBarcodeDialog(
@@ -552,7 +553,7 @@ class EmailDetailsWidget extends StatelessWidget {
             containerColor: greyColor.withOpacity(0.3),
             leadingWidget: Icon(Icons.email_outlined, color: theme.primaryColor),
             trailing: PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: darkGreyColor),
+              icon: Icon(Icons.more_vert, color: blackColor),
               onSelected: (value) {
                 if (value == 'view_qr') {
                   viewQrBarcodeDialog(
@@ -649,7 +650,7 @@ class ContactInfoDetailsWidget extends StatelessWidget {
               radius: config.appHeight(3),
             ),
             trailing: PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: darkGreyColor),
+              icon: Icon(Icons.more_vert, color: blackColor),
               onSelected: (value) {
                 if (value == 'view_qr') {
                   viewQrBarcodeDialog(
@@ -735,7 +736,7 @@ class UrlDetailsWidget extends StatelessWidget {
             leadingWidget: Icon(Icons.link, color: theme.primaryColor),
 
             trailing: PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: darkGreyColor),
+              icon: Icon(Icons.more_vert, color: blackColor),
               onSelected: (value) {
                 if (value == 'view_qr') {
                   viewQrBarcodeDialog(
@@ -836,7 +837,7 @@ class BarcodeDetailsWidget extends StatelessWidget {
             containerColor: greyColor.withOpacity(0.3),
             leadingWidget: Icon(FontAwesome.barcode_solid, color: theme.primaryColor),
             trailing: PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: darkGreyColor),
+              icon: Icon(Icons.more_vert, color: blackColor),
               onSelected: (value) {
                 if (value == 'view_barcode') {
                   viewQrBarcodeDialog(
