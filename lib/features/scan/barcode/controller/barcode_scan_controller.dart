@@ -41,7 +41,7 @@ class BarcodeScanController extends GetxController {
       ],
       facing: CameraFacing.back,
       detectionSpeed: DetectionSpeed.noDuplicates,
-      returnImage: true,
+      // returnImage: true,
     );
 
     startScanner(handleBarcode);
