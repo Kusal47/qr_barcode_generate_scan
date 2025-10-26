@@ -27,8 +27,9 @@ class QrScanController extends GetxController {
       formats: [BarcodeFormat.qrCode],
       facing: CameraFacing.back,
       detectionSpeed: DetectionSpeed.noDuplicates,
+      detectionTimeoutMs: 2000,
       // autoZoom: true,
-      returnImage: true,
+      // returnImage: true,
     );
 
     startScanner(handleBarcode);
@@ -42,10 +43,12 @@ class QrScanController extends GetxController {
     await startScanner(handleBarcode);
     update();
   }
- void resetDialogAndScanner() {
+
+  void resetDialogAndScanner() {
     isDialogDisplayed = false;
     resetScanner();
   }
+
   Future<ScannedCodeResultModel?> handleBarcode(BarcodeCapture barcodes) async {
     barcode = barcodes.barcodes.firstOrNull;
     if (barcode == null || barcode!.displayValue == null) {
@@ -75,64 +78,6 @@ class QrScanController extends GetxController {
       Get.find<HomeController>().loadHistory();
       stopScanner();
       return qrData;
-      // // WiFi
-      // if (qrData.wifi != null && qrData.wifi!.ssid != null && qrData.wifi!.ssid!.isNotEmpty) {
-      //   await secureStorageService.saveWifiData([qrData.wifi!]);
-      //   Get.find<HomeController>().loadHistory();
-      //   stopScanner();
-      //   return qrData;
-      // }
-      // // URL
-      // else if (qrData.url != null) {
-      //   await secureStorageService.saveUrlData([qrData.url!]);
-      //   Get.find<HomeController>().loadHistory();
-      //   stopScanner();
-      //   return qrData;
-      // }
-      // // Contact Info
-      // else if (qrData.contactInfo != null) {
-      //   await secureStorageService.saveContactInfoData([qrData.contactInfo!]);
-      //   Get.find<HomeController>().loadHistory();
-      //   stopScanner();
-      //   return qrData;
-      // }
-      // // Email
-      // else if (qrData.email != null) {
-      //   await secureStorageService.saveEmailData([qrData.email!]);
-      //   Get.find<HomeController>().loadHistory();
-      //   stopScanner();
-      //   return qrData;
-      // }
-      // // SMS
-      // else if (qrData.sms != null) {
-      //   await secureStorageService.saveSmsData([qrData.sms!]);
-      //   Get.find<HomeController>().loadHistory();
-      //   stopScanner();
-      //   return qrData;
-      // }
-      // // Phone
-      // else if (qrData.phone != null) {
-      //   await secureStorageService.savePhoneData([qrData.phone!]);
-      //   Get.find<HomeController>().loadHistory();
-      //   stopScanner();
-      //   return qrData;
-      // }
-      // // Geo
-      // else if (qrData.geo != null) {
-      //   await secureStorageService.saveGeoData([qrData.geo!]);
-      //   Get.find<HomeController>().loadHistory();
-      //   stopScanner();
-      //   return qrData;
-      // }
-      // // Calendar Event
-      // else if (qrData.calendarEvent != null) {
-      //   await secureStorageService.saveCalendarEventData([qrData.calendarEvent!]);
-      //   Get.find<HomeController>().loadHistory();
-      //   stopScanner();
-      //   return qrData;
-      // } else {
-      //   return null;
-      // }
     } catch (e) {
       return null;
     }

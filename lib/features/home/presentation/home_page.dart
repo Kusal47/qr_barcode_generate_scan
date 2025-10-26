@@ -43,7 +43,10 @@ class _HomePageState extends State<HomePage> {
                     drawer: CustomDrawerWidget(),
 
                     floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-                    floatingActionButton: Padding(
+                    floatingActionButton:
+                    // hc.showScanOptions == true
+                    //     ?
+                    Padding(
                       padding: EdgeInsets.all(config.appHorizontalPaddingLarge()),
 
                       child: Row(
@@ -53,8 +56,12 @@ class _HomePageState extends State<HomePage> {
                             child: PrimaryIconButton(
                               iconAlignment: IconAlignment.start,
                               icon: Icon(HeroIcons.qr_code, size: config.appHeight(5)),
-                              label: 'QR',
-                              onPressed: () => Get.toNamed(Routes.qrscanScreen),
+                              label: 'QRCODE',
+                              onPressed: () {
+                                Get.toNamed(Routes.qrscanScreen);
+                                hc.showScanOptions = false;
+                                setState(() {});
+                              },
                             ),
                           ),
                           config.horizontalSpaceSmall(),
@@ -62,14 +69,43 @@ class _HomePageState extends State<HomePage> {
                             child: PrimaryIconButton(
                               iconAlignment: IconAlignment.start,
                               icon: Icon(AntDesign.barcode_outline, size: config.appHeight(5)),
-                              label: 'Barcode',
-                              onPressed: () => Get.toNamed(Routes.barcodescanScreen),
+                              label: 'BARCODE',
+                              onPressed: () {
+                                Get.toNamed(Routes.barcodescanScreen);
+                                hc.showScanOptions = false;
+                                setState(() {});
+                              },
                             ),
                           ),
                         ],
                       ),
                     ),
 
+                    // : Padding(
+                    //   padding: EdgeInsets.all(config.appHorizontalPaddingLarge()),
+
+                    //   child: Container(
+                    //     decoration: BoxDecoration(
+                    //       shape: BoxShape.circle,
+                    //       color: primaryColor,
+                    //     ),
+                    //     height: config.appHeight(9),
+
+                    //     child: Center(
+                    //       child: circleAvatarMethodCustom(
+                    //         config,
+                    //         bgColor: whiteColor,
+                    //         radius: config.appHeight(4.3),
+                    //         AssetImage(UiAssets.logoWithNoBg),
+                    //         child: Image(image: AssetImage(UiAssets.qrScanGif)),
+                    //         onTap: () {
+                    //           hc.showScanOptions = true;
+                    //           setState(() {});
+                    //         },
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     body: CustomSmartRefresher(
                       controller: hc.refreshController,
                       enablePullDown: true,
@@ -95,32 +131,39 @@ class _HomePageState extends State<HomePage> {
                                 : SingleChildScrollView(
                                   child: Column(
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.all(config.appHorizontalPaddingSmall()),
-                                        child: PrimaryFormField(
-                                          readOnly: true,
-                                          onTap: () {
-                                            Get.toNamed(Routes.searchHistoryScreen);
-                                          },
-                                          onSaved: (val) {},
+                                      Visibility(
+                                        visible: hc.historyList.length > 5,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(
+                                            config.appHorizontalPaddingSmall(),
+                                          ),
+                                          child: PrimaryFormField(
+                                            readOnly: true,
+                                            onTap: () {
+                                              Get.toNamed(Routes.searchHistoryScreen);
+                                            },
+                                            onSaved: (val) {},
 
-                                          hintTxt: 'Enter search text here',
-                                          borderRadius: BorderRadius.circular(config.appHeight(10)),
-                                          suffixIcon: Padding(
-                                            padding: EdgeInsets.all(
-                                              config.appHorizontalPaddingSmall(),
+                                            hintTxt: 'Enter search text here',
+                                            borderRadius: BorderRadius.circular(
+                                              config.appHeight(10),
                                             ),
+                                            suffixIcon: Padding(
+                                              padding: EdgeInsets.all(
+                                                config.appHorizontalPaddingSmall(),
+                                              ),
 
-                                            child: prefixCircleAvatarMethodCustom(
-                                              config,
-                                              null,
-                                              radius: config.appHeight(1.1),
-                                              child: IconButton(
-                                                onPressed: () {},
-                                                icon: Icon(
-                                                  AntDesign.search_outline,
-                                                  color: whiteColor,
-                                                  size: config.appHeight(2.5),
+                                              child: prefixCircleAvatarMethodCustom(
+                                                config,
+                                                null,
+                                                radius: config.appHeight(1.1),
+                                                child: IconButton(
+                                                  onPressed: () {},
+                                                  icon: Icon(
+                                                    AntDesign.search_outline,
+                                                    color: whiteColor,
+                                                    size: config.appHeight(2.5),
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -216,7 +259,13 @@ class _HomePageState extends State<HomePage> {
                                               },
                                             );
                                           } else {
-                                            return SizedBox.shrink();
+                                            return DefaultDetailsWidget(
+                                              dataList: dataList,
+                                              onYesPressed: () {
+                                                hc.deleteQRData(url: dataList.displayValue);
+                                                Get.back();
+                                              },
+                                            );
                                           }
                                         },
                                       ),

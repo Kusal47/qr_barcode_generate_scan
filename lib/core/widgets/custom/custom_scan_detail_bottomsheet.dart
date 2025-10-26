@@ -5,7 +5,7 @@ import '../export_common_widget.dart';
 import '../export_custom_widget.dart';
 
 Widget scanDetailsBottomSheet<M, A>({
-  required M model,
+  M? model,
   required String title,
   required List<A> actions,
   required List<Widget> Function(M model) contentBuilder,
@@ -30,7 +30,7 @@ Widget scanDetailsBottomSheet<M, A>({
               config.verticalSpaceMedium(),
 
               // Build content dynamically
-              ...contentBuilder(model),
+              ...contentBuilder(model as M),
 
               config.verticalSpaceMedium(),
 

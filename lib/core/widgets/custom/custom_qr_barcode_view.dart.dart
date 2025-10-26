@@ -49,7 +49,7 @@ viewQrBarcodeDialog(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children:
-                        scannedData.url != null
+                        scannedData.url != null || scannedData.displayValue != null
                             ? List.generate(UrlActionType.values.length, (index) {
                               IconData? icon;
                               Color? color;
