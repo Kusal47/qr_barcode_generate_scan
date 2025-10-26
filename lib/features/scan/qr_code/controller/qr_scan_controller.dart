@@ -42,7 +42,10 @@ class QrScanController extends GetxController {
     await startScanner(handleBarcode);
     update();
   }
-
+ void resetDialogAndScanner() {
+    isDialogDisplayed = false;
+    resetScanner();
+  }
   Future<ScannedCodeResultModel?> handleBarcode(BarcodeCapture barcodes) async {
     barcode = barcodes.barcodes.firstOrNull;
     if (barcode == null || barcode!.displayValue == null) {
