@@ -92,7 +92,7 @@ Widget customListTileWidget(
             title,
             context,
             fontSize: titleFontSize ?? config.appHeight(2.0),
-            fontWeight: titleFontWeight ?? FontWeight.normal,
+            fontWeight: titleFontWeight ?? FontWeight.bold,
             color: titleColor ?? blackColor,
           ),
           subtitle: subtitle,
