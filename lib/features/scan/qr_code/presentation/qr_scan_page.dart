@@ -35,134 +35,117 @@ class _QRScanScreenState extends State<QRScanScreen> {
       qrController.qrScannedData = await qrController.handleBarcode(barcodes);
 
       if (qrController.qrScannedData != null) {
-        if (qrController.qrScannedData!.wifi != null) {
-          if (!qrController.isDialogDisplayed) {
-            qrController.isDialogDisplayed = true;
+        if (!qrController.isDialogDisplayed) {
+          qrController.isDialogDisplayed = true;
 
+          if (qrController.qrScannedData!.wifi != null) {
             showModalBottomSheet(
               context: context,
               isDismissible: true,
               enableDrag: false,
-              barrierColor: Colors.transparent,
+              barrierColor: transparent,
 
               builder: (_) {
                 return detailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
-              qrController.isDialogDisplayed = false;
-              qrController.resetScanner();
+              qrController.resetDialogAndScanner();
             });
-          }
-        } else if (qrController.qrScannedData!.url != null) {
-          if (!qrController.isDialogDisplayed) {
-            qrController.isDialogDisplayed = true;
+          } else if (qrController.qrScannedData!.url != null) {
             showModalBottomSheet(
               context: context,
               isDismissible: true,
-              barrierColor: Colors.transparent,
+              barrierColor: transparent,
               enableDrag: false,
               builder: (_) {
                 return urlDetailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
-              qrController.isDialogDisplayed = false;
-              qrController.resetScanner();
+              qrController.resetDialogAndScanner();
             });
-          }
-        } else if (qrController.qrScannedData!.contactInfo != null) {
-          if (!qrController.isDialogDisplayed) {
-            qrController.isDialogDisplayed = true;
+          } else if (qrController.qrScannedData!.contactInfo != null) {
             showModalBottomSheet(
               context: context,
               isDismissible: true,
-              barrierColor: Colors.transparent,
+              barrierColor: transparent,
               enableDrag: false,
               builder: (_) {
                 return contactDetailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
-              qrController.isDialogDisplayed = false;
-              qrController.resetScanner();
+              qrController.resetDialogAndScanner();
             });
-          }
-        } else if (qrController.qrScannedData!.email != null) {
-          if (!qrController.isDialogDisplayed) {
-            qrController.isDialogDisplayed = true;
+          } else if (qrController.qrScannedData!.email != null) {
             showModalBottomSheet(
               context: context,
               isDismissible: true,
-              barrierColor: Colors.transparent,
+              barrierColor: transparent,
               enableDrag: false,
               builder: (_) {
                 return emailDetailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
-              qrController.isDialogDisplayed = false;
-              qrController.resetScanner();
+              qrController.resetDialogAndScanner();
             });
-          }
-        } else if (qrController.qrScannedData!.sms != null) {
-          if (!qrController.isDialogDisplayed) {
-            qrController.isDialogDisplayed = true;
+          } else if (qrController.qrScannedData!.sms != null) {
             showModalBottomSheet(
               context: context,
               isDismissible: true,
-              barrierColor: Colors.transparent,
+              barrierColor: transparent,
               enableDrag: false,
               builder: (_) {
                 return smsDetailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
-              qrController.isDialogDisplayed = false;
-              qrController.resetScanner();
+              qrController.resetDialogAndScanner();
             });
-          }
-        } else if (qrController.qrScannedData!.phone != null) {
-          if (!qrController.isDialogDisplayed) {
-            qrController.isDialogDisplayed = true;
+          } else if (qrController.qrScannedData!.phone != null) {
             showModalBottomSheet(
               context: context,
               isDismissible: true,
-              barrierColor: Colors.transparent,
+              barrierColor: transparent,
               enableDrag: false,
               builder: (_) {
                 return phoneDetailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
-              qrController.isDialogDisplayed = false;
-              qrController.resetScanner();
+              qrController.resetDialogAndScanner();
             });
-          }
-        } else if (qrController.qrScannedData!.geo != null) {
-          if (!qrController.isDialogDisplayed) {
-            qrController.isDialogDisplayed = true;
+          } else if (qrController.qrScannedData!.geo != null) {
             showModalBottomSheet(
               context: context,
               isDismissible: true,
-              barrierColor: Colors.transparent,
+              barrierColor: transparent,
               enableDrag: false,
               builder: (_) {
                 return geotDetailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
-              qrController.isDialogDisplayed = false;
-              qrController.resetScanner();
+              qrController.resetDialogAndScanner();
             });
-          }
-        } else if (qrController.qrScannedData!.calendarEvent != null) {
-          if (!qrController.isDialogDisplayed) {
-            qrController.isDialogDisplayed = true;
+          } else if (qrController.qrScannedData!.calendarEvent != null) {
             showModalBottomSheet(
               context: context,
               isDismissible: true,
-              barrierColor: Colors.transparent,
+              barrierColor: transparent,
               enableDrag: false,
               builder: (_) {
                 return calenderEventsDetailsBottomSheet(qrController.qrScannedData!);
               },
             ).then((_) {
-              qrController.isDialogDisplayed = false;
-              qrController.resetScanner();
+              qrController.resetDialogAndScanner();
+            });
+          } else {
+            showModalBottomSheet(
+              context: context,
+              isDismissible: true,
+              barrierColor: transparent,
+              enableDrag: false,
+              builder: (_) {
+                return urlDetailsBottomSheet(qrController.qrScannedData!);
+              },
+            ).then((_) {
+              qrController.resetDialogAndScanner();
             });
           }
         }
@@ -170,8 +153,16 @@ class _QRScanScreenState extends State<QRScanScreen> {
         qrController.isSnackbarActive = true;
         ScaffoldMessenger.of(context)
             .showSnackBar(
-              const SnackBar(
-                content: Text('Invalid QR data!', style: TextStyle(color: whiteColor)),
+              SnackBar(
+                content: Text(
+                  'Invalid QR data!',
+                  style: customTextStyle(
+                    color: whiteColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
                 backgroundColor: redColor,
               ),
             )

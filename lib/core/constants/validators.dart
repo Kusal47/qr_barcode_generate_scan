@@ -83,26 +83,62 @@ class Validators {
     return null;
   }
 
+  // static String? checkUrlField(String? fieldContent) {
+  //   if (fieldContent == null || fieldContent.trim().isEmpty) {
+  //     return 'This field is required';
+  //   }
+
+  //   final trimmed = fieldContent.trim();
+
+  //   final urlRegex = RegExp(
+  //     r'^(https?:\/\/)?' // optional http/https
+  //     r'([a-zA-Z0-9-]+\.)+' // subdomains
+  //     r'([a-zA-Z]{2,})' // TLD
+  //     r'(\/[^\s]*)?$', // optional path
+  //   );
+
+  //   if (!urlRegex.hasMatch(trimmed)) {
+  //     return 'Invalid URL address';
+  //   }
+
+  //   return null;
+  // }
   static String? checkUrlField(String? fieldContent) {
-    if (fieldContent == null || fieldContent.trim().isEmpty) {
-      return 'This field is required';
-    }
-
-    final trimmed = fieldContent.trim();
-
-    final urlRegex = RegExp(
-      r'^(https?:\/\/)?' // optional http/https
-      r'([a-zA-Z0-9-]+\.)+' // subdomains
-      r'([a-zA-Z]{2,})' // TLD
-      r'(\/[^\s]*)?$', // optional path
-    );
-
-    if (!urlRegex.hasMatch(trimmed)) {
-      return 'Invalid URL address';
-    }
-
-    return null;
+  if (fieldContent == null || fieldContent.trim().isEmpty) {
+    return 'This field is required';
   }
+
+  final trimmed = fieldContent.trim();
+
+  try {
+    final uri = Uri.parse(trimmed);
+
+    // Check valid scheme and host
+    if (!uri.hasScheme) return 'Invalid URL address';
+
+    final allowedSchemes = ['http', 'https', 'otpauth'];
+
+    if (!allowedSchemes.contains(uri.scheme)) {
+      return 'Invalid URL scheme';
+    }
+
+    // For http/https, host must not be empty
+    if ((uri.scheme == 'http' || uri.scheme == 'https') && uri.host.isEmpty) {
+      return 'Invalid web URL';
+    }
+
+    // For otpauth, path and query are expected
+    if (uri.scheme == 'otpauth' && (uri.path.isEmpty || uri.query.isEmpty)) {
+      return 'Invalid otpauth URL';
+    }
+
+  } catch (_) {
+    return 'Invalid URL address';
+  }
+
+  return null;
+}
+
 
   // ================= Barcode Validations ================= //
 
