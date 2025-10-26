@@ -21,6 +21,7 @@ class HomeController extends GetxController {
   List<ScannedCodeResultModel> searchedList = [];
   final searchController = TextEditingController();
   final searchFocusNode = FocusNode();
+  bool showScanOptions = false;
 
   @override
   void onInit() {
