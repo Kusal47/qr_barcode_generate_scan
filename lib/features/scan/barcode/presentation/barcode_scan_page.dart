@@ -39,7 +39,7 @@ class _BarcodeScanScreenState extends State<BarcodeScanScreen> {
             showModalBottomSheet(
               context: context,
               isDismissible: true,
-              barrierColor: Colors.transparent,
+              barrierColor: transparent,
               enableDrag: false,
               builder: (_) {
                 return detailsBottomSheet(barcodeController.barcodeScannedData!);
