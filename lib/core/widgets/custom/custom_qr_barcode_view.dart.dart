@@ -49,52 +49,7 @@ viewQrBarcodeDialog(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children:
-                        scannedData.url != null || scannedData.displayValue != null
-                            ? List.generate(UrlActionType.values.length, (index) {
-                              IconData? icon;
-                              Color? color;
-                              Function() onTap;
-                              switch (UrlActionType.values[index]) {
-                                case UrlActionType.open:
-                                  icon = HeroIcons.globe_alt;
-                                  color = blueColor;
-                                  onTap = () async {
-                                    urlLaunchMethod(scannedData.url!.url!);
-                                  };
-                                  break;
-                                case UrlActionType.copy:
-                                  icon = HeroIcons.clipboard_document_list;
-                                  color = greenishColor;
-
-                                  onTap = () {
-                                    copyToClipboard(context, scannedData.url!.url!);
-                                  };
-
-                                  break;
-                                case UrlActionType.share:
-                                  icon = HeroIcons.share;
-                                  color = blueColor;
-                                  onTap = () async {
-                                    hc.shareQr(hc.qrKey, text: scannedData.url!.url);
-                                  };
-                                  break;
-                                case UrlActionType.close:
-                                  icon = Icons.close;
-                                  color = redColor;
-                                  onTap = () {
-                                    Get.back();
-                                  };
-                                  break;
-                              }
-                              return circleAvatarMethodCustom(
-                                config,
-                                null,
-                                onTap: onTap,
-                                child: Icon(icon, color: color, size: config.appHeight(3)),
-                                radius: config.appHeight(3),
-                              );
-                            })
-                            : scannedData.wifi != null
+                        scannedData.wifi != null
                             ? List.generate(ActionType.values.length, (index) {
                               IconData? icon;
                               Color? color;
@@ -565,6 +520,51 @@ viewQrBarcodeDialog(
                                   break;
                               }
 
+                              return circleAvatarMethodCustom(
+                                config,
+                                null,
+                                onTap: onTap,
+                                child: Icon(icon, color: color, size: config.appHeight(3)),
+                                radius: config.appHeight(3),
+                              );
+                            })
+                            : scannedData.url != null || scannedData.displayValue != null
+                            ? List.generate(UrlActionType.values.length, (index) {
+                              IconData? icon;
+                              Color? color;
+                              Function() onTap;
+                              switch (UrlActionType.values[index]) {
+                                case UrlActionType.open:
+                                  icon = HeroIcons.globe_alt;
+                                  color = blueColor;
+                                  onTap = () async {
+                                    urlLaunchMethod(scannedData.url!.url!);
+                                  };
+                                  break;
+                                case UrlActionType.copy:
+                                  icon = HeroIcons.clipboard_document_list;
+                                  color = greenishColor;
+
+                                  onTap = () {
+                                    copyToClipboard(context, scannedData.url!.url!);
+                                  };
+
+                                  break;
+                                case UrlActionType.share:
+                                  icon = HeroIcons.share;
+                                  color = blueColor;
+                                  onTap = () async {
+                                    hc.shareQr(hc.qrKey, text: scannedData.url!.url);
+                                  };
+                                  break;
+                                case UrlActionType.close:
+                                  icon = Icons.close;
+                                  color = redColor;
+                                  onTap = () {
+                                    Get.back();
+                                  };
+                                  break;
+                              }
                               return circleAvatarMethodCustom(
                                 config,
                                 null,

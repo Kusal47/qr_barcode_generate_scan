@@ -13,7 +13,7 @@ class SplashController extends GetxController {
   }
 
   onboardDisplay() async {
-    Future.delayed(const Duration(seconds: 6), () async {
+    Future.delayed(const Duration(seconds: 1), () async {
       bool? showOnboard = await onboardScreenCheck();
       if (showOnboard == true) {
         Get.offAllNamed(Routes.onboardScreen);
