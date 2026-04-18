@@ -46,3 +46,7 @@ app.*.map.json
 
 # Environment Variable
 .*env
+
+# Signing files
+key.properties
+*.jks
