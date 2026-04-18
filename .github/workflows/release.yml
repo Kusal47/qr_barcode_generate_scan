@@ -115,7 +115,7 @@ jobs:
           path: build/app/outputs/bundle/release/app-release.aab
 
       # =========================
-      # 🔢 AUTO VERSIONING
+      # AUTO VERSIONING
       # =========================
       - name: Get next version
         id: version
