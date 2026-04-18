@@ -23,7 +23,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.0' # Matches pubspec sdk ^3.7.2 range mostly, but let's use a stable latest
+          flutter-version: '3.41.7'
           channel: 'stable'
           
       - name: Install dependencies
@@ -53,7 +53,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.0'
+          flutter-version: '3.41.7'
           channel: 'stable'
           
       - name: Install dependencies
