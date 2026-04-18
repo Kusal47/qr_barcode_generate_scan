@@ -7,137 +7,160 @@ import 'colors.dart';
 class AppThemes {
   static final Color _lightFocusColor = Colors.black.withOpacity(0.12);
   static final Color _darkFocusColor = Colors.white.withOpacity(0.12);
-static ThemeData lightThemeData = themeData(lightColorScheme, _lightFocusColor, Brightness.light);
-static ThemeData darkThemeData = themeData(darkColorScheme, _darkFocusColor, Brightness.dark);
+  static ThemeData lightThemeData = themeData(
+    lightColorScheme,
+    _lightFocusColor,
+    Brightness.light,
+  );
+  static ThemeData darkThemeData = themeData(
+    darkColorScheme,
+    _darkFocusColor,
+    Brightness.dark,
+  );
 
-static ThemeData themeData(ColorScheme colorScheme, Color focusColor, Brightness brightness) {
-  final isDark = brightness == Brightness.dark;
+  static ThemeData themeData(
+    ColorScheme colorScheme,
+    Color focusColor,
+    Brightness brightness,
+  ) {
+    final isDark = brightness == Brightness.dark;
 
-  return ThemeData(
-    useMaterial3: true,
-    brightness: brightness,
-    colorScheme: colorScheme,
+    return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      colorScheme: colorScheme,
 
-    // ---- COLORS ----
-    primaryColor: colorScheme.primary,
-    primaryColorLight: isDark ? Colors.grey.shade800 : Colors.blue.shade100,
-    primaryColorDark: isDark ? Colors.black : Colors.blueGrey,
-    scaffoldBackgroundColor: colorScheme.background,
-    canvasColor: colorScheme.background,
-    cardColor: colorScheme.surface,
-    dividerColor: Colors.grey,
-    focusColor: focusColor,
-    splashColor: colorScheme.primary.withOpacity(0.12),
-    highlightColor: Colors.transparent,
+      // ---- COLORS ----
+      primaryColor: colorScheme.primary,
+      primaryColorLight: isDark ? Colors.grey.shade800 : Colors.blue.shade100,
+      primaryColorDark: isDark ? Colors.black : Colors.blueGrey,
+      scaffoldBackgroundColor: colorScheme.background,
+      canvasColor: colorScheme.background,
+      cardColor: colorScheme.surface,
+      dividerColor: Colors.grey,
+      focusColor: focusColor,
+      splashColor: colorScheme.primary.withOpacity(0.12),
+      highlightColor: Colors.transparent,
 
-    // ---- APP BAR ----
-    appBarTheme: AppBarTheme(
-      backgroundColor: colorScheme.primary,
-      foregroundColor: colorScheme.onPrimary,
-      elevation: 0,
-      systemOverlayStyle: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
-    ),
-
-    // ---- ICONS ----
-    iconTheme: IconThemeData(color: colorScheme.onBackground),
-    primaryIconTheme: IconThemeData(color: colorScheme.onPrimary),
-
-    // ---- TEXT ----
-    fontFamily: GoogleFonts.ptSans().fontFamily,
-    textTheme: textTheme.apply(
-      bodyColor: colorScheme.onBackground,
-      displayColor: colorScheme.onBackground,
-    ),
-    primaryTextTheme: textTheme.apply(
-      bodyColor: colorScheme.onPrimary,
-      displayColor: colorScheme.onPrimary,
-    ),
-
-    // ---- BUTTONS ----
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
+      // ---- APP BAR ----
+      appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
+        elevation: 0,
+        systemOverlayStyle:
+            isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: colorScheme.primary,
-        side: BorderSide(color: colorScheme.primary),
-      ),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(foregroundColor: colorScheme.secondary),
-    ),
 
-    // ---- INPUTS ----
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: colorScheme.surface,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-    ),
+      // ---- ICONS ----
+      iconTheme: IconThemeData(color: colorScheme.onBackground),
+      primaryIconTheme: IconThemeData(color: colorScheme.onPrimary),
 
-    // ---- CARDS & DIALOGS ----
-    cardTheme: CardTheme(
-      color: colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ),
-    dialogTheme: DialogTheme(
-      backgroundColor: colorScheme.surface,
-      titleTextStyle: TextStyle(
-        color: colorScheme.onSurface,
-        fontWeight: FontWeight.bold,
-        fontSize: 18,
+      // ---- TEXT ----
+      fontFamily: GoogleFonts.ptSans().fontFamily,
+      textTheme: textTheme.apply(
+        bodyColor: colorScheme.onBackground,
+        displayColor: colorScheme.onBackground,
       ),
-      contentTextStyle: TextStyle(color: colorScheme.onSurface),
-    ),
+      primaryTextTheme: textTheme.apply(
+        bodyColor: colorScheme.onPrimary,
+        displayColor: colorScheme.onPrimary,
+      ),
 
-    // ---- SWITCH / SLIDER / RADIO / CHECKBOX ----
-    switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.all(colorScheme.primary),
-      trackColor: MaterialStateProperty.all(colorScheme.primary.withOpacity(0.4)),
-    ),
-    sliderTheme: SliderThemeData(
-      activeTrackColor: colorScheme.primary,
-      thumbColor: colorScheme.primary,
-    ),
-    checkboxTheme: CheckboxThemeData(
-      fillColor: MaterialStateProperty.resolveWith(
-        (states) => states.contains(MaterialState.selected)
-            ? colorScheme.primary
-            : Colors.grey,
+      // ---- BUTTONS ----
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+        ),
       ),
-    ),
-    radioTheme: RadioThemeData(
-      fillColor: MaterialStateProperty.resolveWith(
-        (states) => states.contains(MaterialState.selected)
-            ? colorScheme.primary
-            : Colors.grey,
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          side: BorderSide(color: colorScheme.primary),
+        ),
       ),
-    ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: colorScheme.secondary),
+      ),
 
-    // ---- MISC ----
-    progressIndicatorTheme: ProgressIndicatorThemeData(color: colorScheme.primary),
-    snackBarTheme: SnackBarThemeData(
-      backgroundColor: colorScheme.surface,
-      contentTextStyle: TextStyle(color: colorScheme.onSurface),
-      actionTextColor: colorScheme.secondary,
-    ),
-    tooltipTheme: TooltipThemeData(
-      decoration: BoxDecoration(
+      // ---- INPUTS ----
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: colorScheme.surface,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+
+      // ---- CARDS & DIALOGS ----
+      cardTheme: CardThemeData(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      textStyle: TextStyle(color: colorScheme.onSurface),
-    ),
-  );
-}
+      dialogTheme: DialogThemeData(
+        backgroundColor: colorScheme.surface,
+        titleTextStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+        contentTextStyle: TextStyle(color: colorScheme.onSurface),
+      ),
+
+      // ---- SWITCH / SLIDER / RADIO / CHECKBOX ----
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.all(colorScheme.primary),
+        trackColor: MaterialStateProperty.all(
+          colorScheme.primary.withOpacity(0.4),
+        ),
+      ),
+      sliderTheme: SliderThemeData(
+        activeTrackColor: colorScheme.primary,
+        thumbColor: colorScheme.primary,
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: MaterialStateProperty.resolveWith(
+          (states) =>
+              states.contains(MaterialState.selected)
+                  ? colorScheme.primary
+                  : Colors.grey,
+        ),
+      ),
+      radioTheme: RadioThemeData(
+        fillColor: MaterialStateProperty.resolveWith(
+          (states) =>
+              states.contains(MaterialState.selected)
+                  ? colorScheme.primary
+                  : Colors.grey,
+        ),
+      ),
+
+      // ---- MISC ----
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: colorScheme.primary,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: colorScheme.surface,
+        contentTextStyle: TextStyle(color: colorScheme.onSurface),
+        actionTextColor: colorScheme.secondary,
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        textStyle: TextStyle(color: colorScheme.onSurface),
+      ),
+    );
+  }
 
   static const textTheme = TextTheme(
     titleLarge: TextStyle(fontSize: 15.0, color: Colors.black, height: 1.3),
     titleMedium: TextStyle(fontSize: 16.0, color: Colors.black, height: 1.3),
-    titleSmall:
-        TextStyle(fontSize: 17.0, fontWeight: FontWeight.w500, color: Colors.black, height: 1.3),
+    titleSmall: TextStyle(
+      fontSize: 17.0,
+      fontWeight: FontWeight.w500,
+      color: Colors.black,
+      height: 1.3,
+    ),
   );
 
   static const ColorScheme lightColorScheme = ColorScheme(
@@ -167,5 +190,4 @@ static ThemeData themeData(ColorScheme colorScheme, Color focusColor, Brightness
     onSurface: Colors.white,
     brightness: Brightness.dark,
   );
-
 }
